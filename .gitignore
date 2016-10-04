@@ -4,8 +4,13 @@
 *.iml
 *.iws
 /.idea
+
+#	IntelliJ Ignores
+
 /install-intellij-libs.bat
+!plugin/plugin.iml
 
 #	Target Ignores
 
 /target
+/out
