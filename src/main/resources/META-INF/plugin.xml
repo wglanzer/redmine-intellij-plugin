@@ -1,0 +1,28 @@
+<idea-plugin version="2">
+    <id>redmine-plugin</id>
+    <name>Redmine Integration</name>
+    <version>1.0</version>
+    <vendor email="wernerglanzer@googlemail.com">Werner Glanzer</vendor>
+
+    <description><![CDATA[
+      <p>
+      This plugin integrates the "Redmine" ticket system into IntelliJ IDEA. </br>
+      </p>
+   ]]></description>
+    <change-notes><![CDATA[
+
+    ]]></change-notes>
+
+    <idea-version since-build="162"/>
+
+    <project-components>
+        <component>
+            <implementation-class>com.github.wglanzer.redmine.RComponent</implementation-class>
+        </component>
+    </project-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable groupId="tools" groupWeight="200" dynamic="true" displayName="Redmine Integration" id="preferences.RedminePlugin" instance="com.github.wglanzer.redmine.RConfigurable"/>
+    </extensions>
+
+</idea-plugin>
