@@ -1,0 +1,11 @@
+#	Allgemeine Ignores
+
+*.ipr
+*.iml
+*.iws
+/.idea
+/install-intellij-libs.bat
+
+#	Target Ignores
+
+/target
