@@ -3,6 +3,7 @@ package com.github.wglanzer.redmine.config;
 import com.github.wglanzer.redmine.RApplicationComponent;
 import com.github.wglanzer.redmine.RManager;
 import com.github.wglanzer.redmine.config.gui.RAppSettingsComponent;
+import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import org.jetbrains.annotations.Nls;
@@ -16,18 +17,18 @@ import javax.swing.*;
  *
  * @author w.glanzer, 04.10.2016.
  */
-
 public class RAppSettingsConfigurable implements SearchableConfigurable
 {
 
   private RAppSettingsComponent myComp;
+  private RAppSettingsModel myCompModel;
 
   @Override
   public void apply() throws ConfigurationException
   {
     if(myComp != null)
     {
-      myComp.applyTo((RMutableSettings) RAppSettings.getSettings());
+      myCompModel.applyTo((RMutableSettings) RAppSettings.getSettings());
       RManager.getInstance().reloadConfiguration();
     }
   }
@@ -35,21 +36,25 @@ public class RAppSettingsConfigurable implements SearchableConfigurable
   @Override
   public void reset()
   {
-//    ((RMutableSettings) RAppSettings.getSettings()).resetToDefault();
+    if(myCompModel != null)
+      myCompModel.resetTo(RAppSettings.getSettings());
   }
 
   @Override
   public boolean isModified()
   {
-    return myComp != null && myComp.isModified();
+    return myCompModel != null && myCompModel.isModified();
   }
 
   @Nullable
   @Override
   public JComponent createComponent()
   {
-    if(myComp == null)
-      myComp = new RAppSettingsComponent(RAppSettings.getSettings());
+    if(myComp == null || myCompModel == null)
+    {
+      myCompModel = new RAppSettingsModel(RAppSettings.getSettings());
+      myComp = new RAppSettingsComponent(myCompModel);
+    }
     return myComp;
   }
 

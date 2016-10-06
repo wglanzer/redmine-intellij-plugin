@@ -1,14 +1,11 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.ISettings;
-import com.github.wglanzer.redmine.config.RMutableSettings;
+import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
 import com.intellij.ui.ToolbarDecorator;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Visualization for Redmine configuration
@@ -18,34 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RAppSettingsComponent extends JPanel
 {
 
-  private final ISettings currentSettings;
+  private RAppSettingsModel model;
 
-  private AtomicBoolean modified = new AtomicBoolean(false);
-
-  public RAppSettingsComponent(ISettings pCurrentSettings)
+  public RAppSettingsComponent(RAppSettingsModel pModel)
   {
-    currentSettings = pCurrentSettings;
+    model = pModel;
     _initComponents();
-  }
-
-  /**
-   * Applies this visualization to an settings instance
-   *
-   * @param pSettings  instance
-   */
-  public void applyTo(RMutableSettings pSettings)
-  {
-    pSettings.setExample(UUID.randomUUID().toString());
-  }
-
-  /**
-   * Returns the modified state of the configuration
-   *
-   * @return <tt>true</tt>, if the configuration was modified
-   */
-  public boolean isModified()
-  {
-    return modified.get();
   }
 
   /**
@@ -118,7 +93,7 @@ public class RAppSettingsComponent extends JPanel
   @NotNull
   private SourcesList _createSourceList()
   {
-    return new SourcesList();
+    return new SourcesList(model);
   }
 
   /**
@@ -129,7 +104,7 @@ public class RAppSettingsComponent extends JPanel
   @NotNull
   private WatchesList _createWatchList()
   {
-    return new WatchesList();
+    return new WatchesList(model);
   }
 
   /**
