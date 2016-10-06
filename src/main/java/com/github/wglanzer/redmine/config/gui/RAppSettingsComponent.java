@@ -1,10 +1,8 @@
-package com.github.wglanzer.redmine.config;
+package com.github.wglanzer.redmine.config.gui;
 
-import com.intellij.ui.AnActionButton;
-import com.intellij.ui.AnActionButtonRunnable;
-import com.intellij.ui.CollectionListModel;
+import com.github.wglanzer.redmine.config.ISettings;
+import com.github.wglanzer.redmine.config.RMutableSettings;
 import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -17,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author w.glanzer, 04.10.2016.
  */
-class RAppSettingsComponent extends JPanel
+public class RAppSettingsComponent extends JPanel
 {
 
   private final ISettings currentSettings;
@@ -75,9 +73,10 @@ class RAppSettingsComponent extends JPanel
     gbc.weightx = 10;
     gbc.weighty = 100;
     gbc.insets = new Insets(0, 0, 0, inset);
-    add(ToolbarDecorator.createDecorator(_createSourceList())
-        .setAddAction(new _AddSourceAction())
-        .setRemoveAction(new _RemoveSourceAction())
+    SourcesList sourceList = _createSourceList();
+    add(ToolbarDecorator.createDecorator(sourceList)
+        .setAddAction(sourceList)
+        .setRemoveAction(sourceList)
         .disableUpAction()
         .disableDownAction()
         .setAsUsualTopToolbar()
@@ -91,9 +90,10 @@ class RAppSettingsComponent extends JPanel
     gbc.weightx = 90;
     gbc.weighty = 60;
     gbc.insets = new Insets(0, 0, inset, 0);
-    add(ToolbarDecorator.createDecorator(_createWatchList())
-        .setAddAction(new _AddWatchAction())
-        .setRemoveAction(new _RemoveWatchAction())
+    WatchesList watchesList = _createWatchList();
+    add(ToolbarDecorator.createDecorator(watchesList)
+        .setAddAction(watchesList)
+        .setRemoveAction(watchesList)
         .disableUpAction()
         .disableDownAction()
         .setAsUsualTopToolbar()
@@ -116,9 +116,9 @@ class RAppSettingsComponent extends JPanel
    * @return JList, not <tt>null</tt>
    */
   @NotNull
-  private JList _createSourceList()
+  private SourcesList _createSourceList()
   {
-    return new JBList(new CollectionListModel<>("meinElement1", "meinElement2", "meinElement3"));
+    return new SourcesList();
   }
 
   /**
@@ -127,9 +127,9 @@ class RAppSettingsComponent extends JPanel
    * @return JList, not <tt>null</tt>
    */
   @NotNull
-  private JList _createWatchList()
+  private WatchesList _createWatchList()
   {
-    return new JBList(new CollectionListModel<>("meineWatch1", "meineWatch2", "meineWatch3"));
+    return new WatchesList();
   }
 
   /**
@@ -146,55 +146,4 @@ class RAppSettingsComponent extends JPanel
     return panel;
   }
 
-  /**
-   * Implementates an action which is called when the "remove" button
-   * from the sources list was pressed
-   */
-  private static class _RemoveSourceAction implements AnActionButtonRunnable
-  {
-    @Override
-    public void run(AnActionButton pAnActionButton)
-    {
-
-    }
-  }
-
-  /**
-   * Implementates an action which is called when the "add" button
-   * from the sources list was pressed
-   */
-  private static class _AddSourceAction implements AnActionButtonRunnable
-  {
-    @Override
-    public void run(AnActionButton pAnActionButton)
-    {
-
-    }
-  }
-
-  /**
-   * Implementates an action which is called when the "remove" button
-   * from the watches list was pressed
-   */
-  private static class _RemoveWatchAction implements AnActionButtonRunnable
-  {
-    @Override
-    public void run(AnActionButton pAnActionButton)
-    {
-
-    }
-  }
-
-  /**
-   * Implementates an action which is called when the "add" button
-   * from the watches list was pressed
-   */
-  private static class _AddWatchAction implements AnActionButtonRunnable
-  {
-    @Override
-    public void run(AnActionButton pAnActionButton)
-    {
-
-    }
-  }
 }

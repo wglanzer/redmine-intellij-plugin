@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.config;
 
 import com.github.wglanzer.redmine.RApplicationComponent;
 import com.github.wglanzer.redmine.RManager;
+import com.github.wglanzer.redmine.config.gui.RAppSettingsComponent;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import org.jetbrains.annotations.Nls;

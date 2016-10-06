@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author w.glanzer, 04.10.2016.
  */
-class RMutableSettings implements ISettings, Serializable
+public class RMutableSettings implements ISettings, Serializable
 {
 
   private String example;
