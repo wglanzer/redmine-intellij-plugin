@@ -50,8 +50,8 @@ public class RAppSettingsComponent extends JPanel
     gbc.insets = new Insets(0, 0, 0, inset);
     SourcesList sourceList = _createSourceList();
     add(ToolbarDecorator.createDecorator(sourceList)
-        .setAddAction(sourceList)
-        .setRemoveAction(sourceList)
+        .setAddAction(sourceList::onAddClick)
+        .setRemoveAction(sourceList::onRemoveClick)
         .disableUpAction()
         .disableDownAction()
         .setAsUsualTopToolbar()
@@ -116,8 +116,8 @@ public class RAppSettingsComponent extends JPanel
   private JPanel _createOptionsPanel()
   {
     JPanel panel = new JPanel();
-    panel.setOpaque(true);
-    panel.setBackground(Color.RED);
+    panel.setLayout(new BorderLayout());
+    panel.add(new JLabel("[OPTIONS]", SwingConstants.CENTER), BorderLayout.CENTER);
     return panel;
   }
 
