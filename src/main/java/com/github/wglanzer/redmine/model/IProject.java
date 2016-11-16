@@ -21,4 +21,40 @@ public interface IProject
   @NotNull
   Map<String, ITicket> getTickets();
 
+  /**
+   * Adds an IProjectListener to this project
+   *
+   * @param pListener  Listener to add
+   */
+  void addProjectListener(@NotNull IProjectListener pListener);
+
+  /**
+   * Removes an IProjectListener from this project
+   *
+   * @param pListener  Listener to remove
+   */
+  void removeProjectListener(@NotNull IProjectListener pListener);
+
+  /**
+   * Listens on one IProject
+   *
+   * @see IProject
+   */
+  interface IProjectListener
+  {
+    /**
+     * Fires, if one ticket was added
+     *
+     * @param pTicketAdded Ticket, which was added
+     */
+    void ticketAdded(@NotNull ITicket pTicketAdded);
+
+    /**
+     * Fires, if a ticket was removed
+     *
+     * @param pTicketRemoved Ticket, which was removed
+     */
+    void ticketRemoved(@NotNull ITicket pTicketRemoved);
+  }
+
 }

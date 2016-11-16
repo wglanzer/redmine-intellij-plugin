@@ -17,12 +17,19 @@ public class RManager
     return _INSTANCE;
   }
 
+  private final RServerManager serverManager;
+
+  public RManager()
+  {
+    serverManager = new RServerManager();
+  }
+
   /**
    * The Redmine-Manager should be started now
    */
   public void startup()
   {
-    //todo
+    serverManager.connect();
   }
 
   /**
@@ -30,7 +37,7 @@ public class RManager
    */
   public void reloadConfiguration()
   {
-    //todo
+    serverManager.reloadConfiguration();
   }
 
   /**
@@ -38,7 +45,7 @@ public class RManager
    */
   public void shutdown()
   {
-    //todo
+    serverManager.shutdown();
   }
 
 }
