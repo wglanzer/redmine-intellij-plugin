@@ -98,7 +98,7 @@ class PollingProject implements IProject
    */
   protected void updateProperties(String pName, String pDescription, String pCreatedOn, String pUpdatedOn, boolean pFireChanges)
   {
-    if(!valid)
+    if(!valid && pFireChanges)
       throw new RuntimeException("updated invalid project (projectID: " + id + ")");
 
     valid = false;
