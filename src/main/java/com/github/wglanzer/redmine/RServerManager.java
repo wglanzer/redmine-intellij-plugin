@@ -21,10 +21,12 @@ public class RServerManager
 {
 
   private final List<IServer> availableServers = new ArrayList<>();
+  private final IRLoggingFacade loggingFacade;
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public RServerManager()
+  public RServerManager(IRLoggingFacade pLoggingFacade)
   {
+    loggingFacade = pLoggingFacade;
     reloadConfiguration();
   }
 
@@ -97,7 +99,7 @@ public class RServerManager
    */
   private IServer _toServer(ISource pSource)
   {
-    return new PollingServer(pSource);
+    return new PollingServer(pSource, loggingFacade);
   }
 
 }

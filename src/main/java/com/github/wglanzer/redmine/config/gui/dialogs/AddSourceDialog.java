@@ -156,7 +156,7 @@ public class AddSourceDialog extends JDialog
     gbc.fill = GridBagConstraints.HORIZONTAL;
     contentPane.add(pollIntervall, gbc);
     final JLabel label3 = new JLabel();
-    label3.setText("Poll-Interval:");
+    label3.setText("Interval (sec):");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 2;

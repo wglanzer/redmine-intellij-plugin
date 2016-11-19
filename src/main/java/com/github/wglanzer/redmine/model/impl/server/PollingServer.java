@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
+import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
@@ -25,10 +26,10 @@ public class PollingServer implements IServer
   private final IRRestConnection connection;
   private final PollingProjectDirectory directory;
 
-  public PollingServer(ISource pSource)
+  public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
   {
     source = pSource;
-    connection = new RRestConnection(source.getURL(), source.getAPIKey(), null); // TODO: Handle exception
+    connection = new RRestConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
     directory = new PollingProjectDirectory();
   }
 

@@ -1,7 +1,9 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
+import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -12,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -25,15 +26,15 @@ public class RRestConnection implements IRRestConnection
 {
   private String url;
   private String apiKey;
-  private Consumer<Exception> exceptionConsumer;
+  private IRLoggingFacade loggingFacade;
 
   private AtomicReference<Exception> wasError = new AtomicReference<>(null);
 
-  public RRestConnection(String pUrl, String pAPIKey, @Nullable Consumer<Exception> pExceptionConsumer)
+  public RRestConnection(String pUrl, String pAPIKey, @Nullable IRLoggingFacade pLoggingFacade)
   {
     url = pUrl;
     apiKey = pAPIKey;
-    exceptionConsumer = pExceptionConsumer;
+    loggingFacade = pLoggingFacade;
   }
 
   @Override
@@ -54,7 +55,7 @@ public class RRestConnection implements IRRestConnection
   @Override
   public boolean isValid()
   {
-    return exceptionConsumer == null || wasError.get() == null;
+    return loggingFacade == null || wasError.get() == null;
   }
 
   /**
@@ -78,6 +79,9 @@ public class RRestConnection implements IRRestConnection
     // http://myredmineserver.de/issues.json?key=myapikey
     urlBuilder.append("?key=").append(apiKey);
 
+    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
+      loggingFacade.log(getClass().getName() + ": GET -> " + urlBuilder.toString(), true);
+
     try
     {
       HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
@@ -97,8 +101,8 @@ public class RRestConnection implements IRRestConnection
    */
   private void _dispatchError(Exception pEx)
   {
-    if(exceptionConsumer != null)
-      exceptionConsumer.accept(pEx);
+    if(loggingFacade != null)
+      loggingFacade.log(pEx, false);
     else
       wasError.set(pEx);
   }
