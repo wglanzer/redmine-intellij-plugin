@@ -61,6 +61,12 @@ public class RMutableSettings implements ISettings, Serializable
     {
       return "dd76c1ab88e4b3ba1e7a53228818a852eecde987";
     }
+
+    @Override
+    public int getPollInterval()
+    {
+      return 5;
+    }
   }
 
 }

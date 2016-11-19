@@ -19,16 +19,15 @@ import java.util.stream.Collectors;
  */
 public class PollingServer implements IServer
 {
+  public static final int DEFAULT_POLLINTERVAL = 300;
 
   private final ISource source;
-  private final int pollingInterval;
   private final IRRestConnection connection;
   private final PollingProjectDirectory directory;
 
-  public PollingServer(ISource pSource, int pPollingInterval)
+  public PollingServer(ISource pSource)
   {
     source = pSource;
-    pollingInterval = pPollingInterval;
     connection = new RRestConnection(source.getURL(), source.getAPIKey(), null); // TODO: Handle exception
     directory = new PollingProjectDirectory();
   }

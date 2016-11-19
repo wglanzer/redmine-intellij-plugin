@@ -29,4 +29,11 @@ public interface ISource
   @NotNull
   String getAPIKey();
 
+  /**
+   * Returns the polling interval in seconds
+   *
+   * @return polling interval in seconds
+   */
+  int getPollInterval();
+
 }

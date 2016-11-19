@@ -97,7 +97,7 @@ public class RServerManager
    */
   private IServer _toServer(ISource pSource)
   {
-    return new PollingServer(pSource, 1000); //todo
+    return new PollingServer(pSource);
   }
 
 }

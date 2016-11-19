@@ -1,11 +1,12 @@
 package com.github.wglanzer.redmine.config.gui.dialogs;
 
+import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import com.google.common.base.Strings;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Dialog to enter redmine url and api key
@@ -19,6 +20,7 @@ public class AddSourceDialog extends JDialog
   private JButton buttonCancel;
   private JTextField urlField;
   private JTextField apiKeyField;
+  private JSpinner pollIntervall;
 
   public AddSourceDialog()
   {
@@ -42,6 +44,9 @@ public class AddSourceDialog extends JDialog
 
     // call onCancel() on ESCAPE
     contentPane.registerKeyboardAction(e -> dispose(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+    // Default-pollintervall = 5min
+    pollIntervall.setValue(PollingServer.DEFAULT_POLLINTERVAL);
   }
 
   /**
@@ -60,6 +65,23 @@ public class AddSourceDialog extends JDialog
   public String getAPIKey()
   {
     return Strings.emptyToNull(apiKeyField.getText());
+  }
+
+  /**
+   * Returns the entered polling interval
+   *
+   * @return poll interval as integer, min=0
+   */
+  public int getPollInterval()
+  {
+    try
+    {
+      return Math.max(0, Integer.parseInt(Objects.toString(pollIntervall.getValue())));
+    }
+    catch(NumberFormatException e)
+    {
+      return PollingServer.DEFAULT_POLLINTERVAL;
+    }
   }
 
   {
@@ -91,17 +113,18 @@ public class AddSourceDialog extends JDialog
     gbc.fill = GridBagConstraints.HORIZONTAL;
     contentPane.add(urlField, gbc);
     final JLabel label1 = new JLabel();
-    label1.setText("URL");
+    label1.setText("URL:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.anchor = GridBagConstraints.EAST;
+    gbc.insets = new Insets(0, 0, 0, 5);
     contentPane.add(label1, gbc);
     final JPanel panel1 = new JPanel();
     panel1.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 2;
+    gbc.gridy = 3;
     gbc.fill = GridBagConstraints.BOTH;
     contentPane.add(panel1, gbc);
     buttonOK = new JButton();
@@ -118,12 +141,28 @@ public class AddSourceDialog extends JDialog
     gbc.fill = GridBagConstraints.HORIZONTAL;
     contentPane.add(apiKeyField, gbc);
     final JLabel label2 = new JLabel();
-    label2.setText("API-Key");
+    label2.setText("API-Key:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 1;
-    gbc.anchor = GridBagConstraints.WEST;
+    gbc.anchor = GridBagConstraints.EAST;
+    gbc.insets = new Insets(0, 0, 0, 5);
     contentPane.add(label2, gbc);
+    pollIntervall = new JSpinner();
+    gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 2;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    contentPane.add(pollIntervall, gbc);
+    final JLabel label3 = new JLabel();
+    label3.setText("Poll-Interval:");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 2;
+    gbc.anchor = GridBagConstraints.EAST;
+    gbc.insets = new Insets(0, 0, 0, 5);
+    contentPane.add(label3, gbc);
   }
 
   /**

@@ -44,8 +44,9 @@ class SourcesList extends JBList
 
       String url = dialog.getURL();
       String apiKey = dialog.getAPIKey();
+      int pollInterval = dialog.getPollInterval();
       if(url != null && apiKey != null)
-        model.addSource(url, apiKey);
+        model.addSource(url, apiKey, pollInterval);
     }
     catch(MalformedURLException ignored)
     {
@@ -90,7 +91,7 @@ class SourcesList extends JBList
     public _Model(RAppSettingsModel pModel)
     {
       model = pModel;
-      model.addPropertyChangeListener(evt -> fireContentsChanged(this, 0, Math.max(getSize() - 1, 0))); //todo maybe memoryleak?
+      model.addPropertyChangeListener(evt -> fireContentsChanged(this, 0, Math.max(getSize() - 1, 0)));
     }
 
     @Override
