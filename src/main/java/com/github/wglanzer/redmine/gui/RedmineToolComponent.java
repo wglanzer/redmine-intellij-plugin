@@ -143,7 +143,7 @@ public class RedmineToolComponent extends JPanel
     {
       myProject = pMyProject;
       setUserObject(pMyProject.getName());
-      for(ITicket currTicket : pMyProject.getTickets().values())
+      for(ITicket currTicket : pMyProject.getTickets())
         add(new _TicketNode(currTicket));
     }
   }

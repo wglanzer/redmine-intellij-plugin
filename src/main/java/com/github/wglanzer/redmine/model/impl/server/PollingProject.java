@@ -2,9 +2,12 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.ITicket;
+import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
+import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Project, that was created by PollingServer
@@ -15,16 +18,19 @@ import java.util.*;
 class PollingProject implements IProject
 {
   private final List<IProjectListener> projectListeners = new ArrayList<>();
-
+  private final PollingTicketDirectory ticketDirectory = new PollingTicketDirectory();
+  private final IRRestConnection connection;
   private final String id;
+
   private String name;
   private String description;
   private String createdOn;
   private String updatedOn;
   private boolean valid;
 
-  public PollingProject(String pID, String pName, String pDescription, String pCreatedOn, String pUpdatedOn)
+  public PollingProject(IRRestConnection pRestConnection, String pID, String pName, String pDescription, String pCreatedOn, String pUpdatedOn)
   {
+    connection = pRestConnection;
     updateProperties(pName, pDescription, pCreatedOn, pUpdatedOn, false);
     id = pID;
     valid = true;
@@ -68,9 +74,9 @@ class PollingProject implements IProject
 
   @NotNull
   @Override
-  public Map<String, ITicket> getTickets()
+  public Collection<ITicket> getTickets()
   {
-    return Collections.emptyMap(); //todo
+    return ticketDirectory.getTickets();
   }
 
   @Override
@@ -139,11 +145,41 @@ class PollingProject implements IProject
    */
   protected void destroy()
   {
+    ticketDirectory.clearCaches();
     name = null;
     description = null;
     createdOn = null;
     updatedOn = null;
     valid = false;
+  }
+
+  /**
+   * Polls all tickets from redmine server and
+   * performs update to ITicket instances
+   */
+  protected void pollTickets()
+  {
+    List<Long> allOldTicketIDs = getTickets().stream()
+        .map(ITicket::getID)
+        .collect(Collectors.toList());
+
+    List<ITicket> allNewTickets = connection.doGET(ERRestRequest.GET_ISSUES)
+        .map(ticketDirectory::updateTicket)
+        .collect(Collectors.toList());
+
+    // Fire that a ticket was added
+    allNewTickets.stream()
+        .filter(pProject -> !allOldTicketIDs.contains(pProject.getID()))
+        .forEach(this::_fireTicketAdded);
+
+    // Remove all tickets that are not in the result list from webservice
+    getTickets().stream()
+        .filter(pProject -> !allNewTickets.contains(pProject))
+        .forEach((project) ->
+        {
+          _fireTicketRemoved(project);
+          ticketDirectory.removeTicketFromCache(project);
+        });
   }
 
   /**

@@ -2,7 +2,8 @@ package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,7 +56,7 @@ public interface IProject
    * @return Map, ticketID -> ticket, not <tt>null</tt>
    */
   @NotNull
-  Map<String, ITicket> getTickets();
+  Collection<ITicket> getTickets();
 
   /**
    * Returns the valid state of this project instance

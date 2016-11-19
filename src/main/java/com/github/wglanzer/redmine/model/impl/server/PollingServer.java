@@ -33,8 +33,13 @@ public class PollingServer implements IServer
   {
     source = pSource;
     connection = new RRestConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
-    directory = new PollingProjectDirectory();
-    executor = new PollingExecutor(this::pollProjects, pSource.getPollInterval());
+    directory = new PollingProjectDirectory(connection);
+    executor = new PollingExecutor(() -> {
+      pollProjects();
+      getProjects().stream()
+          .map(pProject -> (PollingProject) pProject)
+          .forEach(PollingProject::pollTickets);
+    }, pSource.getPollInterval());
   }
 
   @Override
@@ -102,6 +107,10 @@ public class PollingServer implements IServer
   protected void performPreload()
   {
     pollProjects(); //Load all Projects into directory
+
+    getProjects().stream() // Load all tickets into projects directory
+        .map(pProject -> (PollingProject) pProject)
+        .forEach(PollingProject::pollTickets);
   }
 
   /**

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public enum ERRestRequest
 {
 
-  GET_ISSUES("issues", null),
+  GET_ISSUES("issues", "issues"),
   GET_PROJECTS("projects", "projects");
 
   private String subPage;

@@ -20,12 +20,12 @@ public interface ITicket
   long getID();
 
   /**
-   * Returns the title of this ticket
+   * Returns the subject of this ticket
    *
    * @return title, not <tt>null</tt>
    */
   @NotNull
-  String getTitle();
+  String getSubject();
 
   /**
    * Returns the description of this ticket
@@ -42,6 +42,38 @@ public interface ITicket
    */
   @NotNull
   String getStatus();
+
+  /**
+   * Returns the author of this ticket
+   *
+   * @return author, not <tt>null</tt>
+   */
+  @NotNull
+  String getAuthor();
+
+  /**
+   * Returns the priority of this ticket
+   *
+   * @return priority, not <tt>null</tt>
+   */
+  @NotNull
+  String getPriority();
+
+  /**
+   * Returns the tracker of this ticket
+   *
+   * @return tracker, not <tt>null</tt>
+   */
+  @NotNull
+  String getTracker();
+
+  /**
+   * Returns the category of this ticket
+   *
+   * @return category, not <tt>null</tt>
+   */
+  @NotNull
+  String getCategory();
 
   /**
    * Returns the additional properties

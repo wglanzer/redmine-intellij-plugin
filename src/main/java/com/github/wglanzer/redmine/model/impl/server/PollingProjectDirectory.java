@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
+import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -16,6 +17,12 @@ class PollingProjectDirectory
 {
 
   private final Map<String, PollingProject> directory = Collections.synchronizedMap(new HashMap<>());
+  private final IRRestConnection connection;
+
+  public PollingProjectDirectory(IRRestConnection pRestConnection)
+  {
+    connection = pRestConnection;
+  }
 
   /**
    * Returns all curretly registered projects
@@ -56,7 +63,7 @@ class PollingProjectDirectory
     if(!directory.containsKey(projectID))
     {
       // No updateProperties neccessary here!
-      PollingProject pp = new PollingProject(projectID, name, description, createdOn, updatedOn);
+      PollingProject pp = new PollingProject(connection, projectID, name, description, createdOn, updatedOn);
       directory.put(projectID, pp);
       return pp;
     }
