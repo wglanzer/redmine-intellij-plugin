@@ -1,7 +1,9 @@
 package com.github.wglanzer.redmine.config.gui;
 
+import com.github.wglanzer.redmine.config.gui.dialogs.AddSourceDialog;
 import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
 import com.github.wglanzer.redmine.model.ISource;
+import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBList;
 
@@ -33,19 +35,21 @@ class SourcesList extends JBList
    */
   public void onAddClick(AnActionButton pButton)
   {
-    while(true)
+    try
     {
-      try
-      {
-        String url = JOptionPane.showInputDialog(this, "URL", "enter URL", JOptionPane.QUESTION_MESSAGE); //TODO BETTER
-        if(url == null || url.trim().isEmpty())
-          break;
-        model.addSource(url, null); //todo
-        break;
-      }
-      catch(MalformedURLException ignored)
-      {
-      }
+      AddSourceDialog dialog = new AddSourceDialog();
+      dialog.setSize(400, 150);
+      dialog.setLocationRelativeTo(SwingUtilities.getRoot(this));
+      dialog.setVisible(true);
+
+      String url = dialog.getURL();
+      String apiKey = dialog.getAPIKey();
+      if(url != null && apiKey != null)
+        model.addSource(url, apiKey);
+    }
+    catch(MalformedURLException ignored)
+    {
+      JOptionPane.showMessageDialog(SwingUtilities.getRoot(this), "Invalid url!", "Exception", JOptionPane.ERROR_MESSAGE);
     }
   }
 
