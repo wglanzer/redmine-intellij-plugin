@@ -15,7 +15,7 @@
           <component id="150e2" class="javax.swing.JButton" binding="refreshButton">
             <constraints border-constraint="West"/>
             <properties>
-              <text value="Button"/>
+              <text value="Refresh"/>
             </properties>
           </component>
         </children>
