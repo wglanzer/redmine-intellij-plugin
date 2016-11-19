@@ -83,7 +83,7 @@ public class RManager
       if(!pSilent)
         Notifications.Bus.notify(GROUP_BALLOON.createNotification("Redmine Integration", _toLogString(pEx.getMessage()), NotificationType.ERROR, null));
       else
-        StatusBar.Info.set(pEx.getMessage(), null);
+        StatusBar.Info.set(_toLogString(pEx.getMessage()), null);
     }
 
     @Override
@@ -92,7 +92,13 @@ public class RManager
       if(!pSilent)
         Notifications.Bus.notify(GROUP_BALLOON.createNotification("Redmine Integration", _toLogString(pLogString), NotificationType.INFORMATION, null));
       else
-        StatusBar.Info.set(pLogString, null);
+        StatusBar.Info.set(_toLogString(pLogString), null);
+    }
+
+    @Override
+    public void debug(String pDebugString)
+    {
+      System.out.println(_toLogString(pDebugString));
     }
 
     private String _toLogString(String pMessage)

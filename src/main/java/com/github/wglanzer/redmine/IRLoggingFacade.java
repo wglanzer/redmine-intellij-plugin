@@ -24,4 +24,11 @@ public interface IRLoggingFacade
    */
   void log(String pLogString, boolean pSilent);
 
+  /**
+   * Logs a debug string
+   *
+   * @param pDebugString String that should be logged as debuglevel
+   */
+  void debug(String pDebugString);
+
 }

@@ -3,6 +3,7 @@ package com.github.wglanzer.redmine.webservice.impl;
 import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -80,11 +82,17 @@ public class RRestConnection implements IRRestConnection
     urlBuilder.append("?key=").append(apiKey);
 
     if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
-      loggingFacade.log(getClass().getName() + ": GET -> " + urlBuilder.toString(), true);
+      loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 
     try
     {
+      Stopwatch watch = Stopwatch.createStarted();
       HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
+      watch.stop();
+
+      if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
+        loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+
       return response.getBody();
     }
     catch(UnirestException e)
