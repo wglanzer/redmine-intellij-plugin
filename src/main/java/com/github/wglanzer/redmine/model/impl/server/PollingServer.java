@@ -25,25 +25,31 @@ public class PollingServer implements IServer
   private final ISource source;
   private final IRRestConnection connection;
   private final PollingProjectDirectory directory;
+  private final PollingExecutor executor;
 
   public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
   {
     source = pSource;
     connection = new RRestConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
     directory = new PollingProjectDirectory();
+    executor = new PollingExecutor(this::pollProjects, pSource.getPollInterval());
   }
 
   @Override
   public void connect()
   {
-    // start listening and start poll
+    // start listening ...
     performPreload();
+
+    // ... and start poll
+    executor.start();
   }
 
   @Override
   public void disconnect()
   {
     // end listening
+    executor.stop();
     directory.clearCaches();
   }
 
