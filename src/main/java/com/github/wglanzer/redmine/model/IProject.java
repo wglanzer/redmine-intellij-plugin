@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,12 +15,54 @@ public interface IProject
 {
 
   /**
+   * Returns the unique redmine-ID for this project
+   *
+   * @return ID as unique string
+   */
+  String getID();
+
+  /**
+   * Returns the name of this project
+   *
+   * @return Readable name
+   */
+  String getName();
+
+  /**
+   * Description for this project
+   *
+   * @return Description as string
+   */
+  String getDescription();
+
+  /**
+   * Date, when this project was created
+   *
+   * @return Date
+   */
+  String getCreatedOn();
+
+  /**
+   * Date, when this project was updated
+   *
+   * @return Date
+   */
+  String getUpdatedOn();
+
+  /**
    * All assigned tickets. Opened, closed, ...
    *
    * @return Map, ticketID -> ticket, not <tt>null</tt>
    */
   @NotNull
   Map<String, ITicket> getTickets();
+
+  /**
+   * Returns the valid state of this project instance
+   *
+   * @return <tt>true</tt> if this project instance is valid
+   */
+  boolean isValid();
 
   /**
    * Adds an IProjectListener to this project
@@ -42,6 +85,16 @@ public interface IProject
    */
   interface IProjectListener
   {
+
+    /**
+     * Fires, if a redmine property was updated (id, name, description, createddate, updateddate, ispublic)
+     *
+     * @param pName     Name of the changed property
+     * @param pOldValue Old value for this property
+     * @param pNewValue New value for this property
+     */
+    void redminePropertyChanged(String pName, String pOldValue, String pNewValue);
+
     /**
      * Fires, if one ticket was added
      *

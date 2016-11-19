@@ -28,7 +28,7 @@ public interface IServer
    *
    * @return <tt>true</tt> if healthy, <tt>false</tt> otherwise
    */
-  boolean isHealthy();
+  boolean isValid();
 
   /**
    * Returns all projects this server contains
@@ -37,6 +37,6 @@ public interface IServer
    * @throws NotConnectedException if the server is not connected yet
    */
   @NotNull
-  Collection<IProject> getProjects() throws NotConnectedException;
+  Collection<IProject> getProjects();
 
 }

@@ -6,7 +6,7 @@ package com.github.wglanzer.redmine.exceptions;
  *
  * @author w.glanzer, 16.11.2016.
  */
-public class NotConnectedException extends Exception
+public class NotConnectedException extends RuntimeException
 {
   public NotConnectedException()
   {

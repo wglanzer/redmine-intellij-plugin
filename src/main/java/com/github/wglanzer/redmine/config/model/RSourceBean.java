@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.config.model;
 
 import com.github.wglanzer.redmine.model.ISource;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -16,10 +17,20 @@ public class RSourceBean implements ISource, Serializable
 
   private String url;
 
+  private String apiKey;
+
+  @NotNull
   @Override
   public String getURL()
   {
     return url;
+  }
+
+  @NotNull
+  @Override
+  public String getAPIKey()
+  {
+    return apiKey;
   }
 
   /**
@@ -30,5 +41,15 @@ public class RSourceBean implements ISource, Serializable
   public void setUrl(String pUrl)
   {
     url = pUrl;
+  }
+
+  /**
+   * Sets the API-Key for this server
+   *
+   * @param pApiKey Key
+   */
+  public void setApiKey(@NotNull String pApiKey)
+  {
+    apiKey = pApiKey;
   }
 }

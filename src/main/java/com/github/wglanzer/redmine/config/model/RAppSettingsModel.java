@@ -44,7 +44,7 @@ public class RAppSettingsModel
    *
    * @param pURL  redmine server url
    */
-  public void addSource(String pURL) throws MalformedURLException
+  public void addSource(String pURL, String pAPIKey) throws MalformedURLException
   {
     synchronized(modified)
     {
@@ -53,6 +53,7 @@ public class RAppSettingsModel
 
       RSourceBean sourceBean = new RSourceBean();
       sourceBean.setUrl(pURL);
+      sourceBean.setApiKey(pAPIKey);
       sources.add(sourceBean);
       _modified();
       _firePropertyChanged(PROP_SOURCES, null, sourceBean);

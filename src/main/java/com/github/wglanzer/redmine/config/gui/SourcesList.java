@@ -40,7 +40,7 @@ class SourcesList extends JBList
         String url = JOptionPane.showInputDialog(this, "URL", "enter URL", JOptionPane.QUESTION_MESSAGE); //TODO BETTER
         if(url == null || url.trim().isEmpty())
           break;
-        model.addSource(url);
+        model.addSource(url, null); //todo
         break;
       }
       catch(MalformedURLException ignored)

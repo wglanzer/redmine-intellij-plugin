@@ -34,7 +34,7 @@ public class RServerManager
     synchronized(availableServers)
     {
       availableServers.stream()
-          .filter(IServer::isHealthy)
+          .filter(IServer::isValid)
           .forEach(IServer::disconnect);
       availableServers.clear();
       availableServers.addAll(RAppSettings.getSettings().getSources().stream()
@@ -66,7 +66,7 @@ public class RServerManager
     synchronized(availableServers)
     {
       availableServers.stream()
-          .filter(IServer::isHealthy)
+          .filter(IServer::isValid)
           .forEach(IServer::disconnect);
       availableServers.clear();
       isRunning.set(false);
