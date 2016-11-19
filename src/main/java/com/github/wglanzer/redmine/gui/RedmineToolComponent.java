@@ -11,6 +11,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Defines the component for the toolwindow
@@ -105,6 +106,29 @@ public class RedmineToolComponent extends JPanel
       setUserObject(pMyServer.getURL());
       for(IProject currProject : pMyServer.getProjects())
         add(new _ProjectNode(currProject));
+
+      pMyServer.addServerListener(new IServer.IServerListener()
+      {
+        @Override
+        public void projectCreated(IProject pCreated)
+        {
+          add(new _ProjectNode(pCreated));
+        }
+
+        @Override
+        public void projectRemoved(IProject pRemoved)
+        {
+          for(int i = 0; i < getChildCount(); i++)
+          {
+            _ProjectNode node = (_ProjectNode) getChildAt(i);
+            if(Objects.equals(node.myProject.getID(), pRemoved.getID()))
+            {
+              remove(node);
+              break;
+            }
+          }
+        }
+      });
     }
   }
 
@@ -113,8 +137,11 @@ public class RedmineToolComponent extends JPanel
    */
   private static class _ProjectNode extends DefaultMutableTreeNode
   {
+    private IProject myProject;
+
     public _ProjectNode(IProject pMyProject)
     {
+      myProject = pMyProject;
       setUserObject(pMyProject.getName());
       for(ITicket currTicket : pMyProject.getTickets().values())
         add(new _TicketNode(currTicket));
@@ -131,6 +158,5 @@ public class RedmineToolComponent extends JPanel
       setUserObject(pMyTicket.getID());
     }
   }
-
 
 }

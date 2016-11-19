@@ -47,4 +47,51 @@ public interface IServer
   @NotNull
   String getURL();
 
+  /**
+   * Adds an IServerListener
+   *
+   * @param pListener Listener that should be added
+   */
+  void addServerListener(IServerListener pListener);
+
+  /**
+   * Removes an IServerListener
+   *
+   * @param pListener Listener that should be removed
+   */
+  void removeServerListener(IServerListener pListener);
+
+  /**
+   * Listener for server events
+   */
+  interface IServerListener
+  {
+    /**
+     * Fired, when the status of the connection changed
+     *
+     * @param pIsConnectedNow <tt>true</tt>, if the server is running now
+     */
+    default void connectionStatusChanged(boolean pIsConnectedNow)
+    {
+    }
+
+    /**
+     * Fired, when a project was created
+     *
+     * @param pCreated New created project
+     */
+    default void projectCreated(IProject pCreated)
+    {
+    }
+
+    /**
+     * Fired, when a project was removed
+     *
+     * @param pRemoved Removed project
+     */
+    default void projectRemoved(IProject pRemoved)
+    {
+    }
+  }
+
 }

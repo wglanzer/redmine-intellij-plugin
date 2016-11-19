@@ -9,6 +9,7 @@ import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class PollingServer implements IServer
   private final IRRestConnection connection;
   private final PollingProjectDirectory directory;
   private final PollingExecutor executor;
+  private final List<IServerListener> listenerList = new ArrayList<>();
 
   public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
   {
@@ -43,12 +45,15 @@ public class PollingServer implements IServer
 
     // ... and start poll
     executor.start();
+
+    _fireConnectionStatusChanged(true);
   }
 
   @Override
   public void disconnect()
   {
     // end listening
+    _fireConnectionStatusChanged(false);
     executor.stop();
     directory.clearCaches();
   }
@@ -73,6 +78,24 @@ public class PollingServer implements IServer
     return source.getURL();
   }
 
+  @Override
+  public void addServerListener(IServerListener pListener)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.add(pListener);
+    }
+  }
+
+  @Override
+  public void removeServerListener(IServerListener pListener)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.remove(pListener);
+    }
+  }
+
   /**
    * Performs a preload of all server related data
    */
@@ -87,14 +110,66 @@ public class PollingServer implements IServer
    */
   protected void pollProjects()
   {
-    List<IProject> allProjects = connection.doGET(ERRestRequest.GET_PROJECTS)
+    List<String> allOldProjectIDs = getProjects().stream()
+        .map(IProject::getID)
+        .collect(Collectors.toList());
+
+    List<IProject> allNewProjects = connection.doGET(ERRestRequest.GET_PROJECTS)
         .map(directory::updateProject)
         .collect(Collectors.toList());
 
+    // Fire that a project was added
+    allNewProjects.stream()
+        .filter(pProject -> !allOldProjectIDs.contains(pProject.getID()))
+        .forEach(this::_fireProjectAdded);
+
     // Remove all projects that are not in the result list from webservice
     getProjects().stream()
-        .filter(pProject -> !allProjects.contains(pProject))
-        .forEach(directory::removeProjectFromCache);
+        .filter(pProject -> !allNewProjects.contains(pProject))
+        .forEach((project) ->
+        {
+          _fireProjectRemoved(project);
+          directory.removeProjectFromCache(project);
+        });
+  }
+
+  /**
+   * Fires that a project was created
+   *
+   * @param pCreated New created project
+   */
+  private void _fireProjectAdded(IProject pCreated)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.forEach(pListener -> pListener.projectCreated(pCreated));
+    }
+  }
+
+  /**
+   * Fires that a project was removed
+   *
+   * @param pRemoved Removed project
+   */
+  private void _fireProjectRemoved(IProject pRemoved)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.forEach(pListener -> pListener.projectRemoved(pRemoved));
+    }
+  }
+
+  /**
+   * Fires, that the status of the connection changed
+   *
+   * @param pIsConnectedNow <tt>true</tt>, if the server is running now
+   */
+  private void _fireConnectionStatusChanged(boolean pIsConnectedNow)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.forEach(pListener -> pListener.connectionStatusChanged(pIsConnectedNow));
+    }
   }
 
 }
