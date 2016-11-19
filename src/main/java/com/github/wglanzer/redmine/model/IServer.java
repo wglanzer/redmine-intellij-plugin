@@ -39,4 +39,12 @@ public interface IServer
   @NotNull
   Collection<IProject> getProjects();
 
+  /**
+   * Gets the url from the connection
+   *
+   * @return configured url
+   */
+  @NotNull
+  String getURL();
+
 }

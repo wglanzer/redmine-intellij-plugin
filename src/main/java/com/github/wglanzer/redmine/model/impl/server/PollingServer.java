@@ -60,6 +60,13 @@ public class PollingServer implements IServer
     return directory.getProjects();
   }
 
+  @NotNull
+  @Override
+  public String getURL()
+  {
+    return source.getURL();
+  }
+
   /**
    * Performs a preload of all server related data
    */

@@ -70,7 +70,7 @@ class PollingProject implements IProject
   @Override
   public Map<String, ITicket> getTickets()
   {
-    return null; //todo
+    return Collections.emptyMap(); //todo
   }
 
   @Override

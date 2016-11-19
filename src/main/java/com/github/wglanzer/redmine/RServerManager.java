@@ -4,8 +4,10 @@ import com.github.wglanzer.redmine.config.RAppSettings;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -74,6 +76,20 @@ public class RServerManager
   }
 
   /**
+   * Returns all currently connected servers
+   *
+   * @return all servers, unmodifiable
+   */
+  @NotNull
+  public List<IServer> getAvailableServers()
+  {
+    synchronized(availableServers)
+    {
+      return Collections.unmodifiableList(availableServers);
+    }
+  }
+
+  /**
    * Converts a source to a server
    *
    * @param pSource  source which should be converted
@@ -81,7 +97,7 @@ public class RServerManager
    */
   private IServer _toServer(ISource pSource)
   {
-    return new PollingServer(pSource, 1000);
+    return new PollingServer(pSource, 1000); //todo
   }
 
 }

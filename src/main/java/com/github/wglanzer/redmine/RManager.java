@@ -48,4 +48,13 @@ public class RManager
     serverManager.shutdown();
   }
 
+  /**
+   * Gets the active serverManager
+   *
+   * @return the RServerManager
+   */
+  public RServerManager getServerManager()
+  {
+    return serverManager;
+  }
 }
