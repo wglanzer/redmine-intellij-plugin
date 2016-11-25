@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author w.glanzer, 19.11.2016.
  */
-public class PollingTicketDirectory
+class PollingTicketDirectory
 {
 
   private final Map<Long, PollingTicket> directory = Collections.synchronizedMap(new HashMap<>());
