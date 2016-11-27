@@ -2,8 +2,8 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.ITicket;
-import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -163,7 +163,11 @@ class PollingProject implements IProject
         .map(ITicket::getID)
         .collect(Collectors.toList());
 
-    List<ITicket> allNewTickets = connection.doGET(ERRestRequest.GET_ISSUES)
+    // Create request to get all tickets assigned to this project
+    IRRestRequest request = IRRestRequest.GET_TICKETS.argument("project_id", id);
+
+    // Execute Request
+    List<ITicket> allNewTickets = connection.doGET(request)
         .map(ticketDirectory::updateTicket)
         .collect(Collectors.toList());
 

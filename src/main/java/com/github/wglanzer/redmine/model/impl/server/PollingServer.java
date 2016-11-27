@@ -5,8 +5,8 @@ import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.webservice.impl.RRestConnection;
-import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -123,7 +123,7 @@ public class PollingServer implements IServer
         .map(IProject::getID)
         .collect(Collectors.toList());
 
-    List<IProject> allNewProjects = connection.doGET(ERRestRequest.GET_PROJECTS)
+    List<IProject> allNewProjects = connection.doGET(IRRestRequest.GET_PROJECTS)
         .map(directory::updateProject)
         .collect(Collectors.toList());
 

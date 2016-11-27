@@ -17,7 +17,7 @@ public interface IRRestConnection
    * @param pGETRequest Request that should be done
    * @return JSON-Result as Stream
    */
-  Stream<JSONObject> doGET(ERRestRequest pGETRequest);
+  Stream<JSONObject> doGET(IRRestRequest pGETRequest);
 
   /**
    * Returns true, if the connection can be used

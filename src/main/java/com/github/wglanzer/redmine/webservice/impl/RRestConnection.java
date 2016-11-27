@@ -1,8 +1,8 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
 import com.github.wglanzer.redmine.IRLoggingFacade;
-import com.github.wglanzer.redmine.webservice.spi.ERRestRequest;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -40,9 +41,9 @@ public class RRestConnection implements IRRestConnection
   }
 
   @Override
-  public Stream<JSONObject> doGET(ERRestRequest pGETRequest)
+  public Stream<JSONObject> doGET(IRRestRequest pGETRequest)
   {
-    JSONObject GETResponse = _doGET(pGETRequest.getSubPage() + ".json").getObject();
+    JSONObject GETResponse = _doGET(pGETRequest.getSubPage() + ".json", pGETRequest.getArguments()).getObject();
 
     if(pGETRequest.getResultTopLevel() == null)
       return Stream.of(GETResponse);
@@ -66,7 +67,7 @@ public class RRestConnection implements IRRestConnection
    * @param pPageKey Subpage ("projects", "issues", etc.)
    * @return Result as JsonNode
    */
-  private JsonNode _doGET(@NotNull String pPageKey)
+  private JsonNode _doGET(@NotNull String pPageKey, @Nullable Map<String, String> pAdditionalArguments)
   {
     StringBuilder urlBuilder = new StringBuilder();
 
@@ -80,6 +81,10 @@ public class RRestConnection implements IRRestConnection
 
     // http://myredmineserver.de/issues.json?key=myapikey
     urlBuilder.append("?key=").append(apiKey);
+
+    // http://myredmineserver.de/issues.json?key=myapikey&[ARGUMENT]=[VALUE]
+    if(pAdditionalArguments != null)
+      pAdditionalArguments.forEach((pKey, pValue) -> urlBuilder.append("&").append(pKey).append("=").append(pValue));
 
     if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
       loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
