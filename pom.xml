@@ -59,6 +59,13 @@
       <version>19.0</version>
     </dependency>
 
+    <!-- mapdb -->
+    <dependency>
+      <groupId>org.mapdb</groupId>
+      <artifactId>mapdb</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>

@@ -1,10 +1,17 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.ITicket;
+import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
+import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
+import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Directory for PollingTickets.
@@ -15,7 +22,21 @@ import java.util.*;
 class PollingTicketDirectory
 {
 
-  private final Map<Long, PollingTicket> directory = Collections.synchronizedMap(new HashMap<>());
+  private final Map<Long, PollingTicket> directory = new HashMap<>();
+  private final ITicketCache persistentCache;
+
+  public PollingTicketDirectory(String pProjectID)
+  {
+    persistentCache = TicketCacheBuilder.createPersistent(new File(IntelliJIDEAUtility.getTicketCacheDirectory(), pProjectID));
+
+    // Transfer all tickets to memory
+    synchronized(directory)
+    {
+      persistentCache.getAllTickets().forEach(pTicket ->
+          updateTicket(pTicket.getID(), pTicket.getSubject(), pTicket.getDescription(), pTicket.getCreatedOn(), pTicket.getUpdatedOn(), pTicket.getStatus(),
+              pTicket.getAuthor(), pTicket.getPriority(), pTicket.getTracker(), pTicket.getCategory()));
+    }
+  }
 
   /**
    * Returns all curretly registered tickets
@@ -50,23 +71,43 @@ class PollingTicketDirectory
     Long ticketID = pTicket.getLong("id");
     String subject = pTicket.getString("subject");
     String description = pTicket.getString("description");
+    String createdOn = pTicket.getString("created_on");
+    String updatedOn = pTicket.getString("updated_on");
     String status = pTicket.getJSONObject("status").getString("name");
     String author = pTicket.getJSONObject("author").getString("name");
     String priority = pTicket.getJSONObject("priority").getString("name");
     String tracker = pTicket.getJSONObject("tracker").getString("name");
     String category = "";//pTicket.getJSONObject("category").getString("name"); todo
 
-    if(!directory.containsKey(ticketID))
+    return updateTicket(ticketID, subject, description, createdOn, updatedOn, status, author, priority, tracker, category);
+  }
+
+  /**
+   * Updates an specific ticket.
+   * If the ticket does not exist, a new instance will be created
+   *
+   * @return Ticket instance which was created or updated
+   */
+  protected ITicket updateTicket(Long pTicketID, String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  {
+    if(!directory.containsKey(pTicketID))
     {
       // No updateProperties neccessary here!
-      PollingTicket pp = new PollingTicket(ticketID, subject, description, status, author, priority, tracker, category);
-      directory.put(ticketID, pp);
+      PollingTicket pp = new PollingTicket(pTicketID, pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
+      directory.put(pTicketID, pp);
+      persistentCache.put(pp);
       return pp;
     }
     else
     {
-      PollingTicket ppToUpdate = directory.get(ticketID);
-      ppToUpdate.updateProperties(subject, description, status, author, priority, tracker, category);
+      PollingTicket ppToUpdate = directory.get(pTicketID);
+      boolean changed = ppToUpdate.updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
+      if(changed)
+      {
+        persistentCache.remove(pTicketID);
+        persistentCache.put(ppToUpdate);
+      }
+
       return ppToUpdate;
     }
   }
@@ -78,10 +119,11 @@ class PollingTicketDirectory
    */
   protected void removeTicketFromCache(ITicket pTicket)
   {
-    Long projectID = pTicket.getID();
-    PollingTicket project = directory.remove(projectID);
-    if(project != null)
-      project.destroy();
+    Long ticketID = pTicket.getID();
+    PollingTicket ticket = directory.remove(ticketID);
+    persistentCache.remove(ticketID);
+    if(ticket != null)
+      ticket.destroy();
   }
 
 }

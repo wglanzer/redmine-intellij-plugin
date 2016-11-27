@@ -36,6 +36,20 @@ public interface ITicket
   String getDescription();
 
   /**
+   * Date, when this project was created
+   *
+   * @return Date
+   */
+  String getCreatedOn();
+
+  /**
+   * Date, when this project was updated
+   *
+   * @return Date
+   */
+  String getUpdatedOn();
+
+  /**
    * Returns the current status of this ticket
    *
    * @return status, not <tt>null</tt>

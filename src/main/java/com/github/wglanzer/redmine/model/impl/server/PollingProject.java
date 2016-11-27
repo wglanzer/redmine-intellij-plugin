@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 class PollingProject implements IProject
 {
   private final List<IProjectListener> projectListeners = new ArrayList<>();
-  private final PollingTicketDirectory ticketDirectory = new PollingTicketDirectory();
+  private final PollingTicketDirectory ticketDirectory;
   private final IRRestConnection connection;
   private final String id;
 
@@ -31,6 +31,7 @@ class PollingProject implements IProject
   public PollingProject(IRRestConnection pRestConnection, String pID, String pName, String pDescription, String pCreatedOn, String pUpdatedOn)
   {
     connection = pRestConnection;
+    ticketDirectory = new PollingTicketDirectory(pID);
     updateProperties(pName, pDescription, pCreatedOn, pUpdatedOn, false);
     id = pID;
     valid = true;

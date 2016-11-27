@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Ticket that was created by PollingTicketDirectory
@@ -16,16 +17,18 @@ class PollingTicket implements ITicket
   private final long id;
   private String subject;
   private String description;
+  private String updatedOn;
+  private String createdOn;
   private String status;
   private String author;
   private String priority;
   private String tracker;
   private String category;
 
-  public PollingTicket(long pID, String pSubject, String pDescription, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  public PollingTicket(long pID, String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
     id = pID;
-    updateProperties(pSubject, pDescription, pStatus, pAuthor, pPriority, pTracker, pCategory);
+    updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
   }
 
   @Override
@@ -46,6 +49,18 @@ class PollingTicket implements ITicket
   public String getDescription()
   {
     return description;
+  }
+
+  @Override
+  public String getCreatedOn()
+  {
+    return createdOn;
+  }
+
+  @Override
+  public String getUpdatedOn()
+  {
+    return updatedOn;
   }
 
   @NotNull
@@ -101,15 +116,65 @@ class PollingTicket implements ITicket
     category = null;
   }
 
-  protected void updateProperties(String pSubject, String pDescription, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  protected boolean updateProperties(String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
-    subject = pSubject;
-    description = pDescription;
-    status = pStatus;
-    author = pAuthor;
-    priority = pPriority;
-    tracker = pTracker;
-    category = pCategory;
+    boolean changed = false;
+
+    if(!Objects.equals(subject, pSubject))
+    {
+      subject = pSubject;
+      changed = true;
+    }
+
+    if(!Objects.equals(description, pDescription))
+    {
+      description = pDescription;
+      changed = true;
+    }
+
+    if(!Objects.equals(createdOn, pCreatedOn))
+    {
+      createdOn = pCreatedOn;
+      changed = true;
+    }
+
+    if(!Objects.equals(updatedOn, pUpdatedOn))
+    {
+      updatedOn = pUpdatedOn;
+      changed = true;
+    }
+
+    if(!Objects.equals(status, pStatus))
+    {
+      status = pStatus;
+      changed = true;
+    }
+
+    if(!Objects.equals(author, pAuthor))
+    {
+      author = pAuthor;
+      changed = true;
+    }
+
+    if(!Objects.equals(priority, pPriority))
+    {
+      priority = pPriority;
+      changed = true;
+    }
+
+    if(!Objects.equals(tracker, pTracker))
+    {
+      tracker = pTracker;
+      changed = true;
+    }
+
+    if(!Objects.equals(category, pCategory))
+    {
+      category = pCategory;
+      changed = true;
+    }
+
+    return changed;
   }
 
 }
