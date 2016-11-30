@@ -6,9 +6,7 @@ import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -57,7 +55,18 @@ public class RServerManager
   {
     synchronized(availableServers)
     {
-      availableServers.forEach(IServer::connect);
+      for(IServer currServer : availableServers)
+      {
+        try
+        {
+          currServer.connect();
+        }
+        catch(Exception e)
+        {
+          loggingFacade.error(new Exception("Server '" + currServer + "' could not be connected", e));
+        }
+      }
+
       isRunning.set(true);
     }
   }

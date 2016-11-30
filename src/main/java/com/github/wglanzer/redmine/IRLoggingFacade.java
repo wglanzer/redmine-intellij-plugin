@@ -14,9 +14,8 @@ public interface IRLoggingFacade
    * Logs an exception
    *
    * @param pEx     Exception that should be logged
-   * @param pSilent <tt>true</tt>, if no balloon should be shown
    */
-  void log(Exception pEx, boolean pSilent);
+  void error(Exception pEx);
 
   /**
    * Logs a string

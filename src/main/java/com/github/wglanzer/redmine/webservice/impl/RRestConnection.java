@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
 import com.github.wglanzer.redmine.IRLoggingFacade;
+import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import com.google.common.base.Stopwatch;
@@ -8,7 +9,6 @@ import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -31,7 +31,7 @@ public class RRestConnection implements IRRestConnection
   private String apiKey;
   private IRLoggingFacade loggingFacade;
 
-  private AtomicReference<Exception> wasError = new AtomicReference<>(null);
+  private AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
 
   public RRestConnection(String pUrl, String pAPIKey, @Nullable IRLoggingFacade pLoggingFacade)
   {
@@ -41,7 +41,7 @@ public class RRestConnection implements IRRestConnection
   }
 
   @Override
-  public Stream<JSONObject> doGET(IRRestRequest pGETRequest)
+  public Stream<JSONObject> doGET(IRRestRequest pGETRequest) throws Exception
   {
     JSONObject GETResponse = _doGET(pGETRequest.getSubPage() + ".json", pGETRequest.getArguments()).getObject();
 
@@ -67,7 +67,7 @@ public class RRestConnection implements IRRestConnection
    * @param pPageKey Subpage ("projects", "issues", etc.)
    * @return Result as JsonNode
    */
-  private JsonNode _doGET(@NotNull String pPageKey, @Nullable Map<String, String> pAdditionalArguments)
+  private JsonNode _doGET(@NotNull String pPageKey, @Nullable Map<String, String> pAdditionalArguments) throws Exception
   {
     StringBuilder urlBuilder = new StringBuilder();
 
@@ -89,34 +89,30 @@ public class RRestConnection implements IRRestConnection
     if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
       loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 
-    try
-    {
-      Stopwatch watch = Stopwatch.createStarted();
-      HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
-      watch.stop();
+    Stopwatch watch = Stopwatch.createStarted();
+    HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
+    watch.stop();
 
-      if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
-        loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
+      loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
 
-      return response.getBody();
-    }
-    catch(UnirestException e)
-    {
-      _dispatchError(e);
-      throw new RuntimeException(e);
-    }
+    JsonNode result = response.getBody();
+    if(_isException(result))
+      throw new ResultHasErrorException(result, urlBuilder.toString());
+
+    return result;
   }
 
   /**
-   * Handles an exception
+   * Returns true, if the result is an exception
    *
-   * @param pEx Exception that should be handled
+   * @param pNode Result
+   * @return <tt>true</tt>, if the result is an exception
    */
-  private void _dispatchError(Exception pEx)
+  private boolean _isException(JsonNode pNode)
   {
-    if(loggingFacade != null)
-      loggingFacade.log(pEx, false);
-    else
-      wasError.set(pEx);
+    JSONObject obj = pNode.getObject();
+    return obj.has("errors");
   }
+
 }

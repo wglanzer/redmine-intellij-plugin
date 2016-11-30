@@ -160,7 +160,7 @@ class PollingProject implements IProject
    * Polls all tickets from redmine server and
    * performs update to ITicket instances
    */
-  protected void pollTickets()
+  protected void pollTickets() throws Exception
   {
     List<Long> allOldTicketIDs = getTickets().stream()
         .map(ITicket::getID)

@@ -34,16 +34,15 @@ public class PollingServer implements IServer
     source = pSource;
     connection = new RRestConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
     directory = new PollingProjectDirectory(connection);
-    executor = new PollingExecutor(() -> {
+    executor = new PollingExecutor(pLoggingFacade, () -> {
       pollProjects();
-      getProjects().stream()
-          .map(pProject -> (PollingProject) pProject)
-          .forEach(PollingProject::pollTickets);
+      for(IProject currProject : getProjects())
+        ((PollingProject) currProject).pollTickets();
     }, pSource.getPollInterval());
   }
 
   @Override
-  public void connect()
+  public void connect() throws Exception
   {
     // start listening ...
     performPreload();
@@ -101,23 +100,28 @@ public class PollingServer implements IServer
     }
   }
 
+  @Override
+  public String toString()
+  {
+    return getURL();
+  }
+
   /**
    * Performs a preload of all server related data
    */
-  protected void performPreload()
+  protected void performPreload() throws Exception
   {
     pollProjects(); //Load all Projects into directory
 
-    getProjects().stream() // Load all tickets into projects directory
-        .map(pProject -> (PollingProject) pProject)
-        .forEach(PollingProject::pollTickets);
+    for(IProject currProject : getProjects()) // Load all tickets into projects directory
+      ((PollingProject) currProject).pollTickets();
   }
 
   /**
    * Polls all projects from redmien server and
    * performs update to IProject instances
    */
-  protected void pollProjects()
+  protected void pollProjects() throws Exception
   {
     List<String> allOldProjectIDs = getProjects().stream()
         .map(IProject::getID)

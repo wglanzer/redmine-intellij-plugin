@@ -5,9 +5,6 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
 /**
  * @author w.glanzer, 27.11.2016.
  */
@@ -22,9 +19,10 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   }
 
   @Override
-  public void log(Exception pEx, boolean pSilent)
+  public void error(Exception pEx)
   {
-    log(NotificationType.ERROR, pEx.getMessage(), pSilent);
+    log(NotificationType.ERROR, pEx.getMessage(), false);
+    pEx.printStackTrace(); // Print it on console -> Debug-Reasons
   }
 
   @Override
@@ -36,7 +34,7 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   @Override
   public void log(NotificationType pType, String pLogString, boolean pSilent)
   {
-    Notification notification = new Notification(NOTIFICATION_ID, NOTIFICATION_ID, _toLogString(pLogString), pType);
+    Notification notification = new Notification(NOTIFICATION_ID, NOTIFICATION_ID, pLogString, pType);
     if(pSilent)
       notification.expire();
     Notifications.Bus.notify(notification);
@@ -49,9 +47,4 @@ class RLoggingFacadeImpl implements IRLoggingFacade
     System.out.println(pDebugString);
   }
 
-  private String _toLogString(String pMessage)
-  {
-    String now = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"));
-    return now + ": " + pMessage;
-  }
 }

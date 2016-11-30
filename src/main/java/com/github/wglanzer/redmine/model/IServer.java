@@ -16,7 +16,7 @@ public interface IServer
   /**
    * Connects the server to its destination
    */
-  void connect();
+  void connect() throws Exception;
 
   /**
    * Disconnects the server
