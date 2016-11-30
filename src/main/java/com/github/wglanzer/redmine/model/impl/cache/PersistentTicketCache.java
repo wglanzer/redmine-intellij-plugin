@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,7 +71,14 @@ class PersistentTicketCache implements ITicketCache
     {
       ITicket pers = new PersistentTicket(pTicket);
       persistentCache.put(pTicket.getID(), pers);
-      persistentCache.put(_LAST_ACCESSED_KEY, pers); //todo
+
+      // If the lastUpdated-Ticket is not set or the new put
+      // ticket is newer than the old one, you have to set the _LAST_ACCESSED_KEY
+      ITicket lastUpdatedTicket = getLastUpdatedTicket();
+      if(lastUpdatedTicket == null ||
+          Instant.parse(pers.getUpdatedOn()).isAfter(Instant.parse(lastUpdatedTicket.getUpdatedOn())))
+        persistentCache.put(_LAST_ACCESSED_KEY, pers);
+
       fileDB.commit();
     }
   }

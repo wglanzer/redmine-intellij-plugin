@@ -5,6 +5,7 @@ import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
 import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
 import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -57,6 +58,17 @@ class PollingTicketDirectory
   {
     directory.forEach((pID, pTicket) -> pTicket.destroy());
     directory.clear();
+  }
+
+  /**
+   * Returns the last modified ticket
+   *
+   * @return the last modified ticket, or <tt>null</tt> if no ticket was registered
+   */
+  @Nullable
+  public ITicket getLastUpdatedTicket()
+  {
+    return persistentCache.getLastUpdatedTicket();
   }
 
   /**

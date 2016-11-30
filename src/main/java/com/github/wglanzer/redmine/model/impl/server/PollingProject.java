@@ -6,6 +6,8 @@ import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -164,8 +166,18 @@ class PollingProject implements IProject
         .map(ITicket::getID)
         .collect(Collectors.toList());
 
-    // Create request to get all tickets assigned to this project
-    IRRestRequest request = IRRestRequest.GET_TICKETS.argument("project_id", id);
+    // Build main request -> Show only MY tickets, no tickets from other projects needed!
+    IRRestRequest request = IRRestRequest.GET_TICKETS
+        .argument("project_id", id);
+
+    // Get only updated tickets. ">lastUpdatedTicket.updated_on"
+    ITicket lastUpdatedTicket = ticketDirectory.getLastUpdatedTicket();
+    if(lastUpdatedTicket != null)
+    {
+      Instant lastUpdatedTicketTime = Instant.parse(lastUpdatedTicket.getUpdatedOn());
+      lastUpdatedTicketTime = lastUpdatedTicketTime.minusMillis(lastUpdatedTicketTime.get(ChronoField.MILLI_OF_SECOND));
+      request = request.argument("updated_on", "%3E%3D" + lastUpdatedTicketTime.plusSeconds(1).toString()); //>2014-01-02T08:12:32Z
+    }
 
     // Execute Request
     List<ITicket> allNewTickets = connection.doGET(request)
