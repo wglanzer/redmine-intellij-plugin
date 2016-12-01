@@ -31,7 +31,7 @@ public class RMutableSettings implements ISettings, Serializable
     ArrayList<ISource> sources = this.sources != null ? new ArrayList<>(this.sources) : new ArrayList<>();
     if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
     {
-      _TestingSource tt = new _TestingSource();
+      RSourceBean tt = new IGNORE_TestingSourcesBean();
       if(sources.stream().noneMatch(pSource -> pSource.getURL().equals(tt.getURL())))
         sources.add(tt);
     }
@@ -41,32 +41,6 @@ public class RMutableSettings implements ISettings, Serializable
   public void setSources(@Nullable List<RSourceBean> pSources)
   {
     sources = pSources;
-  }
-
-  /**
-   * Source for testing-purposes
-   */
-  private static class _TestingSource extends RSourceBean
-  {
-    @NotNull
-    @Override
-    public String getURL()
-    {
-      return "http://redmine.zero-division.de";
-    }
-
-    @NotNull
-    @Override
-    public String getAPIKey()
-    {
-      return "dd76c1ab88e4b3ba1e7a53228818a852eecde987";
-    }
-
-    @Override
-    public int getPollInterval()
-    {
-      return 5;
-    }
   }
 
 }
