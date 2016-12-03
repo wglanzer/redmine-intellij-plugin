@@ -20,7 +20,7 @@
     <!-- TODO -->
     <dependency>
       <groupId>com.github.wglanzer.redmine</groupId>
-      <artifactId>intellijIntegration</artifactId>
+      <artifactId>ideIntegration</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
