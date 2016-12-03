@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
+import com.github.wglanzer.redmine.config.gui.model.RAppSettingsModel;
 import com.intellij.ui.ToolbarDecorator;
 import org.jetbrains.annotations.NotNull;
 

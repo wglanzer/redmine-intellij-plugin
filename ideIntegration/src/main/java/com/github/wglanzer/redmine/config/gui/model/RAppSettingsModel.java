@@ -1,7 +1,8 @@
-package com.github.wglanzer.redmine.config.model;
+package com.github.wglanzer.redmine.config.gui.model;
 
 import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.config.RMutableSettings;
+import com.github.wglanzer.redmine.config.beans.RSourceBean;
 import com.github.wglanzer.redmine.model.ISource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
+import com.github.wglanzer.redmine.config.gui.model.RAppSettingsModel;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.CollectionListModel;

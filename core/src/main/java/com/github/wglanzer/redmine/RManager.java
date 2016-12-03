@@ -1,5 +1,7 @@
 package com.github.wglanzer.redmine;
 
+import com.github.wglanzer.redmine.config.ISettings;
+
 /**
  * Manager 4 Redmine
  *
@@ -17,13 +19,13 @@ public class RManager
     return _INSTANCE;
   }
 
-  private final RServerManager serverManager;
-  private final IRLoggingFacade loggingFacade;
+  private RServerManager serverManager;
+  private IRManagerPrefs preferences;
 
-  public RManager()
+  public void init(IRManagerPrefs pPreferences)
   {
-    loggingFacade = new RLoggingFacadeImpl();
-    serverManager = new RServerManager(loggingFacade);
+    preferences = pPreferences;
+    serverManager = new RServerManager(preferences.getLoggingFacade(), preferences.getCurrentSettings());
   }
 
   /**
@@ -31,6 +33,7 @@ public class RManager
    */
   public void startup()
   {
+    _checkInit();
     serverManager.connect();
   }
 
@@ -39,7 +42,8 @@ public class RManager
    */
   public void reloadConfiguration()
   {
-    serverManager.reloadConfiguration();
+    _checkInit();
+    serverManager.reloadConfiguration(preferences.getCurrentSettings());
   }
 
   /**
@@ -47,6 +51,7 @@ public class RManager
    */
   public void shutdown()
   {
+    _checkInit();
     serverManager.shutdown();
   }
 
@@ -57,7 +62,28 @@ public class RManager
    */
   public RServerManager getServerManager()
   {
+    _checkInit();
     return serverManager;
+  }
+
+  /**
+   * Returns the global preferences, for wich this Manager was initialized
+   *
+   * @return global preferences
+   */
+  public IRManagerPrefs getPreferences()
+  {
+    _checkInit();
+    return preferences;
+  }
+
+  /**
+   * Checks if the Manager was inited
+   */
+  private void _checkInit()
+  {
+    if(serverManager == null)
+      throw new RuntimeException("RManager not initialized!");
   }
 
 }

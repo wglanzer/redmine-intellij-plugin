@@ -16,6 +16,7 @@ public class RApplicationComponent implements ApplicationComponent
   @Override
   public void initComponent()
   {
+    RManager.getInstance().init(new RManagerPrefsImpl());
     RManager.getInstance().startup();
   }
 

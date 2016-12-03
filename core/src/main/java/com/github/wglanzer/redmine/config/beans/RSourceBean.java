@@ -1,4 +1,4 @@
-package com.github.wglanzer.redmine.config.model;
+package com.github.wglanzer.redmine.config.beans;
 
 import com.github.wglanzer.redmine.model.ISource;
 import org.jetbrains.annotations.NotNull;

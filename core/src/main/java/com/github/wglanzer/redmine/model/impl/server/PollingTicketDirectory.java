@@ -1,9 +1,9 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
+import com.github.wglanzer.redmine.RManager;
 import com.github.wglanzer.redmine.model.ITicket;
 import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
 import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
-import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -28,7 +28,7 @@ class PollingTicketDirectory
 
   public PollingTicketDirectory(String pProjectID)
   {
-    persistentCache = TicketCacheBuilder.createPersistent(new File(IntelliJIDEAUtility.getTicketCacheDirectory(), pProjectID));
+    persistentCache = TicketCacheBuilder.createPersistent(new File(RManager.getInstance().getPreferences().getTicketCacheDirectory(), pProjectID));
 
     // Transfer all tickets to memory
     synchronized(directory)

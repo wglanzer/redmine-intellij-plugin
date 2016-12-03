@@ -1,12 +1,14 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.RAppSettings;
+import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -22,16 +24,17 @@ public class RServerManager
   private final IRLoggingFacade loggingFacade;
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public RServerManager(IRLoggingFacade pLoggingFacade)
+  public RServerManager(IRLoggingFacade pLoggingFacade, ISettings pSettings)
   {
     loggingFacade = pLoggingFacade;
-    reloadConfiguration();
+    reloadConfiguration(pSettings);
   }
 
   /**
    * Reloads the configuration from AppSettings
+   * @param pNewSettings
    */
-  public void reloadConfiguration()
+  public void reloadConfiguration(ISettings pNewSettings)
   {
     synchronized(availableServers)
     {
@@ -39,7 +42,7 @@ public class RServerManager
           .filter(IServer::isValid)
           .forEach(IServer::disconnect);
       availableServers.clear();
-      availableServers.addAll(RAppSettings.getSettings().getSources().stream()
+      availableServers.addAll(pNewSettings.getSources().stream()
           .map(this::_toServer)
           .collect(Collectors.toList()));
 

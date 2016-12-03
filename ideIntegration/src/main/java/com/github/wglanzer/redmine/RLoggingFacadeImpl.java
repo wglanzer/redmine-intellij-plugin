@@ -21,23 +21,14 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   @Override
   public void error(Exception pEx)
   {
-    log(NotificationType.ERROR, pEx.getMessage(), false);
+    _log(NotificationType.ERROR, pEx.getMessage(), false);
     pEx.printStackTrace(); // Print it on console -> Debug-Reasons
   }
 
   @Override
   public void log(String pLogString, boolean pSilent)
   {
-    log(NotificationType.INFORMATION, pLogString, pSilent);
-  }
-
-  @Override
-  public void log(NotificationType pType, String pLogString, boolean pSilent)
-  {
-    Notification notification = new Notification(NOTIFICATION_ID, NOTIFICATION_ID, pLogString, pType);
-    if(pSilent)
-      notification.expire();
-    Notifications.Bus.notify(notification);
+    _log(NotificationType.INFORMATION, pLogString, pSilent);
   }
 
   @Override
@@ -45,6 +36,14 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   {
     log(pDebugString, true);
     System.out.println(pDebugString);
+  }
+
+  private void _log(NotificationType pType, String pLogString, boolean pSilent)
+  {
+    Notification notification = new Notification(NOTIFICATION_ID, NOTIFICATION_ID, pLogString, pType);
+    if(pSilent)
+      notification.expire();
+    Notifications.Bus.notify(notification);
   }
 
 }

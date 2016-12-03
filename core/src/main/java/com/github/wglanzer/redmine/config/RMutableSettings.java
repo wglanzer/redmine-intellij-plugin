@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine.config;
 
-import com.github.wglanzer.redmine.config.model.RSourceBean;
+import com.github.wglanzer.redmine.config.beans.RSourceBean;
 import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.Strings;
 import org.jetbrains.annotations.NotNull;

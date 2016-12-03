@@ -12,19 +12,9 @@
 
   <artifactId>core</artifactId>
   <version>1.0</version>
-  <packaging>pom</packaging>
   <name>Redmine: Core</name>
 
   <dependencies>
-
-    <!-- TODO -->
-    <dependency>
-      <groupId>com.github.wglanzer.redmine</groupId>
-      <artifactId>ideIntegration</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- REST -->
     <dependency>
       <groupId>com.mashape.unirest</groupId>
