@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,7 @@ public class PollingServer implements IServer
 
   private final ISource source;
   private final IRRestConnection connection;
+  private final IRLoggingFacade loggingFacade;
   private final PollingProjectDirectory directory;
   private final PollingExecutor executor;
   private final List<IServerListener> listenerList = new ArrayList<>();
@@ -33,6 +35,7 @@ public class PollingServer implements IServer
   {
     source = pSource;
     connection = RRestConnectionBuilder.createConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
+    loggingFacade = pLoggingFacade;
     directory = new PollingProjectDirectory(connection);
     executor = new PollingExecutor(pLoggingFacade, () -> {
       pollProjects();
@@ -42,15 +45,25 @@ public class PollingServer implements IServer
   }
 
   @Override
-  public void connect() throws Exception
+  public void connectAsync()
   {
-    // start listening ...
-    performPreload();
+    Executors.newSingleThreadExecutor().execute(() ->
+    {
+      try
+      {
+        // start listening ...
+        performPreload();
 
-    // ... and start poll
-    executor.start();
+        // ... and start poll
+        executor.start();
 
-    _fireConnectionStatusChanged(true);
+        _fireConnectionStatusChanged(true);
+      }
+      catch(Exception e)
+      {
+        loggingFacade.error(new Exception("Failed to start server (url: '" + getURL() + "')", e));
+      }
+    });
   }
 
   @Override

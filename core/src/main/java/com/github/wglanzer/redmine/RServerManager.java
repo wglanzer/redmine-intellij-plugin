@@ -58,18 +58,7 @@ public class RServerManager
   {
     synchronized(availableServers)
     {
-      for(IServer currServer : availableServers)
-      {
-        try
-        {
-          currServer.connect();
-        }
-        catch(Exception e)
-        {
-          loggingFacade.error(new Exception("Server '" + currServer + "' could not be connected", e));
-        }
-      }
-
+      availableServers.forEach(IServer::connectAsync);
       isRunning.set(true);
     }
   }
