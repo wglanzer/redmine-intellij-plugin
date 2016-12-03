@@ -58,7 +58,7 @@
 
       <!-- Include plugin.xml -->
       <resource>
-        <directory>../ideBridge/src/main/resources/</directory>
+        <directory>src/main/resources/</directory>
         <includes>
           <include>META-INF/plugin.xml</include>
         </includes>
