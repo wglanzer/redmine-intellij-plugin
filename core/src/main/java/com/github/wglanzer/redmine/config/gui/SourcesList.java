@@ -3,7 +3,6 @@ package com.github.wglanzer.redmine.config.gui;
 import com.github.wglanzer.redmine.config.gui.dialogs.AddSourceDialog;
 import com.github.wglanzer.redmine.config.model.RAppSettingsModel;
 import com.github.wglanzer.redmine.model.ISource;
-import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBList;
 

@@ -3,8 +3,6 @@ package com.github.wglanzer.redmine.model;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Represents a complete Redmine project,
