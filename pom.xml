@@ -13,9 +13,17 @@
   <modules>
     <module>core</module>
     <module>ideIntegration</module>
+    <module>webservice</module>
   </modules>
 
   <dependencies>
+
+    <!-- Annotations -->
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>13.0</version>
+    </dependency>
 
     <!-- Google Guava -->
     <dependency>

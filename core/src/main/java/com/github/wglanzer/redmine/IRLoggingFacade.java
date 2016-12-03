@@ -1,11 +1,13 @@
 package com.github.wglanzer.redmine;
 
+import com.github.wglanzer.redmine.webservice.spi.IRRestLoggingFacade;
+
 /**
  * Contains all logging methods needed
  *
  * @author w.glanzer, 19.11.2016.
  */
-public interface IRLoggingFacade
+public interface IRLoggingFacade extends IRRestLoggingFacade
 {
 
   /**

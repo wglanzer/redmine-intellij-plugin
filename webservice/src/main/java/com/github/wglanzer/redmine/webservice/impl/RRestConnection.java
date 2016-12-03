@@ -1,8 +1,8 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
-import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.github.wglanzer.redmine.webservice.spi.IRRestLoggingFacade;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
@@ -25,15 +25,15 @@ import java.util.stream.StreamSupport;
  *
  * @author w.glanzer, 18.11.2016.
  */
-public class RRestConnection implements IRRestConnection
+class RRestConnection implements IRRestConnection
 {
   private String url;
   private String apiKey;
-  private IRLoggingFacade loggingFacade;
+  private IRRestLoggingFacade loggingFacade;
 
   private AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
 
-  public RRestConnection(String pUrl, String pAPIKey, @Nullable IRLoggingFacade pLoggingFacade)
+  public RRestConnection(String pUrl, String pAPIKey, @Nullable IRRestLoggingFacade pLoggingFacade)
   {
     url = pUrl;
     apiKey = pAPIKey;

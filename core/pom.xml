@@ -15,11 +15,10 @@
   <name>Redmine: Core</name>
 
   <dependencies>
-    <!-- REST -->
     <dependency>
-      <groupId>com.mashape.unirest</groupId>
-      <artifactId>unirest-java</artifactId>
-      <version>1.4.9</version>
+      <groupId>com.github.wglanzer.redmine</groupId>
+      <artifactId>webservice</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- mapdb -->

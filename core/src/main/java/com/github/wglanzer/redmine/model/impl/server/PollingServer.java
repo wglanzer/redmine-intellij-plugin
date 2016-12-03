@@ -4,7 +4,7 @@ import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
-import com.github.wglanzer.redmine.webservice.impl.RRestConnection;
+import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class PollingServer implements IServer
   public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
   {
     source = pSource;
-    connection = new RRestConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
+    connection = RRestConnectionBuilder.createConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
     directory = new PollingProjectDirectory(connection);
     executor = new PollingExecutor(pLoggingFacade, () -> {
       pollProjects();
