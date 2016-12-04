@@ -26,11 +26,11 @@ class PollingProject implements IProject
 
   private String name;
   private String description;
-  private String createdOn;
-  private String updatedOn;
+  private Instant createdOn;
+  private Instant updatedOn;
   private boolean valid;
 
-  public PollingProject(IRRestConnection pRestConnection, String pID, String pName, String pDescription, String pCreatedOn, String pUpdatedOn)
+  public PollingProject(IRRestConnection pRestConnection, String pID, String pName, String pDescription, Instant pCreatedOn, Instant pUpdatedOn)
   {
     connection = pRestConnection;
     ticketDirectory = new PollingTicketDirectory(pID);
@@ -58,13 +58,13 @@ class PollingProject implements IProject
   }
 
   @Override
-  public String getCreatedOn()
+  public Instant getCreatedOn()
   {
     return createdOn;
   }
 
   @Override
-  public String getUpdatedOn()
+  public Instant getUpdatedOn()
   {
     return updatedOn;
   }
@@ -105,13 +105,13 @@ class PollingProject implements IProject
    *
    * @param pFireChanges <tt>true</tt>, if valueChanges should be fired to listeners
    */
-  protected void updateProperties(String pName, String pDescription, String pCreatedOn, String pUpdatedOn, boolean pFireChanges)
+  protected void updateProperties(String pName, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, boolean pFireChanges)
   {
     if(!valid && pFireChanges)
       throw new RuntimeException("updated invalid project (projectID: " + id + ")");
 
     valid = false;
-    Map<String, Map.Entry<String, String>> changedProps = new HashMap<>();
+    Map<String, Map.Entry<Object, Object>> changedProps = new HashMap<>();
 
     if(!Objects.equals(name, pName))
     {
@@ -173,11 +173,7 @@ class PollingProject implements IProject
     // Get only updated tickets. ">lastUpdatedTicket.updated_on"
     ITicket lastUpdatedTicket = ticketDirectory.getLastUpdatedTicket();
     if(lastUpdatedTicket != null)
-    {
-      Instant lastUpdatedTicketTime = Instant.parse(lastUpdatedTicket.getUpdatedOn());
-      lastUpdatedTicketTime = lastUpdatedTicketTime.minusMillis(lastUpdatedTicketTime.get(ChronoField.MILLI_OF_SECOND));
-      request = request.argument("updated_on", "%3E%3D" + lastUpdatedTicketTime.plusSeconds(1).toString()); //>2014-01-02T08:12:32Z
-    }
+      request = request.argument("updated_on", "%3E%3D" + lastUpdatedTicket.getUpdatedOn().plusSeconds(1).toString()); //>2014-01-02T08:12:32Z
 
     // Execute Request
     List<ITicket> allNewTickets = connection.doGET(request)
@@ -232,7 +228,7 @@ class PollingProject implements IProject
    * @param pOldValue Old value of this property
    * @param pNewValue New value for this property
    */
-  private void _firePropertyChange(String pProperty, String pOldValue, String pNewValue)
+  private void _firePropertyChange(String pProperty, Object pOldValue, Object pNewValue)
   {
     synchronized(projectListeners)
     {

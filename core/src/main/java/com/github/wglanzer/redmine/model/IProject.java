@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.Collection;
 
 /**
@@ -35,18 +36,20 @@ public interface IProject
   String getDescription();
 
   /**
-   * Date, when this project was created
+   * Date, when this project was created.
+   * Precision = seconds
    *
    * @return Date
    */
-  String getCreatedOn();
+  Instant getCreatedOn();
 
   /**
    * Date, when this project was updated
+   * Precision = seconds
    *
    * @return Date
    */
-  String getUpdatedOn();
+  Instant getUpdatedOn();
 
   /**
    * All assigned tickets. Opened, closed, ...
@@ -92,7 +95,7 @@ public interface IProject
      * @param pOldValue Old value for this property
      * @param pNewValue New value for this property
      */
-    void redminePropertyChanged(String pName, String pOldValue, String pNewValue);
+    void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue);
 
     /**
      * Fires, if one ticket was added

@@ -1,10 +1,12 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
+import com.github.wglanzer.redmine.util.DateUtil;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -57,8 +59,8 @@ class PollingProjectDirectory
     String projectID = String.valueOf(pProject.getInt("id"));
     String name = pProject.getString("name");
     String description = pProject.getString("description");
-    String createdOn = pProject.getString("created_on");
-    String updatedOn = pProject.getString("updated_on");
+    Instant createdOn = DateUtil.toInstant(pProject.getString("created_on"));
+    Instant updatedOn = DateUtil.toInstant(pProject.getString("updated_on"));
 
     if(!directory.containsKey(projectID))
     {

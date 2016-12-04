@@ -75,8 +75,7 @@ class PersistentTicketCache implements ITicketCache
       // If the lastUpdated-Ticket is not set or the new put
       // ticket is newer than the old one, you have to set the _LAST_ACCESSED_KEY
       ITicket lastUpdatedTicket = getLastUpdatedTicket();
-      if(lastUpdatedTicket == null ||
-          Instant.parse(pers.getUpdatedOn()).isAfter(Instant.parse(lastUpdatedTicket.getUpdatedOn())))
+      if(lastUpdatedTicket == null || pers.getUpdatedOn().isAfter(lastUpdatedTicket.getUpdatedOn()))
         persistentCache.put(_LAST_ACCESSED_KEY, pers);
 
       fileDB.commit();

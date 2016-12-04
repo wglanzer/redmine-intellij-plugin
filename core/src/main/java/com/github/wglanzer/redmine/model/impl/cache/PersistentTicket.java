@@ -4,6 +4,7 @@ import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +21,8 @@ class PersistentTicket implements ITicket, Serializable
   private final long id;
   private final String subject;
   private final String description;
-  private final String updatedOn;
-  private final String createdOn;
+  private final Instant updatedOn;
+  private final Instant createdOn;
   private final String status;
   private final String author;
   private final String priority;
@@ -65,13 +66,13 @@ class PersistentTicket implements ITicket, Serializable
   }
 
   @Override
-  public String getCreatedOn()
+  public Instant getCreatedOn()
   {
     return createdOn;
   }
 
   @Override
-  public String getUpdatedOn()
+  public Instant getUpdatedOn()
   {
     return updatedOn;
   }

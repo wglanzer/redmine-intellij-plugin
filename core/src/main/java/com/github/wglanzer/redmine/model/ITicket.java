@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -37,17 +38,19 @@ public interface ITicket
 
   /**
    * Date, when this project was created
+   * Precision = seconds
    *
    * @return Date
    */
-  String getCreatedOn();
+  Instant getCreatedOn();
 
   /**
-   * Date, when this project was updated
+   * Date, when this project was updated.
+   * Precision = seconds
    *
    * @return Date
    */
-  String getUpdatedOn();
+  Instant getUpdatedOn();
 
   /**
    * Returns the current status of this ticket

@@ -3,6 +3,7 @@ package com.github.wglanzer.redmine.model.impl.server;
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -17,15 +18,15 @@ class PollingTicket implements ITicket
   private final long id;
   private String subject;
   private String description;
-  private String updatedOn;
-  private String createdOn;
+  private Instant updatedOn;
+  private Instant createdOn;
   private String status;
   private String author;
   private String priority;
   private String tracker;
   private String category;
 
-  public PollingTicket(long pID, String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  public PollingTicket(long pID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
     id = pID;
     updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
@@ -52,13 +53,13 @@ class PollingTicket implements ITicket
   }
 
   @Override
-  public String getCreatedOn()
+  public Instant getCreatedOn()
   {
     return createdOn;
   }
 
   @Override
-  public String getUpdatedOn()
+  public Instant getUpdatedOn()
   {
     return updatedOn;
   }
@@ -116,7 +117,7 @@ class PollingTicket implements ITicket
     category = null;
   }
 
-  protected boolean updateProperties(String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  protected boolean updateProperties(String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
     boolean changed = false;
 

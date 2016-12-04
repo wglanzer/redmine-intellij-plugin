@@ -4,11 +4,13 @@ import com.github.wglanzer.redmine.RManager;
 import com.github.wglanzer.redmine.model.ITicket;
 import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
 import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
+import com.github.wglanzer.redmine.util.DateUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,8 +85,8 @@ class PollingTicketDirectory
     Long ticketID = pTicket.getLong("id");
     String subject = pTicket.getString("subject");
     String description = pTicket.getString("description");
-    String createdOn = pTicket.getString("created_on");
-    String updatedOn = pTicket.getString("updated_on");
+    Instant createdOn = DateUtil.toInstant(pTicket.getString("created_on"));
+    Instant updatedOn = DateUtil.toInstant(pTicket.getString("updated_on"));
     String status = pTicket.getJSONObject("status").getString("name");
     String author = pTicket.getJSONObject("author").getString("name");
     String priority = pTicket.getJSONObject("priority").getString("name");
@@ -100,7 +102,7 @@ class PollingTicketDirectory
    *
    * @return Ticket instance which was created or updated
    */
-  protected ITicket updateTicket(Long pTicketID, String pSubject, String pDescription, String pCreatedOn, String pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  protected ITicket updateTicket(Long pTicketID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
     if(!directory.containsKey(pTicketID))
     {
