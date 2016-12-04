@@ -86,15 +86,13 @@ class RRestConnection implements IRRestConnection
     if(pAdditionalArguments != null)
       pAdditionalArguments.forEach((pKey, pValue) -> urlBuilder.append("&").append(pKey).append("=").append(pValue));
 
-    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
-      loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
+    loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 
     Stopwatch watch = Stopwatch.createStarted();
     HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
     watch.stop();
 
-    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
-      loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+    loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
 
     JsonNode result = response.getBody();
     if(_isException(result))

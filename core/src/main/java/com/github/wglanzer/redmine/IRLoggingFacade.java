@@ -13,17 +13,24 @@ public interface IRLoggingFacade extends IRRestLoggingFacade
   /**
    * Logs an exception
    *
-   * @param pEx     Exception that should be logged
+   * @param pEx Exception that should be logged
    */
   void error(Exception pEx);
+
+  /**
+   * Logs an exception
+   *
+   * @param pMessage Message that should be logged
+   * @param pCause   Exception that caused this message
+   */
+  void error(String pMessage, Exception pCause);
 
   /**
    * Logs a string
    *
    * @param pLogString String that should be logged
-   * @param pSilent    <tt>true</tt>, if no balloon should be shown
    */
-  void log(String pLogString, boolean pSilent);
+  void log(String pLogString);
 
   /**
    * Logs a debug string
