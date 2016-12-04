@@ -1,12 +1,12 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
+import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import com.google.common.base.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Impl for IRRestRequest
@@ -18,16 +18,16 @@ public class RRestRequestImpl implements IRRestRequest
 
   private final String subpage;
   private final String toplevelResult;
-  private final Map<String, String> arguments;
+  private final ArrayList<IRRestArgument> arguments;
 
   public RRestRequestImpl()
   {
     subpage = null;
     toplevelResult = null;
-    arguments = new HashMap<>();
+    arguments = new ArrayList<>();
   }
 
-  private RRestRequestImpl(String pSubpage, String pToplevelResult, Map<String, String> pArguments)
+  private RRestRequestImpl(String pSubpage, String pToplevelResult, ArrayList<IRRestArgument> pArguments)
   {
     subpage = pSubpage;
     toplevelResult = pToplevelResult;
@@ -47,13 +47,10 @@ public class RRestRequestImpl implements IRRestRequest
   }
 
   @Override
-  public IRRestRequest argument(@NotNull String pArgument, @Nullable String pValue)
+  public IRRestRequest argument(@NotNull IRRestArgument pArgument)
   {
-    HashMap<String, String> oldArgs = new HashMap<>(arguments);
-    if(pValue != null)
-      oldArgs.put(pArgument, pValue);
-    else
-      oldArgs.remove(pArgument);
+    ArrayList<IRRestArgument> oldArgs = new ArrayList<>();
+    oldArgs.add(pArgument);
     return new RRestRequestImpl(subpage, toplevelResult, oldArgs);
   }
 
@@ -75,7 +72,7 @@ public class RRestRequestImpl implements IRRestRequest
 
   @NotNull
   @Override
-  public Map<String, String> getArguments()
+  public ArrayList<IRRestArgument> getArguments()
   {
     return arguments;
   }

@@ -4,7 +4,7 @@ import com.github.wglanzer.redmine.webservice.impl.RRestRequestImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Contains all available requests to
@@ -57,11 +57,10 @@ public interface IRRestRequest
   /**
    * Adds an argument to this query
    *
-   * @param pArgument Argument key
-   * @param pValue    Argument value
+   * @param pArgument Argument
    * @return a new instance-copy of this request
    */
-  IRRestRequest argument(@NotNull String pArgument, @Nullable String pValue);
+  IRRestRequest argument(@NotNull IRRestArgument pArgument);
 
   /**
    * Returns the subpage-ID of this request
@@ -80,11 +79,11 @@ public interface IRRestRequest
   String getResultTopLevel();
 
   /**
-   * A Map of all set arguments
+   * A List of all set arguments
    *
    * @return all arguments
    */
   @NotNull
-  Map<String, String> getArguments();
+  ArrayList<IRRestArgument> getArguments();
 
 }

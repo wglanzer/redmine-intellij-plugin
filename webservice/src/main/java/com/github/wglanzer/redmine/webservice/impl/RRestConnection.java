@@ -1,11 +1,11 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
 import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
+import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestLoggingFacade;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -67,7 +67,7 @@ class RRestConnection implements IRRestConnection
    * @param pPageKey Subpage ("projects", "issues", etc.)
    * @return Result as JsonNode
    */
-  private JsonNode _doGET(@NotNull String pPageKey, @Nullable Map<String, String> pAdditionalArguments) throws Exception
+  private JsonNode _doGET(@NotNull String pPageKey, @Nullable ArrayList<IRRestArgument> pAdditionalArguments) throws Exception
   {
     StringBuilder urlBuilder = new StringBuilder();
 
@@ -84,7 +84,7 @@ class RRestConnection implements IRRestConnection
 
     // http://myredmineserver.de/issues.json?key=myapikey&[ARGUMENT]=[VALUE]
     if(pAdditionalArguments != null)
-      pAdditionalArguments.forEach((pKey, pValue) -> urlBuilder.append("&").append(pKey).append("=").append(pValue));
+      pAdditionalArguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getName()).append("=").append(pArgument.getValue()));
 
     loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 
