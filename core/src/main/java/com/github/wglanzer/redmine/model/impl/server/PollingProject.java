@@ -176,7 +176,7 @@ class PollingProject implements IProject
       request = request.argument("updated_on", "%3E%3D" + lastUpdatedTicket.getUpdatedOn().plusSeconds(1)); //>2014-01-02T08:12:32Z
 
     // Execute Request
-    List<ITicket> allNewTickets = connection.doGET(request)
+    List<ITicket> allNewTickets = connection.doGET(request).getResultNodes()
         .map(ticketDirectory::updateTicket)
         .collect(Collectors.toList());
 

@@ -9,8 +9,19 @@ import org.jetbrains.annotations.NotNull;
 public interface IRRestArgument
 {
 
-  IRRestArgument PROJECT_ID = new RRestArgumentImpl().name("project_id");
+  IRRestArgument PROJECT_ID = new RRestArgumentImpl().name("id");
+  IRRestArgument PROJECT_NAME = new RRestArgumentImpl().name("name");
+  IRRestArgument PROJECT_DESCRIPTION = new RRestArgumentImpl().name("description");
+  IRRestArgument TICKET_ID = new RRestArgumentImpl().name("id");
+  IRRestArgument TICKET_SUBJECT = new RRestArgumentImpl().name("subject");
+  IRRestArgument TICKET_DESCRIPTION = new RRestArgumentImpl().name("description");
+  IRRestArgument TICKET_STATUS = new RRestArgumentImpl().name("status");
+  IRRestArgument TICKET_AUTHOR = new RRestArgumentImpl().name("author");
+  IRRestArgument TICKET_PRIORITY = new RRestArgumentImpl().name("priority");
+  IRRestArgument TICKET_TRACKER = new RRestArgumentImpl().name("tracker");
+  IRRestArgument TICKET_CATEGORY = new RRestArgumentImpl().name("category");
   IRRestArgument UPDATED_ON = new RRestArgumentImpl().name("updated_on");
+  IRRestArgument CREATED_ON = new RRestArgumentImpl().name("created_on");
 
   /**
    * Sets the name of this argument

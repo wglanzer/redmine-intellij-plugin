@@ -140,7 +140,7 @@ public class PollingServer implements IServer
         .map(IProject::getID)
         .collect(Collectors.toList());
 
-    List<IProject> allNewProjects = connection.doGET(IRRestRequest.GET_PROJECTS)
+    List<IProject> allNewProjects = connection.doGET(IRRestRequest.GET_PROJECTS).getResultNodes()
         .map(directory::updateProject)
         .collect(Collectors.toList());
 

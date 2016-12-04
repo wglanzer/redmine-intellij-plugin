@@ -2,9 +2,10 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.util.DateUtil;
+import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
+import com.github.wglanzer.redmine.webservice.spi.IRRestResult;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.time.Instant;
 import java.util.*;
@@ -51,16 +52,16 @@ class PollingProjectDirectory
    * Updates an specific project.
    * If the project does not exist, a new instance will be created
    *
-   * @param pProject JSON-Object from PollingServer
+   * @param pProject Object from PollingServer
    * @return Project instance which was created or updated
    */
-  protected IProject updateProject(JSONObject pProject)
+  protected IProject updateProject(IRRestResult.Node pProject)
   {
-    String projectID = String.valueOf(pProject.getInt("id"));
-    String name = pProject.getString("name");
-    String description = pProject.getString("description");
-    Instant createdOn = DateUtil.toInstant(pProject.getString("created_on"));
-    Instant updatedOn = DateUtil.toInstant(pProject.getString("updated_on"));
+    String projectID = pProject.getValue(IRRestArgument.PROJECT_ID);
+    String name = pProject.getValue(IRRestArgument.PROJECT_NAME);
+    String description = pProject.getValue(IRRestArgument.PROJECT_DESCRIPTION);
+    Instant createdOn = DateUtil.toInstant(pProject.getValue(IRRestArgument.CREATED_ON));
+    Instant updatedOn = DateUtil.toInstant(pProject.getValue(IRRestArgument.UPDATED_ON));
 
     if(!directory.containsKey(projectID))
     {

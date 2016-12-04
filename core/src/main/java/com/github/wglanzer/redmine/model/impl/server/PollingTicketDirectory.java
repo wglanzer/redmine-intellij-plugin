@@ -5,9 +5,10 @@ import com.github.wglanzer.redmine.model.ITicket;
 import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
 import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
 import com.github.wglanzer.redmine.util.DateUtil;
+import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
+import com.github.wglanzer.redmine.webservice.spi.IRRestResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.time.Instant;
@@ -77,21 +78,21 @@ class PollingTicketDirectory
    * Updates an specific ticket.
    * If the ticket does not exist, a new instance will be created
    *
-   * @param pTicket JSON-Object from PollingProject
+   * @param pTicket Object from PollingProject
    * @return Ticket instance which was created or updated
    */
-  protected ITicket updateTicket(JSONObject pTicket)
+  protected ITicket updateTicket(IRRestResult.Node pTicket)
   {
-    Long ticketID = pTicket.getLong("id");
-    String subject = pTicket.getString("subject");
-    String description = pTicket.getString("description");
-    Instant createdOn = DateUtil.toInstant(pTicket.getString("created_on"));
-    Instant updatedOn = DateUtil.toInstant(pTicket.getString("updated_on"));
-    String status = pTicket.getJSONObject("status").getString("name");
-    String author = pTicket.getJSONObject("author").getString("name");
-    String priority = pTicket.getJSONObject("priority").getString("name");
-    String tracker = pTicket.getJSONObject("tracker").getString("name");
-    String category = "";//pTicket.getJSONObject("category").getString("name"); todo
+    long ticketID = Long.parseLong(pTicket.getValue(IRRestArgument.TICKET_ID));
+    String subject = pTicket.getValue(IRRestArgument.TICKET_SUBJECT);
+    String description = pTicket.getValue(IRRestArgument.TICKET_DESCRIPTION);
+    Instant createdOn = DateUtil.toInstant(pTicket.getValue(IRRestArgument.CREATED_ON));
+    Instant updatedOn = DateUtil.toInstant(pTicket.getValue(IRRestArgument.UPDATED_ON));
+    String status = pTicket.getValue(IRRestArgument.TICKET_STATUS);
+    String author = pTicket.getValue(IRRestArgument.TICKET_AUTHOR);
+    String priority = pTicket.getValue(IRRestArgument.TICKET_PRIORITY);
+    String tracker = pTicket.getValue(IRRestArgument.TICKET_TRACKER);
+    String category = ""; //pTicket.getValue(IRRestArgument.TICKET_CATEGORY); TODO
 
     return updateTicket(ticketID, subject, description, createdOn, updatedOn, status, author, priority, tracker, category);
   }

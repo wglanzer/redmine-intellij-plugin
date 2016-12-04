@@ -1,8 +1,6 @@
 package com.github.wglanzer.redmine.webservice.spi;
 
-import org.json.JSONObject;
-
-import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author w.glanzer, 18.11.2016.
@@ -15,9 +13,10 @@ public interface IRRestConnection
    * to the specified redmine server
    *
    * @param pGETRequest Request that should be done
-   * @return JSON-Result as Stream
+   * @return Result, wrapped in IRRestResult, not <tt>null</tt>
    */
-  Stream<JSONObject> doGET(IRRestRequest pGETRequest) throws Exception;
+  @NotNull
+  IRRestResult doGET(IRRestRequest pGETRequest) throws Exception;
 
   /**
    * Returns true, if the connection can be used
