@@ -40,15 +40,19 @@ class RRestConnection implements IRRestConnection
   @Override
   public IRRestResult doGET(IRRestRequest pGETRequest) throws Exception
   {
-    JSONObject GETResponse = _doGET(pGETRequest.getSubPage() + ".json", pGETRequest.getArguments()).getObject();
+    if(!(pGETRequest instanceof RRestRequestImpl))
+      throw new UnsupportedOperationException(pGETRequest.getClass() + " not supported as request-type");
+
+    RRestRequestImpl request = (RRestRequestImpl) pGETRequest;
+    JSONObject GETResponse = _doGET(request.getSubPage() + ".json", request.getArguments()).getObject();
     JSONArray result;
 
-    if(pGETRequest.getResultTopLevel() == null)
+    if(request.getResultTopLevel() == null)
       result = new JSONArray(Collections.singleton(GETResponse));
     else
-      result = GETResponse.getJSONArray(pGETRequest.getResultTopLevel());
+      result = GETResponse.getJSONArray(request.getResultTopLevel());
 
-    return new JSONRRestResult(pGETRequest, result);
+    return new JSONRRestResult(request, result);
   }
 
   @Override
@@ -81,7 +85,7 @@ class RRestConnection implements IRRestConnection
 
     // http://myredmineserver.de/issues.json?key=myapikey&[ARGUMENT]=[VALUE]
     if(pAdditionalArguments != null)
-      pAdditionalArguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getName()).append("=").append(pArgument.getValue()));
+      pAdditionalArguments.forEach((pArgument) -> urlBuilder.append("&").append(((RRestArgumentImpl) pArgument).getName()).append("=").append(pArgument.getValue()));
 
     loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 

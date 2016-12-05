@@ -35,19 +35,7 @@ public class RRestRequestImpl implements IRRestRequest
   }
 
   @Override
-  public IRRestRequest subpage(@NotNull String pSubPage)
-  {
-    return new RRestRequestImpl(pSubPage, toplevelResult, arguments);
-  }
-
-  @Override
-  public IRRestRequest resultTopLevel(@Nullable String pTopLevelResult)
-  {
-    return new RRestRequestImpl(subpage, pTopLevelResult, arguments);
-  }
-
-  @Override
-  public IRRestRequest argument(@NotNull IRRestArgument pArgument)
+  public RRestRequestImpl argument(@NotNull IRRestArgument pArgument)
   {
     ArrayList<IRRestArgument> oldArgs = new ArrayList<>();
     oldArgs.add(pArgument);
@@ -56,6 +44,44 @@ public class RRestRequestImpl implements IRRestRequest
 
   @NotNull
   @Override
+  public ArrayList<IRRestArgument> getArguments()
+  {
+    return arguments;
+  }
+
+  /**
+   * This method sets the subpage-ID
+   * For example: "projects" to query "http://redmine.myurl.com/projects.json"
+   *
+   * @param pSubPage Subpage as string, or <tt>null</tt> to clear
+   * @return a new instance-copy of this request
+   */
+  public RRestRequestImpl subpage(@NotNull String pSubPage)
+  {
+    return new RRestRequestImpl(pSubPage, toplevelResult, arguments);
+  }
+
+  /**
+   * This method sets the result toplevel.
+   * If the redmine server API answers with:
+   * projects:
+   *   project:
+   *     ...
+   *   project:
+   *     ...
+   *
+   * you can set "projects" as result toplevel, so that "projects"
+   * wont be shown in result-Stream within the connection
+   *
+   * @param pTopLevelResult toplevel as string, or <tt>null</tt> to clear
+   * @return a new instance-copy of this request
+   */
+  public RRestRequestImpl resultTopLevel(@Nullable String pTopLevelResult)
+  {
+    return new RRestRequestImpl(subpage, pTopLevelResult, arguments);
+  }
+
+  @NotNull
   public String getSubPage()
   {
     if(subpage == null)
@@ -64,17 +90,9 @@ public class RRestRequestImpl implements IRRestRequest
     return subpage;
   }
 
-  @Override
   public String getResultTopLevel()
   {
     return toplevelResult;
-  }
-
-  @NotNull
-  @Override
-  public ArrayList<IRRestArgument> getArguments()
-  {
-    return arguments;
   }
 
   @Override

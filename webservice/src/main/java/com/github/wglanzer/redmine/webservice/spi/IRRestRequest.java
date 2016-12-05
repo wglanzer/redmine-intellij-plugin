@@ -2,7 +2,6 @@ package com.github.wglanzer.redmine.webservice.spi;
 
 import com.github.wglanzer.redmine.webservice.impl.RRestRequestImpl;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -29,54 +28,12 @@ public interface IRRestRequest
   IRRestRequest GET_TICKETS = new RRestRequestImpl().subpage("issues").resultTopLevel("issues");
 
   /**
-   * This method sets the subpage-ID
-   * For example: "projects" to query "http://redmine.myurl.com/projects.json"
-   *
-   * @param pSubPage Subpage as string, or <tt>null</tt> to clear
-   * @return a new instance-copy of this request
-   */
-  IRRestRequest subpage(@NotNull String pSubPage);
-
-  /**
-   * This method sets the result toplevel.
-   * If the redmine server API answers with:
-   * projects:
-   *   project:
-   *     ...
-   *   project:
-   *     ...
-   *
-   * you can set "projects" as result toplevel, so that "projects"
-   * wont be shown in result-Stream within the connection
-   *
-   * @param pTopLevelResult toplevel as string, or <tt>null</tt> to clear
-   * @return a new instance-copy of this request
-   */
-  IRRestRequest resultTopLevel(@Nullable String pTopLevelResult);
-
-  /**
    * Adds an argument to this query
    *
    * @param pArgument Argument
    * @return a new instance-copy of this request
    */
   IRRestRequest argument(@NotNull IRRestArgument pArgument);
-
-  /**
-   * Returns the subpage-ID of this request
-   *
-   * @return subpage-ID as String, not <tt>null</tt>
-   */
-  @NotNull
-  String getSubPage();
-
-  /**
-   * Returns the result toplevel of this request
-   *
-   * @return result toplevel as String, not <tt>null</tt>
-   */
-  @Nullable
-  String getResultTopLevel();
 
   /**
    * A List of all set arguments

@@ -1,7 +1,6 @@
 package com.github.wglanzer.redmine.webservice.spi;
 
 import com.github.wglanzer.redmine.webservice.impl.RRestArgumentImpl;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author w.glanzer, 04.12.2016.
@@ -22,14 +21,6 @@ public interface IRRestArgument
   IRRestArgument TICKET_CATEGORY = new RRestArgumentImpl().name("category");
   IRRestArgument UPDATED_ON = new RRestArgumentImpl().name("updated_on");
   IRRestArgument CREATED_ON = new RRestArgumentImpl().name("created_on");
-
-  /**
-   * Sets the name of this argument
-   *
-   * @param pName new Name
-   * @return a copy of this argument, name set to pName
-   */
-  IRRestArgument name(@NotNull String pName);
 
   /**
    * Sets the value of this argument

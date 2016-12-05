@@ -26,13 +26,7 @@ public class RRestArgumentImpl implements IRRestArgument
   }
 
   @Override
-  public IRRestArgument name(@NotNull String pName)
-  {
-    return new RRestArgumentImpl(pName, value);
-  }
-
-  @Override
-  public IRRestArgument value(String pValue)
+  public RRestArgumentImpl value(String pValue)
   {
     return new RRestArgumentImpl(name, pValue);
   }
@@ -48,4 +42,16 @@ public class RRestArgumentImpl implements IRRestArgument
   {
     return value;
   }
+
+  /**
+   * Sets the name of this argument
+   *
+   * @param pName new Name
+   * @return a copy of this argument, name set to pName
+   */
+  public RRestArgumentImpl name(@NotNull String pName)
+  {
+    return new RRestArgumentImpl(pName, value);
+  }
+
 }
