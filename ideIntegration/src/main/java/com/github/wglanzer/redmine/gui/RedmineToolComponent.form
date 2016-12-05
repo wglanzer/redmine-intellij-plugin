@@ -20,10 +20,17 @@
           </component>
         </children>
       </grid>
-      <component id="995fa" class="javax.swing.JTree" binding="redmineTree">
+      <scrollpane id="2bcc0">
         <constraints border-constraint="Center"/>
         <properties/>
-      </component>
+        <border type="none"/>
+        <children>
+          <component id="995fa" class="javax.swing.JTree" binding="redmineTree">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>

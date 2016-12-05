@@ -84,8 +84,10 @@ public class RedmineToolComponent extends JPanel
     refreshButton = new JButton();
     refreshButton.setText("Refresh");
     panel1.add(refreshButton, BorderLayout.WEST);
+    final JScrollPane scrollPane1 = new JScrollPane();
+    rootPanel.add(scrollPane1, BorderLayout.CENTER);
     redmineTree = new JTree();
-    rootPanel.add(redmineTree, BorderLayout.CENTER);
+    scrollPane1.setViewportView(redmineTree);
   }
 
   /**
