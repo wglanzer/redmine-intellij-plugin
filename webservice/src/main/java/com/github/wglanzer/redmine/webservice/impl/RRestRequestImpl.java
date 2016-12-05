@@ -19,27 +19,30 @@ public class RRestRequestImpl implements IRRestRequest
   private final String subpage;
   private final String toplevelResult;
   private final ArrayList<IRRestArgument> arguments;
+  private final boolean pageable;
 
   public RRestRequestImpl()
   {
     subpage = null;
     toplevelResult = null;
     arguments = new ArrayList<>();
+    pageable = false;
   }
 
-  private RRestRequestImpl(String pSubpage, String pToplevelResult, ArrayList<IRRestArgument> pArguments)
+  private RRestRequestImpl(String pSubpage, String pToplevelResult, ArrayList<IRRestArgument> pArguments, boolean pPageable)
   {
     subpage = pSubpage;
     toplevelResult = pToplevelResult;
     arguments = pArguments;
+    pageable = pPageable;
   }
 
   @Override
   public RRestRequestImpl argument(@NotNull IRRestArgument pArgument)
   {
-    ArrayList<IRRestArgument> oldArgs = new ArrayList<>();
+    ArrayList<IRRestArgument> oldArgs = new ArrayList<>(arguments);
     oldArgs.add(pArgument);
-    return new RRestRequestImpl(subpage, toplevelResult, oldArgs);
+    return new RRestRequestImpl(subpage, toplevelResult, oldArgs, pageable);
   }
 
   @NotNull
@@ -47,6 +50,12 @@ public class RRestRequestImpl implements IRRestRequest
   public ArrayList<IRRestArgument> getArguments()
   {
     return arguments;
+  }
+
+  @Override
+  public boolean isPageable()
+  {
+    return pageable;
   }
 
   /**
@@ -58,7 +67,7 @@ public class RRestRequestImpl implements IRRestRequest
    */
   public RRestRequestImpl subpage(@NotNull String pSubPage)
   {
-    return new RRestRequestImpl(pSubPage, toplevelResult, arguments);
+    return new RRestRequestImpl(pSubPage, toplevelResult, arguments, pageable);
   }
 
   /**
@@ -78,7 +87,18 @@ public class RRestRequestImpl implements IRRestRequest
    */
   public RRestRequestImpl resultTopLevel(@Nullable String pTopLevelResult)
   {
-    return new RRestRequestImpl(subpage, pTopLevelResult, arguments);
+    return new RRestRequestImpl(subpage, pTopLevelResult, arguments, pageable);
+  }
+
+  /**
+   * Sets the flag that indicates, if the request is pageable or not
+   *
+   * @param pPageable <tt>true</tt> if it is pageable
+   * @return a new instance-copy of this request
+   */
+  public RRestRequestImpl pageable(boolean pPageable)
+  {
+    return new RRestRequestImpl(subpage, toplevelResult, arguments, pPageable);
   }
 
   @NotNull

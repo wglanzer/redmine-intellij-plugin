@@ -25,7 +25,7 @@ public interface IRRestRequest
    * available tickets from a redmine server.
    * It should contain the "project_id"-argument to filter by projectid
    */
-  IRRestRequest GET_TICKETS = new RRestRequestImpl().subpage("issues").resultTopLevel("issues");
+  IRRestRequest GET_TICKETS = new RRestRequestImpl().subpage("issues").resultTopLevel("issues").pageable(true);
 
   /**
    * Adds an argument to this query
@@ -42,5 +42,11 @@ public interface IRRestRequest
    */
   @NotNull
   ArrayList<IRRestArgument> getArguments();
+
+  /**
+   * @return Returns the flag that indicates, that the request
+   * can be paged by adding "offset", "limit" and "sort" parameters
+   */
+  boolean isPageable();
 
 }

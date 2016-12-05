@@ -21,6 +21,11 @@ public interface IRRestArgument
   IRRestArgument TICKET_CATEGORY = new RRestArgumentImpl().name("category");
   IRRestArgument UPDATED_ON = new RRestArgumentImpl().name("updated_on");
   IRRestArgument CREATED_ON = new RRestArgumentImpl().name("created_on");
+  IRRestArgument API_KEY = new RRestArgumentImpl().name("key");
+  IRRestArgument SORT = new RRestArgumentImpl().name("sort");
+  IRRestArgument PAGE_OFFSET = new RRestArgumentImpl().name("offset");
+  IRRestArgument PAGE_LIMIT = new RRestArgumentImpl().name("limit");
+  IRRestArgument PAGE_TOTALCOUNT = new RRestArgumentImpl().name("total_count");
 
   /**
    * Sets the value of this argument

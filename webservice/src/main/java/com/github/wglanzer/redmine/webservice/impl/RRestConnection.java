@@ -3,7 +3,6 @@ package com.github.wglanzer.redmine.webservice.impl;
 import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
 import com.github.wglanzer.redmine.webservice.spi.*;
 import com.google.common.base.Stopwatch;
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +12,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RRestConnection implements IRRestConnection
 {
+  private static final int _PAGESIZE = 25;
   private String url;
   private String apiKey;
   private IRRestLoggingFacade loggingFacade;
@@ -44,7 +45,7 @@ class RRestConnection implements IRRestConnection
       throw new UnsupportedOperationException(pGETRequest.getClass() + " not supported as request-type");
 
     RRestRequestImpl request = (RRestRequestImpl) pGETRequest;
-    JSONObject GETResponse = _doGET(request.getSubPage() + ".json", request.getArguments()).getObject();
+    JSONObject GETResponse = _doGET(pGETRequest, request.getSubPage() + ".json", request.getArguments()).getObject();
     JSONArray result;
 
     if(request.getResultTopLevel() == null)
@@ -68,7 +69,7 @@ class RRestConnection implements IRRestConnection
    * @return Result as JsonNode
    */
   @NotNull
-  private JsonNode _doGET(@NotNull String pPageKey, @Nullable ArrayList<IRRestArgument> pAdditionalArguments) throws Exception
+  private JsonNode _doGET(@NotNull IRRestRequest pRequest, @NotNull String pPageKey, @Nullable ArrayList<IRRestArgument> pAdditionalArguments) throws Exception
   {
     StringBuilder urlBuilder = new StringBuilder();
 
@@ -81,25 +82,117 @@ class RRestConnection implements IRRestConnection
     urlBuilder.append(pPageKey);
 
     // http://myredmineserver.de/issues.json?key=myapikey
-    urlBuilder.append("?key=").append(apiKey);
+    ArrayList<IRRestArgument> arguments = pAdditionalArguments != null ? new ArrayList<>(pAdditionalArguments) : new ArrayList<>();
+    arguments.add(IRRestArgument.API_KEY.value(apiKey));
 
-    // http://myredmineserver.de/issues.json?key=myapikey&[ARGUMENT]=[VALUE]
-    if(pAdditionalArguments != null)
-      pAdditionalArguments.forEach((pArgument) -> urlBuilder.append("&").append(((RRestArgumentImpl) pArgument).getName()).append("=").append(pArgument.getValue()));
+    JsonNode response;
+    if(pRequest.isPageable())
+      response = _executePaged(pRequest, urlBuilder.toString(), arguments);
+    else
+      response = _executePlain(urlBuilder.toString(), arguments);
 
+    if(_isException(response))
+      throw new ResultHasErrorException(response, urlBuilder.toString());
+
+    return response;
+  }
+
+  /**
+   * Executes the REST-URL, does pageing
+   *
+   * @param pURL       URL that should be executed
+   * @param pArguments Additional arguments, not <tt>null</tt>
+   * @return result, not wrapped
+   * @throws Exception if an error occured
+   */
+  private JsonNode _executePaged(IRRestRequest pRequest, @NotNull String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  {
+    try
+    {
+      int currentOffset = 0;
+      int total_count = _PAGESIZE;
+
+      // Add pagelimit and sort, always the same during request
+      pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(_PAGESIZE)));
+      pArguments.add(IRRestArgument.SORT.value(":desc"));
+      ArrayList<JsonNode> results = new ArrayList<>();
+
+      while(total_count >= currentOffset + _PAGESIZE)
+      {
+        ArrayList<IRRestArgument> currentArguments = new ArrayList<>(pArguments);
+        currentArguments.add(IRRestArgument.PAGE_OFFSET.value(String.valueOf(currentOffset)));
+        JsonNode response = _executePlain(pURL, currentArguments);
+        JSONObject object = response.getObject();
+        currentOffset = object.getInt(IRRestArgument.PAGE_OFFSET.getName()) + _PAGESIZE;
+        total_count = object.getInt(IRRestArgument.PAGE_TOTALCOUNT.getName());
+        results.add(response);
+      }
+
+      // Merge to one jsonnode
+      return _merge(results, ((RRestRequestImpl) pRequest).getResultTopLevel());
+    }
+    catch(Exception e)
+    {
+      throw new Exception("Error executing request (url: " + pURL + ")", e);
+    }
+  }
+
+  /**
+   * Executes the REST-URL, NO pageing
+   *
+   * @param pURL       URL that should be executed
+   * @param pArguments Additional arguments, not <tt>null</tt>
+   * @return result, not wrapped
+   * @throws Exception if an error occured
+   */
+  private JsonNode _executePlain(@NotNull String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  {
+    StringBuilder urlBuilder = new StringBuilder(pURL);
+    ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
+
+    // Add arguments to urlBuilder
+    if(arguments.size() > 0)
+    {
+      IRRestArgument firstArg = arguments.get(0);
+      urlBuilder.append("?").append(firstArg.getName()).append("=").append(firstArg.getValue());
+     arguments.remove(0);
+    }
+    arguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getName()).append("=").append(pArgument.getValue()));
+
+    // Log output
     loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
 
     Stopwatch watch = Stopwatch.createStarted();
-    HttpResponse<JsonNode> response = Unirest.get(urlBuilder.toString()).asJson();
+    JsonNode result = Unirest.get(urlBuilder.toString()).asJson().getBody();
     watch.stop();
 
+    // Log output + time
     loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
-
-    JsonNode result = response.getBody();
-    if(_isException(result))
-      throw new ResultHasErrorException(result, urlBuilder.toString());
-
     return result;
+  }
+
+  /**
+   * Merges a lot of JsonNodes to one JsonNode
+   *
+   * @param pNodes          Nodes that should be merged
+   * @param pTopLevelResult TLR
+   * @return a Node containing all other nodes content
+   */
+  @NotNull
+  private JsonNode _merge(List<JsonNode> pNodes, String pTopLevelResult)
+  {
+    JsonNode resultNode = new JsonNode(null);
+    JSONObject resultObject = resultNode.getObject();
+    JSONArray resultTopLevelArray = new JSONArray();
+    resultObject.put(pTopLevelResult, resultTopLevelArray);
+    pNodes.stream()
+        .map(JsonNode::getObject)
+        .map(pJSONObject -> pJSONObject.getJSONArray(pTopLevelResult))
+        .forEach(pTopLevelArray -> {
+          for(Object entry : pTopLevelArray)
+            resultTopLevelArray.put(entry);
+        });
+    return resultNode;
   }
 
   /**
