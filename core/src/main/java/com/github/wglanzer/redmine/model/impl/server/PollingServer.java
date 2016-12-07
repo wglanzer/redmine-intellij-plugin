@@ -5,8 +5,10 @@ import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
+import com.github.wglanzer.redmine.webservice.impl.WebserviceModule;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
+import com.google.inject.Guice;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,6 +25,10 @@ import java.util.stream.Collectors;
 public class PollingServer implements IServer
 {
   public static final int DEFAULT_POLLINTERVAL = 300;
+
+  static {
+    Guice.createInjector(new WebserviceModule());
+  }
 
   private final ISource source;
   private final IRRestConnection connection;

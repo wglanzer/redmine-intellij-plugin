@@ -1,7 +1,5 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.ISettings;
-
 /**
  * Manager 4 Redmine
  *
