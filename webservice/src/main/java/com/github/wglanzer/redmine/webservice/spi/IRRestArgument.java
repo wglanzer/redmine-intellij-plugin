@@ -26,6 +26,7 @@ public interface IRRestArgument
   IRRestArgument PAGE_OFFSET = new RRestArgumentImpl().name("offset");
   IRRestArgument PAGE_LIMIT = new RRestArgumentImpl().name("limit");
   IRRestArgument PAGE_TOTALCOUNT = new RRestArgumentImpl().name("total_count");
+  IRRestArgument TICKET_STATUS_ID = new RRestArgumentImpl().name("status_id"); //todo
 
   /**
    * Sets the value of this argument
