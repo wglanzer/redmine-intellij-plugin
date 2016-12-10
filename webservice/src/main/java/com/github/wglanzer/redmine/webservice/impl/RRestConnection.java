@@ -13,6 +13,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,11 +26,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RRestConnection implements IRRestConnection
 {
-  private static final int _PAGESIZE = 25;
+  private static final int _PAGESIZE = 25; // todo configurable
   private String url;
   private String apiKey;
   private IRRestLoggingFacade loggingFacade;
-
+  private final ExecutorService executor = Executors.newFixedThreadPool(8); //todo why 8?
   private AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
 
   public RRestConnection(String pUrl, String pAPIKey, @Nullable IRRestLoggingFacade pLoggingFacade)
@@ -107,33 +110,68 @@ class RRestConnection implements IRRestConnection
    */
   private JsonNode _executePaged(IRRestRequest pRequest, @NotNull String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
   {
+    synchronized(executor)
+    {
+      try
+      {
+        int total_count = _getTotalCount(pURL, pArguments);
+
+        // Add pagelimit and sort, always the same during request
+        pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(_PAGESIZE)));
+        pArguments.add(IRRestArgument.SORT.value(":desc"));
+        List<JsonNode> results = Collections.synchronizedList(new ArrayList<>());
+        List<CompletableFuture<Void>> resultFutures = new ArrayList<>();
+
+        for(int i = 0; i < total_count; i += _PAGESIZE)
+        {
+          final ArrayList<IRRestArgument> currentArguments = new ArrayList<>(pArguments);
+          currentArguments.add(IRRestArgument.PAGE_OFFSET.value(String.valueOf(i)));
+          resultFutures.add(CompletableFuture.runAsync(() ->
+          {
+            try
+            {
+              results.add(_executePlain(pURL, currentArguments));
+            }
+            catch(Exception e)
+            {
+              throw new RuntimeException("Error executing request: url -> " + pURL + ", arguments -> " + currentArguments, e);
+            }
+          }, executor));
+        }
+
+        // Wait to finish all tasks
+        CompletableFuture.allOf(resultFutures.toArray(new CompletableFuture[resultFutures.size()])).get();
+
+        // Merge to one jsonnode
+        return _merge(results, ((RRestRequestImpl) pRequest).getResultTopLevel());
+      }
+      catch(Exception e)
+      {
+        throw new Exception("Error executing request (url: " + pURL + ")", e);
+      }
+    }
+  }
+
+  /**
+   * Returns the total_count-Attribute from Rest-API
+   *
+   * @param pURL       URL
+   * @param pArguments Arguments
+   * @return total_count-Attribute
+   * @throws Exception if an error occured
+   */
+  private int _getTotalCount(String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  {
     try
     {
-      int currentOffset = 0;
-      int total_count = _PAGESIZE;
-
-      // Add pagelimit and sort, always the same during request
-      pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(_PAGESIZE)));
-      pArguments.add(IRRestArgument.SORT.value(":desc"));
-      ArrayList<JsonNode> results = new ArrayList<>();
-
-      while(total_count >= currentOffset + _PAGESIZE)
-      {
-        ArrayList<IRRestArgument> currentArguments = new ArrayList<>(pArguments);
-        currentArguments.add(IRRestArgument.PAGE_OFFSET.value(String.valueOf(currentOffset)));
-        JsonNode response = _executePlain(pURL, currentArguments);
-        JSONObject object = response.getObject();
-        currentOffset = object.getInt(IRRestArgument.PAGE_OFFSET.getName()) + _PAGESIZE;
-        total_count = object.getInt(IRRestArgument.PAGE_TOTALCOUNT.getName());
-        results.add(response);
-      }
-
-      // Merge to one jsonnode
-      return _merge(results, ((RRestRequestImpl) pRequest).getResultTopLevel());
+      ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
+      arguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(0)));
+      JsonNode node = _executePlain(pURL, arguments);
+      return node.getObject().getInt(IRRestArgument.PAGE_TOTALCOUNT.getName());
     }
     catch(Exception e)
     {
-      throw new Exception("Error executing request (url: " + pURL + ")", e);
+      throw new Exception("total_count could not be determined", e);
     }
   }
 
