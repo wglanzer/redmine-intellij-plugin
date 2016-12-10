@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author w.glanzer, 27.11.2016.
@@ -22,8 +22,7 @@ class PersistentTicketCache implements ITicketCache
   private static final String _CACHE_ID = "ticketCache";
   private static final Long _LAST_ACCESSED_KEY = -1337L;
 
-  private final HTreeMap<Long, ITicket> persistentCache;
-  private final DB fileDB;
+  private final Map<Long, ITicket> persistentCache;
 
   public PersistentTicketCache(File pCacheFolder)
   {
@@ -35,7 +34,8 @@ class PersistentTicketCache implements ITicketCache
       path += File.separatorChar;
     path += _CACHE_ID;
 
-    fileDB = DBMaker.fileDB(path).checksumHeaderBypass()
+    DB fileDB = DBMaker.fileDB(path).checksumHeaderBypass()
+        .fileChannelEnable()
         .closeOnJvmShutdown()
         .make();
     persistentCache = fileDB.hashMap(_CACHE_ID, new SerializerLong(), new Serializer<ITicket>()
@@ -67,56 +67,33 @@ class PersistentTicketCache implements ITicketCache
   @Override
   public void put(ITicket pTicket)
   {
-    synchronized(persistentCache)
-    {
-      ITicket pers = new PersistentTicket(pTicket);
-      persistentCache.put(pTicket.getID(), pers);
-
-      // If the lastUpdated-Ticket is not set or the new put
-      // ticket is newer than the old one, you have to set the _LAST_ACCESSED_KEY
-      ITicket lastUpdatedTicket = getLastUpdatedTicket();
-      if(lastUpdatedTicket == null || pers.getUpdatedOn().isAfter(lastUpdatedTicket.getUpdatedOn()))
-        persistentCache.put(_LAST_ACCESSED_KEY, pers);
-
-      fileDB.commit();
-    }
+    ITicket pers = new PersistentTicket(pTicket);
+    persistentCache.put(pTicket.getID(), pers);
   }
 
   @Override
   public void remove(Long pTicketID)
   {
-    synchronized(persistentCache)
-    {
-      persistentCache.remove(pTicketID);
-    }
+    persistentCache.remove(pTicketID);
   }
 
   @Override
   public ITicket get(Long pID)
   {
-    synchronized(persistentCache)
-    {
-      return persistentCache.get(pID);
-    }
+    return persistentCache.get(pID);
   }
 
   @NotNull
   @Override
   public List<ITicket> getAllTickets()
   {
-    synchronized(persistentCache)
-    {
-      return new ArrayList<>(persistentCache.values());
-    }
+    return new ArrayList<>(persistentCache.values());
   }
 
   @Override
   public ITicket getLastUpdatedTicket()
   {
-    synchronized(persistentCache)
-    {
-      return persistentCache.get(_LAST_ACCESSED_KEY);
-    }
+    return persistentCache.get(_LAST_ACCESSED_KEY);
   }
 
 }
