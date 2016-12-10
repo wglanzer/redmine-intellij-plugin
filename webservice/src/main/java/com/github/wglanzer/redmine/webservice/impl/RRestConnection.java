@@ -26,18 +26,22 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class RRestConnection implements IRRestConnection
 {
-  private static final int _PAGESIZE = 25; // todo configurable
-  private String url;
-  private String apiKey;
-  private IRRestLoggingFacade loggingFacade;
-  private final ExecutorService executor = Executors.newFixedThreadPool(8); //todo why 8?
-  private AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
+  private static final int _DEFAULT_PAGESIZE = 25;
+  private static final int _MAX_PAGESIZE = 100; // Maximum elements are limited to 100 per page (Redmine-REST-API)
 
-  public RRestConnection(String pUrl, String pAPIKey, @Nullable IRRestLoggingFacade pLoggingFacade)
+  private final int pagesize;
+  private final String url;
+  private final String apiKey;
+  private final IRRestLoggingFacade loggingFacade;
+  private final ExecutorService executor = Executors.newFixedThreadPool(8); //todo why 8?
+  private final AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
+
+  public RRestConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pUrl, String pAPIKey, Integer pPageSize)
   {
     url = pUrl;
     apiKey = pAPIKey;
     loggingFacade = pLoggingFacade;
+    pagesize = pPageSize == null ? _DEFAULT_PAGESIZE : (pPageSize > _MAX_PAGESIZE ? _MAX_PAGESIZE : pPageSize);
   }
 
   @NotNull
@@ -117,12 +121,12 @@ class RRestConnection implements IRRestConnection
         int total_count = _getTotalCount(pURL, pArguments);
 
         // Add pagelimit and sort, always the same during request
-        pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(_PAGESIZE)));
+        pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(pagesize)));
         pArguments.add(IRRestArgument.SORT.value(":desc"));
         List<JsonNode> results = Collections.synchronizedList(new ArrayList<>());
         List<CompletableFuture<Void>> resultFutures = new ArrayList<>();
 
-        for(int i = 0; i < total_count; i += _PAGESIZE)
+        for(int i = 0; i < total_count; i += pagesize)
         {
           final ArrayList<IRRestArgument> currentArguments = new ArrayList<>(pArguments);
           currentArguments.add(IRRestArgument.PAGE_OFFSET.value(String.valueOf(i)));

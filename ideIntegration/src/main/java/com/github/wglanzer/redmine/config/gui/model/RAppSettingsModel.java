@@ -45,7 +45,7 @@ public class RAppSettingsModel
    *
    * @param pURL  redmine server url
    */
-  public void addSource(String pURL, String pAPIKey, int pPollInterval) throws MalformedURLException
+  public void addSource(String pURL, String pAPIKey, int pPollInterval, Integer pPageSize) throws MalformedURLException
   {
     synchronized(modified)
     {
@@ -56,6 +56,7 @@ public class RAppSettingsModel
       sourceBean.setUrl(pURL);
       sourceBean.setApiKey(pAPIKey);
       sourceBean.setPollingInterval(pPollInterval);
+      sourceBean.setPageSize(pPageSize);
       sources.add(sourceBean);
       _modified();
       _firePropertyChanged(PROP_SOURCES, null, sourceBean);

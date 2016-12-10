@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes a source for a server to connect.
@@ -35,5 +36,13 @@ public interface ISource
    * @return polling interval in seconds
    */
   int getPollInterval();
+
+  /**
+   * Returns the wished element-count per GET-Request-Page
+   *
+   * @return page (<=100) or <tt>null</tt> if no specific size should be set
+   */
+  @Nullable
+  Integer getPageSize();
 
 }

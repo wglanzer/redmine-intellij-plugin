@@ -45,7 +45,7 @@ class SourcesList extends JBList
       String apiKey = dialog.getAPIKey();
       int pollInterval = dialog.getPollInterval();
       if(url != null && apiKey != null)
-        model.addSource(url, apiKey, pollInterval);
+        model.addSource(url, apiKey, pollInterval, null); // todo pageSize in Dialog!
     }
     catch(MalformedURLException ignored)
     {

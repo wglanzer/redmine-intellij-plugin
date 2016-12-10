@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.webservice.impl;
 
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestLoggingFacade;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Builds RRestConnections
@@ -11,9 +12,9 @@ import com.github.wglanzer.redmine.webservice.spi.IRRestLoggingFacade;
 public class RRestConnectionBuilder
 {
 
-  public static IRRestConnection createConnection(String pURL, String pAPIKey, IRRestLoggingFacade pLoggingFacade)
+  public static IRRestConnection createConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pURL, String pAPIKey, Integer pPageSize)
   {
-    return new RRestConnection(pURL, pAPIKey, pLoggingFacade);
+    return new RRestConnection(pLoggingFacade, pURL, pAPIKey, pPageSize);
   }
 
 }

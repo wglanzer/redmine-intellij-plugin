@@ -34,7 +34,7 @@ public class PollingServer implements IServer
   public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
   {
     source = pSource;
-    connection = RRestConnectionBuilder.createConnection(source.getURL(), source.getAPIKey(), pLoggingFacade);
+    connection = RRestConnectionBuilder.createConnection(pLoggingFacade, source.getURL(), source.getAPIKey(), source.getPageSize());
     loggingFacade = pLoggingFacade;
     directory = new PollingProjectDirectory(connection);
     executor = new PollingExecutor(pLoggingFacade, () -> {

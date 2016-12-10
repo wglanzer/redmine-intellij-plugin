@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.config.beans;
 
 import com.github.wglanzer.redmine.model.ISource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -18,6 +19,7 @@ public class RSourceBean implements ISource, Serializable
   private String url;
   private String apiKey;
   private int pollingInterval;
+  private Integer pageSize;
 
   @NotNull
   @Override
@@ -37,6 +39,13 @@ public class RSourceBean implements ISource, Serializable
   public int getPollInterval()
   {
     return pollingInterval;
+  }
+
+  @Nullable
+  @Override
+  public Integer getPageSize()
+  {
+    return pageSize;
   }
 
   /**
@@ -67,5 +76,15 @@ public class RSourceBean implements ISource, Serializable
   public void setPollingInterval(int pPollingInterval)
   {
     pollingInterval = pPollingInterval;
+  }
+
+  /**
+   * Sets the pageSize for this server
+   *
+   * @param pPageSize Size of the GET-Request-Page, or <tt>null</tt> -> default
+   */
+  public void setPageSize(Integer pPageSize)
+  {
+    pageSize = pPageSize;
   }
 }
