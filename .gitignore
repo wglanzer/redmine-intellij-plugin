@@ -4,6 +4,7 @@
 *.iml
 *.iws
 /.idea
+/artifacts
 
 #	IntelliJ Ignores
 
