@@ -102,9 +102,10 @@ public interface IProject
     /**
      * Fires, if one ticket was added
      *
-     * @param pTicketAdded Ticket, which was added
+     * @param pTicketAdded          Ticket, which was added
+     * @param pCreatedDuringPreload <tt>true</tt>, if this project was created during preload-phase
      */
-    default void ticketAdded(@NotNull ITicket pTicketAdded)
+    default void ticketAdded(@NotNull ITicket pTicketAdded, boolean pCreatedDuringPreload)
     {
     }
 

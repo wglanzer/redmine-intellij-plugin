@@ -4,9 +4,7 @@ import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Ticket that was created by PollingTicketDirectory
@@ -15,6 +13,7 @@ import java.util.Objects;
  */
 class PollingTicket implements ITicket
 {
+  private final List<ITicketListener> listenerList = new ArrayList<>();
   private final long id;
   private String subject;
   private String description;
@@ -29,7 +28,7 @@ class PollingTicket implements ITicket
   public PollingTicket(long pID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
   {
     id = pID;
-    updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
+    updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory, false);
   }
 
   @Override
@@ -106,6 +105,24 @@ class PollingTicket implements ITicket
     return Collections.emptyMap(); //todo
   }
 
+  @Override
+  public void addTicketListener(@NotNull ITicketListener pListener)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.add(pListener);
+    }
+  }
+
+  @Override
+  public void removeTicketListener(@NotNull ITicketListener pListener)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.remove(pListener);
+    }
+  }
+
   protected void destroy()
   {
     subject = null;
@@ -117,65 +134,82 @@ class PollingTicket implements ITicket
     category = null;
   }
 
-  protected boolean updateProperties(String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  protected boolean updateProperties(String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory, boolean pFireChanges)
   {
-    boolean changed = false;
+    Map<String, Map.Entry<Object, Object>> changedProps = new HashMap<>();
 
     if(!Objects.equals(subject, pSubject))
     {
+      changedProps.put("subject", new AbstractMap.SimpleEntry<>(subject, pSubject));
       subject = pSubject;
-      changed = true;
     }
 
     if(!Objects.equals(description, pDescription))
     {
+      changedProps.put("description", new AbstractMap.SimpleEntry<>(description, pDescription));
       description = pDescription;
-      changed = true;
     }
 
     if(!Objects.equals(createdOn, pCreatedOn))
     {
+      changedProps.put("createdOn", new AbstractMap.SimpleEntry<>(createdOn, pCreatedOn));
       createdOn = pCreatedOn;
-      changed = true;
     }
 
     if(!Objects.equals(updatedOn, pUpdatedOn))
     {
+      changedProps.put("updatedOn", new AbstractMap.SimpleEntry<>(updatedOn, pUpdatedOn));
       updatedOn = pUpdatedOn;
-      changed = true;
     }
 
     if(!Objects.equals(status, pStatus))
     {
+      changedProps.put("status", new AbstractMap.SimpleEntry<>(status, pStatus));
       status = pStatus;
-      changed = true;
     }
 
     if(!Objects.equals(author, pAuthor))
     {
+      changedProps.put("author", new AbstractMap.SimpleEntry<>(author, pAuthor));
       author = pAuthor;
-      changed = true;
     }
 
     if(!Objects.equals(priority, pPriority))
     {
+      changedProps.put("priority", new AbstractMap.SimpleEntry<>(priority, pPriority));
       priority = pPriority;
-      changed = true;
     }
 
     if(!Objects.equals(tracker, pTracker))
     {
+      changedProps.put("tracker", new AbstractMap.SimpleEntry<>(tracker, pTracker));
       tracker = pTracker;
-      changed = true;
     }
 
     if(!Objects.equals(category, pCategory))
     {
+      changedProps.put("category", new AbstractMap.SimpleEntry<>(category, pCategory));
       category = pCategory;
-      changed = true;
     }
 
-    return changed;
+    if(pFireChanges && !changedProps.isEmpty())
+      changedProps.forEach((pChangedKey, pOldNewValues) -> _firePropertyChange(pChangedKey, pOldNewValues.getKey(), pOldNewValues.getValue()));
+    return !changedProps.isEmpty();
+  }
+
+  /**
+   * Fires, that a redmine property has Changed
+   *
+   * @param pProperty Property that has changed
+   * @param pOldValue Old value of this property
+   * @param pNewValue New value for this property
+   */
+  private void _firePropertyChange(String pProperty, Object pOldValue, Object pNewValue)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.forEach(pListener -> pListener.redminePropertyChanged(pProperty, pOldValue, pNewValue));
+    }
   }
 
 }

@@ -100,4 +100,38 @@ public interface ITicket
   @NotNull
   Map<String, String> getAdditionalProperties();
 
+  /**
+   * Adds an ITicketListener to this ticket
+   *
+   * @param pListener Listener to add
+   */
+  void addTicketListener(@NotNull ITicketListener pListener);
+
+  /**
+   * Removes an ITicketListener from this ticket
+   *
+   * @param pListener Listener to remove
+   */
+  void removeTicketListener(@NotNull ITicketListener pListener);
+
+  /**
+   * Listens on one ITicket
+   *
+   * @see ITicket
+   */
+  interface ITicketListener
+  {
+
+    /**
+     * Fires, if a redmine property was updated
+     *
+     * @param pName     Name of the changed property
+     * @param pOldValue Old value for this property
+     * @param pNewValue New value for this property
+     */
+    default void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
+    {
+    }
+
+  }
 }

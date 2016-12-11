@@ -184,20 +184,21 @@ class PollingProject implements IProject
 
     // Fire that a ticket was added
     allNewTickets.stream()
-        .filter(pProject -> !allOldTicketIDs.contains(pProject.getID()))
-        .forEach(this::_fireTicketAdded);
+        .filter(pTicket -> !allOldTicketIDs.contains(pTicket.getID()))
+        .forEach(pTicket -> _fireTicketAdded(pTicket, pIsPreload));
   }
 
   /**
    * Fires, that a ticket was added
    *
    * @param pAddedTicket Added ticket
+   * @param pIsPreload   <tt>true</tt>, if this project was created during preload-phase
    */
-  private void _fireTicketAdded(ITicket pAddedTicket)
+  private void _fireTicketAdded(ITicket pAddedTicket, boolean pIsPreload)
   {
     synchronized(projectListeners)
     {
-      projectListeners.forEach(pListener -> pListener.ticketAdded(pAddedTicket));
+      projectListeners.forEach(pListener -> pListener.ticketAdded(pAddedTicket, pIsPreload));
     }
   }
 

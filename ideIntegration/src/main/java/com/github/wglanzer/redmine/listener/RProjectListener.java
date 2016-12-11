@@ -28,9 +28,11 @@ public class RProjectListener implements IProject.IProjectListener
   }
 
   @Override
-  public void ticketAdded(@NotNull ITicket pTicketAdded)
+  public void ticketAdded(@NotNull ITicket pTicketAdded, boolean pCreatedDuringPreload)
   {
-    IntelliJIDEAUtility.showMessage("Ticket created", pTicketAdded.getSubject(), NotificationType.ERROR, false);
+    pTicketAdded.addTicketListener(new RTicketListener(pTicketAdded)); // New ticket -> listen on it
+    if(!pCreatedDuringPreload)
+      IntelliJIDEAUtility.showMessage("Ticket created", pTicketAdded.getSubject(), NotificationType.INFORMATION, false);
   }
 
 }

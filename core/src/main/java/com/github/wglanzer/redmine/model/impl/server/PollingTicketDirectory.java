@@ -117,7 +117,7 @@ class PollingTicketDirectory
     else
     {
       PollingTicket ppToUpdate = directory.get(pTicketID);
-      boolean changed = ppToUpdate.updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
+      boolean changed = ppToUpdate.updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory, true);
       if(changed)
       {
         persistentCache.remove(pTicketID);

@@ -118,4 +118,16 @@ class PersistentTicket implements ITicket, Serializable
   {
     return arguments;
   }
+
+  @Override
+  public void addTicketListener(@NotNull ITicketListener pListener)
+  {
+    throw new UnsupportedOperationException("addTicketListener() not implemented");
+  }
+
+  @Override
+  public void removeTicketListener(@NotNull ITicketListener pListener)
+  {
+    throw new UnsupportedOperationException("removeTicketListener() not implemented");
+  }
 }

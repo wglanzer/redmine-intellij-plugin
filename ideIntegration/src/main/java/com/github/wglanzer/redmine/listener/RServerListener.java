@@ -22,6 +22,11 @@ public class RServerListener implements IServer.IServerListener
   public void projectCreated(IProject pCreated, boolean pCreatedDuringPreload)
   {
     if(pCreatedDuringPreload)
+    {
       pCreated.addProjectListener(new RProjectListener(pCreated));
+
+      // All already loaded tickets can be got here -> listen on it
+      pCreated.getTickets().forEach(pTicket -> pTicket.addTicketListener(new RTicketListener(pTicket)));
+    }
   }
 }
