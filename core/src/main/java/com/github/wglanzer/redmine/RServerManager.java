@@ -22,11 +22,13 @@ public class RServerManager
 
   private final List<IServer> availableServers = new ArrayList<>();
   private final IRLoggingFacade loggingFacade;
+  private final IRTaskCreator taskCreator;
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public RServerManager(IRLoggingFacade pLoggingFacade, ISettings pSettings)
+  public RServerManager(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, ISettings pSettings)
   {
     loggingFacade = pLoggingFacade;
+    taskCreator = pTaskCreator;
     reloadConfiguration(pSettings);
   }
 
@@ -100,7 +102,7 @@ public class RServerManager
    */
   private IServer _toServer(ISource pSource)
   {
-    return new PollingServer(pSource, loggingFacade);
+    return new PollingServer(loggingFacade, taskCreator, pSource);
   }
 
 }

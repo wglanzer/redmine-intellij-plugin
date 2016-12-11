@@ -14,6 +14,8 @@ public interface IRManagerPrefs
 
   IRLoggingFacade getLoggingFacade();
 
+  IRTaskCreator getTaskCreator();
+
   ISettings getCurrentSettings();
 
   File getTicketCacheDirectory();

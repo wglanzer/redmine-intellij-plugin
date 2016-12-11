@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.IRLoggingFacade;
+import com.github.wglanzer.redmine.IRTaskCreator;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
@@ -13,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -28,41 +28,53 @@ public class PollingServer implements IServer
   private final ISource source;
   private final IRRestConnection connection;
   private final IRLoggingFacade loggingFacade;
+  private final IRTaskCreator taskCreator;
   private final PollingProjectDirectory directory;
   private final PollingExecutor executor;
   private final List<IServerListener> listenerList = new ArrayList<>();
 
-  public PollingServer(ISource pSource, IRLoggingFacade pLoggingFacade)
+  public PollingServer(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, ISource pSource)
   {
+    taskCreator = pTaskCreator;
     source = pSource;
     connection = RRestConnectionBuilder.createConnection(pLoggingFacade, source.getURL(), source.getAPIKey(), source.getPageSize());
     loggingFacade = pLoggingFacade;
     directory = new PollingProjectDirectory(connection);
-    executor = new PollingExecutor(pLoggingFacade, () -> {
+    executor = new PollingExecutor(pLoggingFacade, pTaskCreator, () ->
+    {
       pollProjects();
       for(IProject currProject : getProjects())
         ((PollingProject) currProject).pollTickets();
-    }, pSource.getPollInterval());
+    }, pSource.getPollInterval(), false);
   }
 
   @Override
   public void connectAsync()
   {
-    Executors.newSingleThreadExecutor().execute(() ->
+    taskCreator.executeInBackground(new IRTaskCreator.ITask()
     {
-      try
+      @Override
+      public String getName()
       {
-        // start listening ...
-        performPreload();
-
-        // ... and start poll
-        executor.start();
-
-        _fireConnectionStatusChanged(true);
+        return "Tickets preloading...";
       }
-      catch(Exception e)
+
+      @Override
+      public void accept(IRTaskCreator.IProgressIndicator pIProgressIndicator)
       {
-        loggingFacade.error(new Exception("Failed to start server (url: '" + getURL() + "')", e));
+        try
+        {
+          performPreload();
+
+          // ... and start poll
+          executor.start();
+
+          _fireConnectionStatusChanged(true);
+        }
+        catch(Exception e)
+        {
+          loggingFacade.error(new Exception("Failed to preload server (url: '" + getURL() + "')", e));
+        }
       }
     });
   }

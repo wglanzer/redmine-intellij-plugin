@@ -1,7 +1,5 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.ISettings;
-
 /**
  * Manager 4 Redmine
  *
@@ -25,7 +23,7 @@ public class RManager
   public void init(IRManagerPrefs pPreferences)
   {
     preferences = pPreferences;
-    serverManager = new RServerManager(preferences.getLoggingFacade(), preferences.getCurrentSettings());
+    serverManager = new RServerManager(preferences.getLoggingFacade(), preferences.getTaskCreator(), preferences.getCurrentSettings());
   }
 
   /**
