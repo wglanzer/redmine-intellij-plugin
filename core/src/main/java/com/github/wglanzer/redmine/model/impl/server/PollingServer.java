@@ -153,7 +153,7 @@ public class PollingServer implements IServer
     pProgressIndicator.addPercentage(0.2);
 
     Collection<IProject> allProjects = getProjects();
-    double percentagePerProject = 60.0 / (double) allProjects.size();
+    double percentagePerProject = 0.6D / (double) allProjects.size();
     for(IProject currProject : allProjects) // Load all tickets into projects directory
     {
       ((PollingProject) currProject).pollTickets();
