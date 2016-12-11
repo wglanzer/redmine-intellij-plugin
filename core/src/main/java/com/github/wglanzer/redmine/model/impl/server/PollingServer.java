@@ -56,7 +56,7 @@ public class PollingServer implements IServer
       @Override
       public String getName()
       {
-        return "Tickets preloading...";
+        return "Preloading Tickets...";
       }
 
       @Override
