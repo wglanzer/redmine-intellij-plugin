@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author w.glanzer, 27.11.2016.
  */
-public interface ITicketCache
+public interface IPersistentTicketCache
 {
 
   /**

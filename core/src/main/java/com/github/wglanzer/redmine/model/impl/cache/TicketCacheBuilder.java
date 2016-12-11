@@ -16,7 +16,7 @@ public class TicketCacheBuilder
    * @param pCacheFolder Folder for this cache
    * @return a ticketCache which stores its tickets to disk
    */
-  public static ITicketCache createPersistent(File pCacheFolder)
+  public static IPersistentTicketCache createPersistent(File pCacheFolder)
   {
     return new PersistentTicketCache(pCacheFolder);
   }

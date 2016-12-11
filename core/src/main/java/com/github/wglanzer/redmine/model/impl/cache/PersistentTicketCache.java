@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author w.glanzer, 27.11.2016.
  */
-class PersistentTicketCache implements ITicketCache
+class PersistentTicketCache implements IPersistentTicketCache
 {
 
   private static final String _CACHE_ID = "ticketCache";

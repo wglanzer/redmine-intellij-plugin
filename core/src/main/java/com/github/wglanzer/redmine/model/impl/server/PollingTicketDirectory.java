@@ -2,7 +2,7 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.RManager;
 import com.github.wglanzer.redmine.model.ITicket;
-import com.github.wglanzer.redmine.model.impl.cache.ITicketCache;
+import com.github.wglanzer.redmine.model.impl.cache.IPersistentTicketCache;
 import com.github.wglanzer.redmine.model.impl.cache.TicketCacheBuilder;
 import com.github.wglanzer.redmine.util.DateUtil;
 import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
@@ -26,7 +26,7 @@ class PollingTicketDirectory
 {
 
   private final Map<Long, PollingTicket> directory = new HashMap<>();
-  private final ITicketCache persistentCache;
+  private final IPersistentTicketCache persistentCache;
 
   public PollingTicketDirectory(String pProjectID)
   {
