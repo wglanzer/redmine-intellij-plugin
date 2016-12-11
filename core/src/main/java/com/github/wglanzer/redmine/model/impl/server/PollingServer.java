@@ -42,9 +42,9 @@ public class PollingServer implements IServer
     directory = new PollingProjectDirectory(connection);
     executor = new PollingExecutor(pLoggingFacade, pTaskCreator, () ->
     {
-      pollProjects();
+      pollProjects(false);
       for(IProject currProject : getProjects())
-        ((PollingProject) currProject).pollTickets();
+        ((PollingProject) currProject).pollTickets(false);
     }, pSource.getPollInterval(), false);
   }
 
@@ -86,6 +86,7 @@ public class PollingServer implements IServer
   {
     // end listening
     _fireConnectionStatusChanged(false);
+    listenerList.clear();
     executor.stop();
     directory.clearCaches();
   }
@@ -149,14 +150,14 @@ public class PollingServer implements IServer
    */
   protected void performPreload(IRTaskCreator.IProgressIndicator pProgressIndicator) throws Exception
   {
-    pollProjects(); //Load all Projects into directory
+    pollProjects(true); //Load all Projects into directory
     pProgressIndicator.addPercentage(0.2);
 
     Collection<IProject> allProjects = getProjects();
     double percentagePerProject = 0.6D / (double) allProjects.size();
     for(IProject currProject : allProjects) // Load all tickets into projects directory
     {
-      ((PollingProject) currProject).pollTickets();
+      ((PollingProject) currProject).pollTickets(true);
       pProgressIndicator.addPercentage(percentagePerProject);
     }
   }
@@ -164,8 +165,10 @@ public class PollingServer implements IServer
   /**
    * Polls all projects from redmien server and
    * performs update to IProject instances
+   *
+   * @param pIsPreload <tt>true</tt>, if this project was created during preload-phase
    */
-  protected void pollProjects() throws Exception
+  protected void pollProjects(boolean pIsPreload) throws Exception
   {
     List<String> allOldProjectIDs = getProjects().stream()
         .map(IProject::getID)
@@ -178,7 +181,7 @@ public class PollingServer implements IServer
     // Fire that a project was added
     allNewProjects.stream()
         .filter(pProject -> !allOldProjectIDs.contains(pProject.getID()))
-        .forEach(this::_fireProjectAdded);
+        .forEach((created) -> _fireProjectAdded(created, pIsPreload));
 
     // Remove all projects that are not in the result list from webservice
     getProjects().stream()
@@ -193,13 +196,14 @@ public class PollingServer implements IServer
   /**
    * Fires that a project was created
    *
-   * @param pCreated New created project
+   * @param pCreated              New created project
+   * @param pCreatedDuringPreload <tt>true</tt>, if this project was created during preload-phase
    */
-  private void _fireProjectAdded(IProject pCreated)
+  private void _fireProjectAdded(IProject pCreated, boolean pCreatedDuringPreload)
   {
     synchronized(listenerList)
     {
-      listenerList.forEach(pListener -> pListener.projectCreated(pCreated));
+      listenerList.forEach(pListener -> pListener.projectCreated(pCreated, pCreatedDuringPreload));
     }
   }
 

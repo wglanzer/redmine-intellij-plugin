@@ -87,9 +87,10 @@ public interface IServer
     /**
      * Fired, when a project was created
      *
-     * @param pCreated New created project
+     * @param pCreated              New created project
+     * @param pCreatedDuringPreload <tt>true</tt>, if this project was created during preload-phase
      */
-    default void projectCreated(IProject pCreated)
+    default void projectCreated(IProject pCreated, boolean pCreatedDuringPreload)
     {
     }
 

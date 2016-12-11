@@ -113,7 +113,7 @@ public class RedmineToolComponent extends JPanel
       pMyServer.addServerListener(new IServer.IServerListener()
       {
         @Override
-        public void projectCreated(IProject pCreated)
+        public void projectCreated(IProject pCreated, boolean pCreatedDuringPreload)
         {
           add(new _ProjectNode(pCreated));
         }

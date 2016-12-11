@@ -1,5 +1,7 @@
 package com.github.wglanzer.redmine;
 
+import com.github.wglanzer.redmine.listener.RServerListener;
+import com.github.wglanzer.redmine.model.IServer;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,14 +12,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RApplicationComponent implements ApplicationComponent
 {
-
+  public static final String NOTIFICATION_ID = "Redmine Integration";
   public static final String REDMINE_INTEGRATION_PLUGIN_NAME = "Redmine Integration";
 
   @Override
   public void initComponent()
   {
-    RManager.getInstance().init(new RManagerPrefsImpl());
-    RManager.getInstance().startup();
+    RManager manager = RManager.getInstance();
+
+    // Init "background"-tasks
+    manager.init(new RManagerPrefsImpl());
+    manager.startup();
+
+    // Init listeners which interact with IntelliJ
+    for(IServer currServer : manager.getServerManager().getAvailableServers())
+      currServer.addServerListener(new RServerListener(currServer));
   }
 
   @Override

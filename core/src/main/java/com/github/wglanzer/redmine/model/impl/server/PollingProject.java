@@ -148,6 +148,7 @@ class PollingProject implements IProject
    */
   protected void destroy()
   {
+    projectListeners.clear();
     ticketDirectory.clearCaches();
     name = null;
     description = null;
@@ -159,8 +160,10 @@ class PollingProject implements IProject
   /**
    * Polls all tickets from redmine server and
    * performs update to ITicket instances
+   *
+   * @param pIsPreload <tt>true</tt>, if this project was created during preload-phase
    */
-  protected void pollTickets() throws Exception
+  protected void pollTickets(boolean pIsPreload) throws Exception
   {
     List<Long> allOldTicketIDs = getTickets().stream()
         .map(ITicket::getID)

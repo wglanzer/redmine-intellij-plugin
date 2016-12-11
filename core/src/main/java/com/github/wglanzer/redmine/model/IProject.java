@@ -69,14 +69,14 @@ public interface IProject
   /**
    * Adds an IProjectListener to this project
    *
-   * @param pListener  Listener to add
+   * @param pListener Listener to add
    */
   void addProjectListener(@NotNull IProjectListener pListener);
 
   /**
    * Removes an IProjectListener from this project
    *
-   * @param pListener  Listener to remove
+   * @param pListener Listener to remove
    */
   void removeProjectListener(@NotNull IProjectListener pListener);
 
@@ -95,14 +95,18 @@ public interface IProject
      * @param pOldValue Old value for this property
      * @param pNewValue New value for this property
      */
-    void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue);
+    default void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
+    {
+    }
 
     /**
      * Fires, if one ticket was added
      *
      * @param pTicketAdded Ticket, which was added
      */
-    void ticketAdded(@NotNull ITicket pTicketAdded);
+    default void ticketAdded(@NotNull ITicket pTicketAdded)
+    {
+    }
 
   }
 
