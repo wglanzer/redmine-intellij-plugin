@@ -7,11 +7,10 @@
   <parent>
     <groupId>com.github.wglanzer.redmine</groupId>
     <artifactId>redmine</artifactId>
-    <version>1.0</version>
+    <version>0.1_1212160004</version>
   </parent>
 
   <artifactId>ideIntegration</artifactId>
-  <version>1.0</version>
   <name>Redmine: IDE Integration</name>
 
   <properties>
