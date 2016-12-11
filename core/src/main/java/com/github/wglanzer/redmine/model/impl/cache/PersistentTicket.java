@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model.impl.cache;
 
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -25,6 +26,7 @@ class PersistentTicket implements ITicket, Serializable
   private final Instant createdOn;
   private final String status;
   private final String author;
+  private final String assignee;
   private final String priority;
   private final String tracker;
   private final String category;
@@ -39,6 +41,7 @@ class PersistentTicket implements ITicket, Serializable
     updatedOn = pTicket.getUpdatedOn();
     status = pTicket.getStatus();
     author = pTicket.getAuthor();
+    assignee = pTicket.getAssignee();
     priority = pTicket.getPriority();
     tracker = pTicket.getTracker();
     category = pTicket.getCategory();
@@ -89,6 +92,13 @@ class PersistentTicket implements ITicket, Serializable
   public String getAuthor()
   {
     return author;
+  }
+
+  @Nullable
+  @Override
+  public String getAssignee()
+  {
+    return assignee;
   }
 
   @NotNull

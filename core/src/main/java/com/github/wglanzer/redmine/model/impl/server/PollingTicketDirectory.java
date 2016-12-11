@@ -37,7 +37,7 @@ class PollingTicketDirectory
     {
       persistentCache.getAllTickets().parallelStream().forEach(pTicket ->
           updateTicket(pTicket.getID(), pTicket.getSubject(), pTicket.getDescription(), pTicket.getCreatedOn(), pTicket.getUpdatedOn(), pTicket.getStatus(),
-              pTicket.getAuthor(), pTicket.getPriority(), pTicket.getTracker(), pTicket.getCategory()));
+              pTicket.getAuthor(), pTicket.getAssignee(), pTicket.getPriority(), pTicket.getTracker(), pTicket.getCategory()));
     }
   }
 
@@ -90,11 +90,12 @@ class PollingTicketDirectory
       Instant updatedOn = DateUtil.toInstant(pTicket.getValue(IRRestArgument.UPDATED_ON));
       String status = pTicket.getValue(IRRestArgument.TICKET_STATUS);
       String author = pTicket.getValue(IRRestArgument.TICKET_AUTHOR);
+      String assignee = pTicket.getValue(IRRestArgument.TICKET_ASSIGNEE);
       String priority = pTicket.getValue(IRRestArgument.TICKET_PRIORITY);
       String tracker = pTicket.getValue(IRRestArgument.TICKET_TRACKER);
       String category = ""; //pTicket.getValue(IRRestArgument.TICKET_CATEGORY); TODO
 
-      return updateTicket(ticketID, subject, description, createdOn, updatedOn, status, author, priority, tracker, category);
+      return updateTicket(ticketID, subject, description, createdOn, updatedOn, status, author, assignee, priority, tracker, category);
     }).collect(Collectors.toList());
   }
 
@@ -104,12 +105,12 @@ class PollingTicketDirectory
    *
    * @return Ticket instance which was created or updated
    */
-  protected ITicket updateTicket(Long pTicketID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  protected ITicket updateTicket(Long pTicketID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pAssignee, String pPriority, String pTracker, String pCategory)
   {
     if(!directory.containsKey(pTicketID))
     {
       // No updateProperties neccessary here!
-      PollingTicket pp = new PollingTicket(pTicketID, pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory);
+      PollingTicket pp = new PollingTicket(pTicketID, pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pAssignee, pPriority, pTracker, pCategory);
       directory.put(pTicketID, pp);
       persistentCache.put(pp);
       return pp;
@@ -117,7 +118,7 @@ class PollingTicketDirectory
     else
     {
       PollingTicket ppToUpdate = directory.get(pTicketID);
-      boolean changed = ppToUpdate.updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory, true);
+      boolean changed = ppToUpdate.updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pAssignee, pPriority, pTracker, pCategory, true);
       if(changed)
       {
         persistentCache.remove(pTicketID);

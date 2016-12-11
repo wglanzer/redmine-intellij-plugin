@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.*;
@@ -21,14 +22,15 @@ class PollingTicket implements ITicket
   private Instant createdOn;
   private String status;
   private String author;
+  private String assignee;
   private String priority;
   private String tracker;
   private String category;
 
-  public PollingTicket(long pID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory)
+  public PollingTicket(long pID, String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pAssignee, String pPriority, String pTracker, String pCategory)
   {
     id = pID;
-    updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pPriority, pTracker, pCategory, false);
+    updateProperties(pSubject, pDescription, pCreatedOn, pUpdatedOn, pStatus, pAuthor, pAssignee, pPriority, pTracker, pCategory, false);
   }
 
   @Override
@@ -75,6 +77,13 @@ class PollingTicket implements ITicket
   public String getAuthor()
   {
     return author;
+  }
+
+  @Nullable
+  @Override
+  public String getAssignee()
+  {
+    return assignee;
   }
 
   @NotNull
@@ -134,7 +143,7 @@ class PollingTicket implements ITicket
     category = null;
   }
 
-  protected boolean updateProperties(String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pPriority, String pTracker, String pCategory, boolean pFireChanges)
+  protected boolean updateProperties(String pSubject, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, String pStatus, String pAuthor, String pAssignee, String pPriority, String pTracker, String pCategory, boolean pFireChanges)
   {
     Map<String, Map.Entry<Object, Object>> changedProps = new HashMap<>();
 
@@ -190,6 +199,12 @@ class PollingTicket implements ITicket
     {
       changedProps.put("category", new AbstractMap.SimpleEntry<>(category, pCategory));
       category = pCategory;
+    }
+
+    if(!Objects.equals(assignee, pAssignee))
+    {
+      changedProps.put("assignee", new AbstractMap.SimpleEntry<>(assignee, pAssignee));
+      assignee = pAssignee;
     }
 
     if(pFireChanges && !changedProps.isEmpty())

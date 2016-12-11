@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
@@ -67,6 +68,14 @@ public interface ITicket
    */
   @NotNull
   String getAuthor();
+
+  /**
+   * Returns the person, which is assigned to this ticket
+   *
+   * @return the assigned person, or <tt>null</tt> if it is not assigned
+   */
+  @Nullable
+  String getAssignee();
 
   /**
    * Returns the priority of this ticket

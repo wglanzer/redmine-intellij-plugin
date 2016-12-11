@@ -16,6 +16,7 @@ public interface IRRestArgument
   IRRestArgument TICKET_DESCRIPTION = new RRestArgumentImpl().resultName("description");
   IRRestArgument TICKET_STATUS = new RRestArgumentImpl().requestName("status_id").resultName("status");
   IRRestArgument TICKET_AUTHOR = new RRestArgumentImpl().resultName("author");
+  IRRestArgument TICKET_ASSIGNEE = new RRestArgumentImpl().resultName("assigned_to");
   IRRestArgument TICKET_PRIORITY = new RRestArgumentImpl().resultName("priority");
   IRRestArgument TICKET_TRACKER = new RRestArgumentImpl().resultName("tracker");
   IRRestArgument TICKET_CATEGORY = new RRestArgumentImpl().resultName("category");
