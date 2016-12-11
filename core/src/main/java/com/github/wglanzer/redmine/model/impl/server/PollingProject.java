@@ -199,19 +199,6 @@ class PollingProject implements IProject
   }
 
   /**
-   * Fires, that a ticket was removed
-   *
-   * @param pRemovedTicket Removed ticket
-   */
-  private void _fireTicketRemoved(ITicket pRemovedTicket)
-  {
-    synchronized(projectListeners)
-    {
-      projectListeners.forEach(pListener -> pListener.ticketRemoved(pRemovedTicket));
-    }
-  }
-
-  /**
    * Fires, that a redmine property has Changed
    *
    * @param pProperty Property that has changed

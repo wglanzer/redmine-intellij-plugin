@@ -104,12 +104,6 @@ public interface IProject
      */
     void ticketAdded(@NotNull ITicket pTicketAdded);
 
-    /**
-     * Fires, if a ticket was removed
-     *
-     * @param pTicketRemoved Ticket, which was removed
-     */
-    void ticketRemoved(@NotNull ITicket pTicketRemoved);
   }
 
 }
