@@ -183,15 +183,6 @@ class PollingProject implements IProject
     allNewTickets.stream()
         .filter(pProject -> !allOldTicketIDs.contains(pProject.getID()))
         .forEach(this::_fireTicketAdded);
-
-    // Remove all tickets that are not in the result list from webservice
-    getTickets().stream()
-        .filter(pProject -> !allNewTickets.contains(pProject))
-        .forEach((project) ->
-        {
-          _fireTicketRemoved(project);
-          ticketDirectory.removeTicketFromCache(project);
-        });
   }
 
   /**

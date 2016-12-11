@@ -118,7 +118,6 @@ class PersistentTicketCache implements IPersistentTicketCache
   @Override
   public void destroy()
   {
-    persistentCache.clearWithoutNotification();
     persistentCache.close();
     fileDB.close();
   }
