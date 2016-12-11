@@ -1,12 +1,10 @@
 package com.github.wglanzer.redmine;
 
-import com.intellij.notification.Notification;
+import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -16,12 +14,11 @@ import java.io.StringWriter;
 class RLoggingFacadeImpl implements IRLoggingFacade
 {
 
-  private static final String NOTIFICATION_ID = "Redmine Integration";
   private static final boolean _IS_DEBUG = System.getProperty("plugin.redmine.debug") != null;
 
   static
   {
-    Notifications.Bus.register(NOTIFICATION_ID, NotificationDisplayType.BALLOON);
+    Notifications.Bus.register(RApplicationComponent.NOTIFICATION_ID, NotificationDisplayType.BALLOON);
   }
 
   @Override
@@ -35,7 +32,7 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   {
     StringWriter writer = new StringWriter();
     pCause.printStackTrace(new PrintWriter(writer));
-    _log(NotificationType.ERROR, pMessage, writer.toString(), false);
+    IntelliJIDEAUtility.showMessage(pMessage, writer.toString(), NotificationType.ERROR, false);
     if(_IS_DEBUG)
       pCause.printStackTrace(); // Print it on console -> Debug-Reasons
   }
@@ -43,7 +40,7 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   @Override
   public void log(String pLogString)
   {
-    _log(NotificationType.INFORMATION, "LOG", pLogString, false);
+    IntelliJIDEAUtility.showMessage("LOG", pLogString, NotificationType.INFORMATION, false);
   }
 
   @Override
@@ -53,15 +50,7 @@ class RLoggingFacadeImpl implements IRLoggingFacade
     if(!_IS_DEBUG)
       return;
 
-    _log(NotificationType.INFORMATION, "DEBUG", pDebugString, true);
-  }
-
-  private void _log(NotificationType pType, @Nullable String pTitle, String pDetails, boolean pOnlyEventLog)
-  {
-    Notification notification = new Notification(NOTIFICATION_ID, new ImageIcon(), NOTIFICATION_ID, pTitle != null ? pTitle : "", pDetails, pType, null);
-    if(pOnlyEventLog)
-      notification.expire();
-    Notifications.Bus.notify(notification);
+    IntelliJIDEAUtility.showMessage("DEBUG", pDebugString, NotificationType.INFORMATION, true);
   }
 
 }
