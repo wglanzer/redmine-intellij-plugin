@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 
 /**
@@ -22,6 +23,8 @@ import java.io.File;
  */
 public class IntelliJIDEAUtility
 {
+
+  private static final int _EXPIRE_AFTER_MS = 3000;
 
   /**
    * Returns the whole plugin directory on HDD
@@ -61,9 +64,28 @@ public class IntelliJIDEAUtility
    */
   public static void showMessage(@Nullable String pTitle, @Nullable String pDetails, @NotNull NotificationType pType, boolean pOnlyEventLog)
   {
-    Notification notification = new Notification(RApplicationComponent.NOTIFICATION_ID, new ImageIcon(), RApplicationComponent.NOTIFICATION_ID, pTitle != null ? pTitle : "", pDetails, pType, null);
+    Notification notification = new Notification(RApplicationComponent.NOTIFICATION_ID, new ImageIcon(), RApplicationComponent.NOTIFICATION_ID, pTitle != null ? pTitle : "", pDetails, pType, (pNotification, pHyperlinkEvent) ->
+    {
+      try
+      {
+        // open URLs
+        Desktop.getDesktop().browse(pHyperlinkEvent.getURL().toURI());
+      }
+      catch(Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    });
+
     if(pOnlyEventLog)
       notification.expire();
+    else
+    {
+      Timer timer = new Timer(_EXPIRE_AFTER_MS, e -> notification.expire());
+      timer.setRepeats(false);
+      timer.start();
+    }
+
     for(Project project : ProjectManager.getInstance().getOpenProjects())
       Notifications.Bus.notify(notification, project);
   }
