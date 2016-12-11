@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author w.glanzer, 27.11.2016.
@@ -19,10 +22,12 @@ class PersistentTicketCache implements IPersistentTicketCache
 {
 
   private static final String _CACHE_ID = "ticketCache";
-  private static final Long _LAST_ACCESSED_KEY = -1337L;
 
   private final HTreeMap<Long, ITicket> persistentCache;
   private final DB fileDB;
+
+  private final AtomicInteger lastAccessedTicketHash = new AtomicInteger(-1);
+  private ITicket lastAccessedTicket = null;
 
   public PersistentTicketCache(File pCacheFolder)
   {
@@ -93,7 +98,21 @@ class PersistentTicketCache implements IPersistentTicketCache
   @Override
   public ITicket getLastUpdatedTicket()
   {
-    return persistentCache.get(_LAST_ACCESSED_KEY);
+    synchronized(lastAccessedTicketHash)
+    {
+      Collection<ITicket> currentValues = persistentCache.getValues();
+      if(currentValues.hashCode() == lastAccessedTicketHash.get() && currentValues.size() > 0 && lastAccessedTicket != null)
+        return lastAccessedTicket;
+      else
+      {
+        //calculate lastAccessed-Ticket
+        lastAccessedTicket = currentValues.parallelStream()
+            .sorted(Comparator.comparing(ITicket::getUpdatedOn).reversed())
+            .findFirst().orElse(null);
+        lastAccessedTicketHash.set(currentValues.hashCode());
+        return lastAccessedTicket;
+      }
+    }
   }
 
   @Override
