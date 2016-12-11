@@ -8,6 +8,7 @@ import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,6 +96,13 @@ public class PollingServer implements IServer
     return source.getURL();
   }
 
+  @Nullable
+  @Override
+  public String getDisplayName()
+  {
+    return source.getDisplayName();
+  }
+
   @Override
   public void addServerListener(IServerListener pListener)
   {
@@ -116,7 +124,8 @@ public class PollingServer implements IServer
   @Override
   public String toString()
   {
-    return getURL();
+    return "Server: " + source.getDisplayName() + "\n" +
+        "URL: " + source.getURL();
   }
 
   /**

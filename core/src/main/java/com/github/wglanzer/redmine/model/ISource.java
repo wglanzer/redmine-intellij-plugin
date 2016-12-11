@@ -14,6 +14,14 @@ public interface ISource
 {
 
   /**
+   * Displayable name representing this ISource-object
+   *
+   * @return displayable name, or <tt>null</tt> if no name is specified
+   */
+  @Nullable
+  String getDisplayName();
+
+  /**
    * URL as string, not <tt>null</tt>
    * For example: "https://redmine.mydomain.com"
    *

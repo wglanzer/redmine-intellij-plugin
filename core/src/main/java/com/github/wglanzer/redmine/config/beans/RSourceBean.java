@@ -14,12 +14,20 @@ import java.io.Serializable;
 public class RSourceBean implements ISource, Serializable
 {
 
-  private static final long serialVersionUID = -5253459219433359704L;
+  private static final long serialVersionUID = -5253459215423359704L;
 
+  private String displayName;
   private String url;
   private String apiKey;
   private Integer pollingInterval;
   private Integer pageSize;
+
+  @Nullable
+  @Override
+  public String getDisplayName()
+  {
+    return displayName;
+  }
 
   @NotNull
   @Override
@@ -86,5 +94,15 @@ public class RSourceBean implements ISource, Serializable
   public void setPageSize(Integer pPageSize)
   {
     pageSize = pPageSize;
+  }
+
+  /**
+   * Sets the display name for this server
+   *
+   * @param pDisplayName DisplayName that should be set, <tt>null</tt> clears this display name
+   */
+  public void setDisplayName(String pDisplayName)
+  {
+    displayName = pDisplayName;
   }
 }

@@ -48,6 +48,7 @@ public class RAppSettingsModel
     synchronized(modified)
     {
       RSourceBean sourceBean = new RSourceBean();
+      sourceBean.setDisplayName("Redmine Server");
       sourceBean.setUrl("https://example.mydomain.com/");
       sourceBean.setApiKey("mySecureAPIKeyGeneratedByRedmine");
       sourceBean.setPollingInterval(PollingServer.DEFAULT_POLLINTERVAL);

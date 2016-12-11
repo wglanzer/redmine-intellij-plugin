@@ -106,7 +106,7 @@ public class RedmineToolComponent extends JPanel
   {
     public _ServerNode(IServer pMyServer)
     {
-      setUserObject(pMyServer.getURL());
+      setUserObject(pMyServer.getDisplayName());
       for(IProject currProject : pMyServer.getProjects())
         add(new _ProjectNode(currProject));
 

@@ -43,6 +43,7 @@ public class RAppSettingsComponent extends JPanel
   private JLabel intervalPanel;
   private JLabel pageSizePanel;
   private JTabbedPane tab;
+  private JTextField displayName;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -82,6 +83,20 @@ public class RAppSettingsComponent extends JPanel
         {
           _fireChange("apikey", selectedSource.getAPIKey(), apiKeyField.getText());
           selectedSource.setApiKey(apiKeyField.getText());
+        }
+      }
+    });
+
+    // DisplayName
+    displayName.addFocusListener(new FocusAdapter()
+    {
+      @Override
+      public void focusLost(FocusEvent e)
+      {
+        if(selectedSource != null)
+        {
+          _fireChange("displayName", selectedSource.getDisplayName(), displayName.getText());
+          selectedSource.setDisplayName(displayName.getText());
         }
       }
     });
@@ -192,7 +207,8 @@ public class RAppSettingsComponent extends JPanel
   private void createUIComponents()
   {
     sourceList = new SourcesList(model);
-    sourceList.addListSelectionListener(e -> {
+    sourceList.addListSelectionListener(e ->
+    {
       if(sourceList.getSelectedIndices().length == 1) // only 1 selected entry
         _selectedSourceChanged((RSourceBean) sourceList.getSelectedValue());
       else
@@ -254,27 +270,27 @@ public class RAppSettingsComponent extends JPanel
     GridBagConstraints gbc;
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.gridy = 0;
+    gbc.gridy = 1;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(0, 0, 0, 5);
+    gbc.insets = new Insets(5, 0, 0, 5);
     panel1.add(urlPanel, gbc);
     urlField = new JTextField();
     urlField.setEnabled(false);
     urlField.setText("");
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 0;
+    gbc.gridy = 1;
     gbc.gridwidth = 3;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(1, 0, 1, 0);
+    gbc.insets = new Insets(5, 0, 0, 0);
     panel1.add(urlField, gbc);
     apiKeyPanel = new JLabel();
     apiKeyPanel.setEnabled(false);
     apiKeyPanel.setText("API-Key:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.gridy = 1;
+    gbc.gridy = 2;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 5);
     panel1.add(apiKeyPanel, gbc);
@@ -282,7 +298,7 @@ public class RAppSettingsComponent extends JPanel
     apiKeyField.setEnabled(false);
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 1;
+    gbc.gridy = 2;
     gbc.gridwidth = 3;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -293,7 +309,7 @@ public class RAppSettingsComponent extends JPanel
     intervalPanel.setText("Interval (sec):");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.gridy = 2;
+    gbc.gridy = 3;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 5);
     panel1.add(intervalPanel, gbc);
@@ -301,7 +317,7 @@ public class RAppSettingsComponent extends JPanel
     pollIntervall.setEnabled(false);
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 2;
+    gbc.gridy = 3;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
@@ -312,7 +328,7 @@ public class RAppSettingsComponent extends JPanel
     pageSizePanel.setToolTipText("Minimum: 1\nMaximum: 100");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.gridy = 3;
+    gbc.gridy = 4;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 5);
     panel1.add(pageSizePanel, gbc);
@@ -320,7 +336,7 @@ public class RAppSettingsComponent extends JPanel
     pageSize.setEnabled(false);
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 3;
+    gbc.gridy = 4;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
@@ -328,35 +344,54 @@ public class RAppSettingsComponent extends JPanel
     final JPanel spacer1 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 4;
+    gbc.gridy = 5;
     gbc.weightx = 0.1;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer1, gbc);
     final JPanel spacer2 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 2;
-    gbc.gridy = 4;
+    gbc.gridy = 5;
     gbc.weightx = 0.15;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer2, gbc);
     final JPanel spacer3 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 3;
-    gbc.gridy = 4;
+    gbc.gridy = 5;
     gbc.weightx = 0.35;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer3, gbc);
     final JPanel spacer4 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 3;
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     gbc.weighty = 0.1;
     gbc.fill = GridBagConstraints.VERTICAL;
     panel1.add(spacer4, gbc);
+    displayName = new JTextField();
+    displayName.setEnabled(false);
+    displayName.setText("");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 0;
+    gbc.gridwidth = 3;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel1.add(displayName, gbc);
+    final JLabel label1 = new JLabel();
+    label1.setEnabled(false);
+    label1.setText("Name:");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.anchor = GridBagConstraints.EAST;
+    gbc.insets = new Insets(0, 0, 0, 5);
+    panel1.add(label1, gbc);
     final JPanel panel2 = new JPanel();
     panel2.setLayout(new GridBagLayout());
     panel2.setEnabled(true);
-    panel2.setVisible(true);
+    panel2.setVisible(false);
     tab.addTab("Watches", panel2);
     tab.setEnabledAt(1, false);
     gbc = new GridBagConstraints();

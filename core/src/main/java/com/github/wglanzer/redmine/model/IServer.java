@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model;
 
 import com.github.wglanzer.redmine.exceptions.NotConnectedException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -46,6 +47,14 @@ public interface IServer
    */
   @NotNull
   String getURL();
+
+  /**
+   * Displayable name representing this server
+   *
+   * @return displayable name, or <tt>null</tt> if no name is specified
+   */
+  @Nullable
+  String getDisplayName();
 
   /**
    * Adds an IServerListener
