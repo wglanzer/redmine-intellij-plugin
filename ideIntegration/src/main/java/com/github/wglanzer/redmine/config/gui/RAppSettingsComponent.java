@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.config.gui;
 
 import com.github.wglanzer.redmine.config.beans.RSourceBean;
+import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.MoreObjects;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.ui.Splitter;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Objects;
 
 /**
  * Visualization for Redmine configuration
@@ -128,6 +130,23 @@ public class RAppSettingsComponent extends JPanel
       }
     });
 
+    // If a source was added, select it!
+    model.addPropertyChangeListener(evt ->
+    {
+      if(Objects.equals(evt.getPropertyName(), RAppSettingsModel.PROP_SOURCES))
+      {
+        // removed
+        if(evt.getOldValue() != null && evt.getNewValue() == null)
+        {
+          if(sourceList.getSelectedIndex() >= sourceList.getModel().getSize()) // selection is outside of range
+            _selectedSourceChanged(null);
+        }
+        // added
+        else if(evt.getOldValue() == null && evt.getNewValue() != null)
+          sourceList.setSelectedIndex(sourceList.indexOf((ISource) evt.getNewValue()));
+      }
+    });
+
     // Select first entry
     SwingUtilities.invokeLater(() ->
     {
@@ -173,7 +192,12 @@ public class RAppSettingsComponent extends JPanel
   private void createUIComponents()
   {
     sourceList = new SourcesList(model);
-    sourceList.addListSelectionListener(e -> _selectedSourceChanged((RSourceBean) sourceList.getSelectedValue()));
+    sourceList.addListSelectionListener(e -> {
+      if(sourceList.getSelectedIndices().length == 1) // only 1 selected entry
+        _selectedSourceChanged((RSourceBean) sourceList.getSelectedValue());
+      else
+        _selectedSourceChanged(null);
+    });
     sourcesListPanel = ToolbarDecorator.createDecorator(sourceList)
         .setToolbarPosition(ActionToolbarPosition.TOP)
         .setAddAction(sourceList::onAddClick)

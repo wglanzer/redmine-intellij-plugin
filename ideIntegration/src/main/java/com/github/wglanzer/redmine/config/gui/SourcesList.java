@@ -6,6 +6,8 @@ import com.intellij.ui.components.JBList;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Component inside settings.
@@ -41,9 +43,23 @@ class SourcesList extends JBList
    */
   public void onRemoveClick(AnActionButton pButton)
   {
-    ISource selectedValue = (ISource) getSelectedValue();
-    if(selectedValue != null)
-      model.removeSource(selectedValue);
+    List<ISource> selectedValues = (List<ISource>) getSelectedValuesList();
+    if(selectedValues != null)
+      selectedValues.forEach(pValue -> model.removeSource(pValue));
+  }
+
+  /**
+   * Returns the index of the given source
+   *
+   * @param pSource source that should be searched
+   * @return index, or -1 if nothing was found
+   */
+  public int indexOf(ISource pSource)
+  {
+    for(int i = 0; i < getModel().getSize(); i++)
+      if(Objects.equals(getModel().getElementAt(i), pSource))
+        return i;
+    return -1;
   }
 
   /**
