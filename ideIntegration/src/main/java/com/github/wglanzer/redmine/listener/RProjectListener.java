@@ -1,9 +1,8 @@
 package com.github.wglanzer.redmine.listener;
 
 import com.github.wglanzer.redmine.model.IProject;
+import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
-import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
-import com.intellij.notification.NotificationType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,25 +13,27 @@ import org.jetbrains.annotations.NotNull;
 public class RProjectListener implements IProject.IProjectListener
 {
 
+  private final IServer server;
   private final IProject project;
 
-  public RProjectListener(IProject pProject)
+  public RProjectListener(IServer pServer, IProject pProject)
   {
+    server = pServer;
     project = pProject;
   }
 
   @Override
   public void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
   {
-    // property from project changed
+    Notifier.notifyProjectPropertyChanged(server, project, pName, pOldValue, pNewValue);
   }
 
   @Override
   public void ticketAdded(@NotNull ITicket pTicketAdded, boolean pCreatedDuringPreload)
   {
-    pTicketAdded.addTicketListener(new RTicketListener(pTicketAdded)); // New ticket -> listen on it
+    pTicketAdded.addTicketListener(new RTicketListener(server, project, pTicketAdded)); // New ticket -> listen on it
     if(!pCreatedDuringPreload)
-      IntelliJIDEAUtility.showMessage("Ticket created", pTicketAdded.getSubject(), NotificationType.INFORMATION, false);
+      Notifier.notifyNewTicket(server, pTicketAdded);
   }
 
 }

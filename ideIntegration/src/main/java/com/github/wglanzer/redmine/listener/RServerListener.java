@@ -21,12 +21,11 @@ public class RServerListener implements IServer.IServerListener
   @Override
   public void projectCreated(IProject pCreated, boolean pCreatedDuringPreload)
   {
-    if(pCreatedDuringPreload)
-    {
-      pCreated.addProjectListener(new RProjectListener(pCreated));
+    // All already loaded tickets can be got here -> listen on it
+    pCreated.getTickets().forEach(pTicket -> pTicket.addTicketListener(new RTicketListener(server, pCreated, pTicket)));
+    pCreated.addProjectListener(new RProjectListener(server, pCreated));
 
-      // All already loaded tickets can be got here -> listen on it
-      pCreated.getTickets().forEach(pTicket -> pTicket.addTicketListener(new RTicketListener(pTicket)));
-    }
+    if(!pCreatedDuringPreload)
+      Notifier.notifyNewProject(server, pCreated);
   }
 }

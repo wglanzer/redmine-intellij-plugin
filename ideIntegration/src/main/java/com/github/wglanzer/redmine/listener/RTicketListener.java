@@ -1,8 +1,8 @@
 package com.github.wglanzer.redmine.listener;
 
+import com.github.wglanzer.redmine.model.IProject;
+import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
-import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
-import com.intellij.notification.NotificationType;
 
 /**
  * Listener on each ticket.
@@ -12,16 +12,20 @@ import com.intellij.notification.NotificationType;
 public class RTicketListener implements ITicket.ITicketListener
 {
 
+  private final IServer server;
+  private final IProject project;
   private final ITicket ticket;
 
-  public RTicketListener(ITicket pTicket)
+  public RTicketListener(IServer pServer, IProject pProject, ITicket pTicket)
   {
+    server = pServer;
+    project = pProject;
     ticket = pTicket;
   }
 
   @Override
   public void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
   {
-    IntelliJIDEAUtility.showMessage("Ticket property change", "name: " + pName + ", newValue: " + pNewValue, NotificationType.INFORMATION, false);
+    Notifier.notifyTicketPropertyChanged(server, ticket, pName, pOldValue, pNewValue);
   }
 }
