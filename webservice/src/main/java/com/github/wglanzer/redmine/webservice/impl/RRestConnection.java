@@ -171,7 +171,7 @@ class RRestConnection implements IRRestConnection
       ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
       arguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(0)));
       JsonNode node = _executePlain(pURL, arguments);
-      return node.getObject().getInt(IRRestArgument.PAGE_TOTALCOUNT.getName());
+      return node.getObject().getInt(IRRestArgument.PAGE_TOTALCOUNT.getRequestName());
     }
     catch(Exception e)
     {
@@ -196,10 +196,10 @@ class RRestConnection implements IRRestConnection
     if(arguments.size() > 0)
     {
       IRRestArgument firstArg = arguments.get(0);
-      urlBuilder.append("?").append(firstArg.getName()).append("=").append(firstArg.getValue());
+      urlBuilder.append("?").append(firstArg.getRequestName()).append("=").append(firstArg.getValue());
      arguments.remove(0);
     }
-    arguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getName()).append("=").append(pArgument.getValue()));
+    arguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getRequestName()).append("=").append(pArgument.getValue()));
 
     // Log output
     loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());

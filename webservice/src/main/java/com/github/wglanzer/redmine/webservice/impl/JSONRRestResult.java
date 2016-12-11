@@ -70,7 +70,7 @@ class JSONRRestResult implements IRRestResult
     @Override
     public String getValue(IRRestArgument pArgument)
     {
-      return arguments.get(pArgument.getName());
+      return arguments.get(pArgument.getResultName());
     }
   }
 

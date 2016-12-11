@@ -169,7 +169,7 @@ class PollingProject implements IProject
     // Build main request -> Show only MY tickets, no tickets from other projects needed!
     IRRestRequest request = IRRestRequest.GET_TICKETS
         .argument(IRRestArgument.PROJECT_ID.value(id))
-        .argument(IRRestArgument.TICKET_STATUS_ID.value("*"));
+        .argument(IRRestArgument.TICKET_STATUS.value("*"));
 
     // Get only updated tickets. ">lastUpdatedTicket.updated_on"
     ITicket lastUpdatedTicket = ticketDirectory.getLastUpdatedTicket();
