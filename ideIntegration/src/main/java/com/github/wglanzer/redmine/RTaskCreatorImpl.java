@@ -1,10 +1,15 @@
 package com.github.wglanzer.redmine;
 
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerAdapter;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TaskCreator to connect intelliJ-UI to redmine tasks
@@ -14,29 +19,57 @@ import org.jetbrains.annotations.NotNull;
 class RTaskCreatorImpl implements IRTaskCreator
 {
 
-  private final Project project;
+  private final AtomicBoolean _inited = new AtomicBoolean(false);
+  private final List<Task> _preInitTasks = new ArrayList<>();
 
-  public RTaskCreatorImpl(Project pProject)
+  public RTaskCreatorImpl()
   {
-    project = pProject;
+    // Only if the first project was opened, you can successfully add background tasks...
+    ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter()
+    {
+      @Override
+      public void projectOpened(Project project)
+      {
+        ProjectManager.getInstance().removeProjectManagerListener(this);
+        synchronized(_inited)
+        {
+          _inited.set(true);
+          _preInitTasks.forEach(Task::queue);
+        }
+      }
+    });
   }
 
   @Override
   public <T extends ITask> T executeInBackground(T pTask)
   {
-    ProgressManager.getInstance().run(new Task.Backgroundable(project, pTask.getName())
+    _executeWhenProjectLoaded(new Task.Backgroundable(null, pTask.getName(), false)
     {
       @Override
       public void run(@NotNull ProgressIndicator pProgressIndicator)
       {
-        pProgressIndicator.startNonCancelableSection();
-        System.out.println("execute " + pTask);
+        pProgressIndicator.setText(pTask.getName());
         pTask.accept(new _IDEA_Indicator(pProgressIndicator));
-        System.out.println("finished " + pTask);
-        pProgressIndicator.finishNonCancelableSection();
       }
     });
+
     return pTask;
+  }
+
+  /**
+   * Executes a task, when the first project was loaded
+   *
+   * @param pIdeaTask Task that should be executed
+   */
+  private void _executeWhenProjectLoaded(Task pIdeaTask)
+  {
+    synchronized(_inited)
+    {
+      if(_inited.get())
+        pIdeaTask.queue();
+      else
+        _preInitTasks.add(pIdeaTask);
+    }
   }
 
   /**

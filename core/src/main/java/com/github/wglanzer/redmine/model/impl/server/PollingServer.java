@@ -60,16 +60,18 @@ public class PollingServer implements IServer
       }
 
       @Override
-      public void accept(IRTaskCreator.IProgressIndicator pIProgressIndicator)
+      public void accept(IRTaskCreator.IProgressIndicator pProgressIndicator)
       {
         try
         {
-          performPreload();
+          performPreload(pProgressIndicator); // 80%
 
           // ... and start poll
           executor.start();
+          pProgressIndicator.addPercentage(0.1);
 
           _fireConnectionStatusChanged(true);
+          pProgressIndicator.addPercentage(0.1);
         }
         catch(Exception e)
         {
@@ -142,13 +144,21 @@ public class PollingServer implements IServer
 
   /**
    * Performs a preload of all server related data
+   *
+   * @param pProgressIndicator indicator for progress, you have "80%"
    */
-  protected void performPreload() throws Exception
+  protected void performPreload(IRTaskCreator.IProgressIndicator pProgressIndicator) throws Exception
   {
     pollProjects(); //Load all Projects into directory
+    pProgressIndicator.addPercentage(0.2);
 
-    for(IProject currProject : getProjects()) // Load all tickets into projects directory
+    Collection<IProject> allProjects = getProjects();
+    double percentagePerProject = 60.0 / (double) allProjects.size();
+    for(IProject currProject : allProjects) // Load all tickets into projects directory
+    {
       ((PollingProject) currProject).pollTickets();
+      pProgressIndicator.addPercentage(percentagePerProject);
+    }
   }
 
   /**

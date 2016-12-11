@@ -3,7 +3,6 @@ package com.github.wglanzer.redmine;
 import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.config.RAppSettings;
 import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
-import com.intellij.openapi.project.Project;
 
 import java.io.File;
 
@@ -17,10 +16,10 @@ class RManagerPrefsImpl implements IRManagerPrefs
   private IRLoggingFacade loggingFacade;
   private IRTaskCreator taskCreator;
 
-  public RManagerPrefsImpl(Project pProject)
+  public RManagerPrefsImpl()
   {
     loggingFacade = new RLoggingFacadeImpl();
-    taskCreator = new RTaskCreatorImpl(pProject);
+    taskCreator = new RTaskCreatorImpl();
   }
 
   @Override

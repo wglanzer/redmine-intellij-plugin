@@ -1,8 +1,6 @@
 package com.github.wglanzer.redmine;
 
 import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,8 +16,7 @@ public class RApplicationComponent implements ApplicationComponent
   @Override
   public void initComponent()
   {
-    Project currentProject = ProjectManager.getInstance().getDefaultProject();
-    RManager.getInstance().init(new RManagerPrefsImpl(currentProject));
+    RManager.getInstance().init(new RManagerPrefsImpl());
     RManager.getInstance().startup();
   }
 
