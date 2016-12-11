@@ -28,7 +28,7 @@ public class RMutableSettings implements ISettings, Serializable
   public List<ISource> getSources()
   {
     ArrayList<ISource> sources = this.sources != null ? new ArrayList<>(this.sources) : new ArrayList<>();
-    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug")).equals("true"))
+    if(Strings.nullToEmpty(System.getProperty("plugin.redmine.debug.useDummy")).equals("true"))
     {
       RSourceBean tt = new IGNORE_TestingSourcesBean();
       if(sources.stream().noneMatch(pSource -> pSource.getURL().equals(tt.getURL())))
