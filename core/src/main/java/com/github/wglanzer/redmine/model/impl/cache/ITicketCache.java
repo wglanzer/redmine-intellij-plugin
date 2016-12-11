@@ -56,4 +56,8 @@ public interface ITicketCache
   @Nullable
   ITicket getLastUpdatedTicket();
 
+  /**
+   * Destroys this ticket cache completely!
+   */
+  void destroy();
 }

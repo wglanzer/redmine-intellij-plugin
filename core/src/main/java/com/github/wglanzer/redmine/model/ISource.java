@@ -35,7 +35,7 @@ public interface ISource
    *
    * @return polling interval in seconds
    */
-  int getPollInterval();
+  Integer getPollInterval();
 
   /**
    * Returns the wished element-count per GET-Request-Page

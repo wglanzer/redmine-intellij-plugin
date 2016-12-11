@@ -14,11 +14,11 @@ import java.io.Serializable;
 public class RSourceBean implements ISource, Serializable
 {
 
-  private static final long serialVersionUID = -5253459219403859704L;
+  private static final long serialVersionUID = -5253459219433359704L;
 
   private String url;
   private String apiKey;
-  private int pollingInterval;
+  private Integer pollingInterval;
   private Integer pageSize;
 
   @NotNull
@@ -36,7 +36,7 @@ public class RSourceBean implements ISource, Serializable
   }
 
   @Override
-  public int getPollInterval()
+  public Integer getPollInterval()
   {
     return pollingInterval;
   }
@@ -73,7 +73,7 @@ public class RSourceBean implements ISource, Serializable
    *
    * @param pPollingInterval polling interval
    */
-  public void setPollingInterval(int pPollingInterval)
+  public void setPollingInterval(Integer pPollingInterval)
   {
     pollingInterval = pPollingInterval;
   }

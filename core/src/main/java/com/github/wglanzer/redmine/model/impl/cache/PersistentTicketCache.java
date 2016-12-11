@@ -11,7 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author w.glanzer, 27.11.2016.
@@ -22,7 +21,8 @@ class PersistentTicketCache implements ITicketCache
   private static final String _CACHE_ID = "ticketCache";
   private static final Long _LAST_ACCESSED_KEY = -1337L;
 
-  private final Map<Long, ITicket> persistentCache;
+  private final HTreeMap<Long, ITicket> persistentCache;
+  private final DB fileDB;
 
   public PersistentTicketCache(File pCacheFolder)
   {
@@ -34,7 +34,7 @@ class PersistentTicketCache implements ITicketCache
       path += File.separatorChar;
     path += _CACHE_ID;
 
-    DB fileDB = DBMaker.fileDB(path).checksumHeaderBypass()
+    fileDB = DBMaker.fileDB(path).checksumHeaderBypass()
         .fileChannelEnable()
         .closeOnJvmShutdown()
         .make();
@@ -96,4 +96,11 @@ class PersistentTicketCache implements ITicketCache
     return persistentCache.get(_LAST_ACCESSED_KEY);
   }
 
+  @Override
+  public void destroy()
+  {
+    persistentCache.clearWithoutNotification();
+    persistentCache.close();
+    fileDB.close();
+  }
 }

@@ -1,14 +1,11 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.gui.dialogs.AddSourceDialog;
-import com.github.wglanzer.redmine.config.gui.model.RAppSettingsModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.components.JBList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.MalformedURLException;
 
 /**
  * Component inside settings.
@@ -34,23 +31,7 @@ class SourcesList extends JBList
    */
   public void onAddClick(AnActionButton pButton)
   {
-    try
-    {
-      AddSourceDialog dialog = new AddSourceDialog();
-      dialog.setSize(400, 150);
-      dialog.setLocationRelativeTo(SwingUtilities.getRoot(this));
-      dialog.setVisible(true);
-
-      String url = dialog.getURL();
-      String apiKey = dialog.getAPIKey();
-      int pollInterval = dialog.getPollInterval();
-      if(url != null && apiKey != null)
-        model.addSource(url, apiKey, pollInterval, null); // todo pageSize in Dialog!
-    }
-    catch(MalformedURLException ignored)
-    {
-      JOptionPane.showMessageDialog(SwingUtilities.getRoot(this), "Invalid url!", "Exception", JOptionPane.ERROR_MESSAGE);
-    }
+    model.addEmptySource();
   }
 
   /**
@@ -74,8 +55,7 @@ class SourcesList extends JBList
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)
     {
       super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-      ISource source = (ISource) value;
-      setText(source.getURL());
+      setText(((ISource) value).getURL());
       return this;
     }
   }

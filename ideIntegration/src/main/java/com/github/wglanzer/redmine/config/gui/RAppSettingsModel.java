@@ -1,19 +1,19 @@
-package com.github.wglanzer.redmine.config.gui.model;
+package com.github.wglanzer.redmine.config.gui;
 
 import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.config.RMutableSettings;
 import com.github.wglanzer.redmine.config.beans.RSourceBean;
 import com.github.wglanzer.redmine.model.ISource;
+import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -41,25 +41,19 @@ public class RAppSettingsModel
   }
 
   /**
-   * Adds a redmine source
-   *
-   * @param pURL  redmine server url
+   * Adds an empty redmine source
    */
-  public void addSource(String pURL, String pAPIKey, int pPollInterval, Integer pPageSize) throws MalformedURLException
+  public void addEmptySource()
   {
     synchronized(modified)
     {
-      if(!_checkURL(pURL))
-        throw new MalformedURLException("URL invalid (url: " + pURL + ")");
-
       RSourceBean sourceBean = new RSourceBean();
-      sourceBean.setUrl(pURL);
-      sourceBean.setApiKey(pAPIKey);
-      sourceBean.setPollingInterval(pPollInterval);
-      sourceBean.setPageSize(pPageSize);
+      sourceBean.setUrl("https://example.mydomain.com/");
+      sourceBean.setApiKey("mySecureAPIKeyGeneratedByRedmine");
+      sourceBean.setPollingInterval(PollingServer.DEFAULT_POLLINTERVAL);
+      sourceBean.setPageSize(25);
       sources.add(sourceBean);
-      _modified();
-      _firePropertyChanged(PROP_SOURCES, null, sourceBean);
+      firePropertyChanged(PROP_SOURCES, null, sourceBean);
     }
   }
 
@@ -80,7 +74,7 @@ public class RAppSettingsModel
       if(deletedBean != null)
       {
         boolean remove = sources.remove(deletedBean);
-        _firePropertyChanged(PROP_SOURCES, deletedBean, null);
+        firePropertyChanged(PROP_SOURCES, deletedBean, null);
         return remove;
       }
 
@@ -175,8 +169,11 @@ public class RAppSettingsModel
    * @param pOldValue  Old value, before change
    * @param pNewValue  New value, after change
    */
-  private void _firePropertyChanged(String pProperty, Object pOldValue, Object pNewValue)
+  protected void firePropertyChanged(String pProperty, Object pOldValue, Object pNewValue)
   {
+    if(!Objects.equals(pOldValue, pNewValue))
+      _modified();
+
     synchronized(listeners)
     {
       PropertyChangeEvent ev = new PropertyChangeEvent(this, pProperty, pOldValue, pNewValue);
@@ -192,25 +189,6 @@ public class RAppSettingsModel
     synchronized(modified)
     {
       modified.set(true);
-    }
-  }
-
-  /**
-   * Checks the URL, if it can be set as Redmine-URL
-   *
-   * @param pURL  URL, which is wanted to be set
-   * @return <tt>true</tt>, if it can be set
-   */
-  private boolean _checkURL(String pURL)
-  {
-    try
-    {
-      new URL(pURL);
-      return true;
-    }
-    catch(Exception e)
-    {
-      return false;
     }
   }
 

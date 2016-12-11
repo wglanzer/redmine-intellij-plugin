@@ -58,6 +58,7 @@ class PollingTicketDirectory
    */
   public void clearCaches()
   {
+    persistentCache.destroy();
     directory.forEach((pID, pTicket) -> pTicket.destroy());
     directory.clear();
   }
