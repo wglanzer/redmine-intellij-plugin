@@ -4,6 +4,7 @@ import com.github.wglanzer.redmine.RManager;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -145,19 +146,30 @@ public class RedmineToolComponent extends JPanel
     {
       myProject = pMyProject;
       setUserObject(pMyProject.getName());
-      for(ITicket currTicket : pMyProject.getTickets())
-        add(new _TicketNode(currTicket));
+      pMyProject.getTickets().stream()
+          .map(_TicketNode::new)
+          .sorted()
+          .forEachOrdered(this::add);
     }
   }
 
   /**
    * Node representing one single ticket
    */
-  private static class _TicketNode extends DefaultMutableTreeNode
+  private static class _TicketNode extends DefaultMutableTreeNode implements Comparable<_TicketNode>
   {
+    private final long ticketID;
+
     public _TicketNode(ITicket pMyTicket)
     {
-      setUserObject(pMyTicket.getID());
+      ticketID = pMyTicket.getID();
+      setUserObject(ticketID);
+    }
+
+    @Override
+    public int compareTo(@NotNull _TicketNode o)
+    {
+      return (int) (ticketID - o.ticketID);
     }
   }
 
