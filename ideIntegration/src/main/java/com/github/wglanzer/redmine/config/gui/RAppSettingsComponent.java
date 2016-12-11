@@ -44,6 +44,7 @@ public class RAppSettingsComponent extends JPanel
   private JLabel pageSizePanel;
   private JTabbedPane tab;
   private JTextField displayName;
+  private JLabel displayNamePanel;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -190,13 +191,16 @@ public class RAppSettingsComponent extends JPanel
     urlPanel.setEnabled(enableSelected);
     intervalPanel.setEnabled(enableSelected);
     pageSizePanel.setEnabled(enableSelected);
+    displayNamePanel.setEnabled(enableSelected);
     apiKeyPanel.setEnabled(enableSelected);
     urlField.setEnabled(enableSelected);
     apiKeyField.setEnabled(enableSelected);
     pollIntervall.setEnabled(enableSelected);
     pageSize.setEnabled(enableSelected);
+    displayName.setEnabled(enableSelected);
     urlField.setText(pSelectedSource != null ? pSelectedSource.getURL() : "");
     apiKeyField.setText(pSelectedSource != null ? pSelectedSource.getAPIKey() : "");
+    displayName.setText(pSelectedSource != null ? pSelectedSource.getDisplayName() : "");
     pollIntervall.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPollInterval() : null, 0));
     pageSize.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPageSize() : null, 0));
   }
@@ -379,15 +383,15 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(displayName, gbc);
-    final JLabel label1 = new JLabel();
-    label1.setEnabled(false);
-    label1.setText("Name:");
+    displayNamePanel = new JLabel();
+    displayNamePanel.setEnabled(false);
+    displayNamePanel.setText("Name:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(0, 0, 0, 5);
-    panel1.add(label1, gbc);
+    panel1.add(displayNamePanel, gbc);
     final JPanel panel2 = new JPanel();
     panel2.setLayout(new GridBagLayout());
     panel2.setEnabled(true);

@@ -139,7 +139,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="a8604" class="javax.swing.JLabel">
+              <component id="a8604" class="javax.swing.JLabel" binding="displayNamePanel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                   <gridbag top="0" left="0" bottom="0" right="5" weightx="0.0" weighty="0.0"/>
