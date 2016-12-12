@@ -5,10 +5,12 @@ import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,7 @@ public class RServerManager
       availableServers.clear();
       availableServers.addAll(pNewSettings.getSources().stream()
           .map(this::_toServer)
+          .filter(Objects::nonNull)
           .collect(Collectors.toList()));
 
       if(isRunning.get())
@@ -98,11 +101,20 @@ public class RServerManager
    * Converts a source to a server
    *
    * @param pSource  source which should be converted
-   * @return the server instance
+   * @return the server instance, <tt>null</tt> if it can't be created
    */
+  @Nullable
   private IServer _toServer(ISource pSource)
   {
-    return new PollingServer(loggingFacade, taskCreator, pSource);
+    try
+    {
+      return new PollingServer(loggingFacade, taskCreator, pSource);
+    }
+    catch(Exception e)
+    {
+      loggingFacade.error(e);
+      return null;
+    }
   }
 
 }
