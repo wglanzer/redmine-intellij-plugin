@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.github.wglanzer.redmine</groupId>
     <artifactId>redmine</artifactId>
-    <version>0.1_1212160004</version>
+    <version>0.1.1_1212162324</version>
   </parent>
 
   <artifactId>core</artifactId>
