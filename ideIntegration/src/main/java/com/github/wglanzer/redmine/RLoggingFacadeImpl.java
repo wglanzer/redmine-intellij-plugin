@@ -5,9 +5,6 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 /**
  * @author w.glanzer, 27.11.2016.
  */
@@ -30,9 +27,7 @@ class RLoggingFacadeImpl implements IRLoggingFacade
   @Override
   public void error(String pMessage, Exception pCause)
   {
-    StringWriter writer = new StringWriter();
-    pCause.printStackTrace(new PrintWriter(writer));
-    IntelliJIDEAUtility.showMessage(pMessage, writer.toString(), NotificationType.ERROR, false);
+    IntelliJIDEAUtility.showMessage(pMessage, _toLogableString(pCause), NotificationType.ERROR, false);
     if(_IS_DEBUG)
       pCause.printStackTrace(); // Print it on console -> Debug-Reasons
   }
@@ -51,6 +46,33 @@ class RLoggingFacadeImpl implements IRLoggingFacade
       return;
 
     IntelliJIDEAUtility.showMessage("DEBUG", pDebugString, NotificationType.INFORMATION, true);
+  }
+
+  private String _toLogableString(Throwable e)
+  {
+    Throwable currEx = e;
+    StringBuilder builder = new StringBuilder();
+    for(int i = 0; currEx != null; i++)
+    {
+      StringBuilder myExLine = new StringBuilder();
+      for(int whitespaces = 0; whitespaces < i; whitespaces++)
+        myExLine.append("  ");
+
+      // Log exception
+      myExLine.append(currEx.getClass()).append(": ").append(currEx.getLocalizedMessage());
+      for(StackTraceElement currElement : currEx.getStackTrace())
+        myExLine.append(" [->] ").append(currElement);
+
+      // Shorten it
+      if(myExLine.length() > 255)
+        myExLine.delete(255, myExLine.length()).append("[...continued...]");
+
+      currEx = currEx.getCause();
+      if(currEx != null)
+        myExLine.append("\n");
+      builder.append(myExLine);
+    }
+    return builder.toString();
   }
 
 }
