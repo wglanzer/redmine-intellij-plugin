@@ -1,7 +1,7 @@
 package com.github.wglanzer.redmine.config.gui;
 
+import com.github.wglanzer.redmine.config.IMutableSettings;
 import com.github.wglanzer.redmine.config.ISettings;
-import com.github.wglanzer.redmine.config.RMutableSettings;
 import com.github.wglanzer.redmine.config.beans.RSourceBean;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Model for global configuration.
  * It won't be saved to disk. All the settings will be "cached" and stored
- * to RMutableSettings when calling {@link RAppSettingsModel#applyTo(RMutableSettings)}
+ * to RMutableSettings when calling {@link RAppSettingsModel#applyTo(com.github.wglanzer.redmine.config.IMutableSettings)}
  *
  * @author w.glanzer, 06.10.2016.
  */
@@ -115,9 +115,13 @@ public class RAppSettingsModel
    *
    * @param pSettings  instance
    */
-  public void applyTo(RMutableSettings pSettings)
+  public void applyTo(IMutableSettings pSettings)
   {
-    pSettings.setSources(sources);
+    synchronized(modified)
+    {
+      pSettings.setSources(sources);
+      modified.set(false);
+    }
   }
 
   /**

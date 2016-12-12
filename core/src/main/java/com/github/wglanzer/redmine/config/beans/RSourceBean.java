@@ -16,11 +16,11 @@ public class RSourceBean implements ISource, Serializable
 
   private static final long serialVersionUID = -5253459215423359704L;
 
-  private String displayName;
-  private String url;
-  private String apiKey;
-  private Integer pollingInterval;
-  private Integer pageSize;
+  public String displayName;
+  public String url;
+  public String apiKey;
+  public Integer pollingInterval;
+  public Integer pageSize;
 
   @Nullable
   @Override

@@ -28,7 +28,7 @@ public class RAppSettingsConfigurable implements SearchableConfigurable
   {
     if(myComp != null)
     {
-      myCompModel.applyTo((RMutableSettings) RAppSettings.getSettings());
+      myCompModel.applyTo((IMutableSettings) RAppSettings.getSettings());
       RManager.getInstance().reloadConfiguration();
     }
   }
