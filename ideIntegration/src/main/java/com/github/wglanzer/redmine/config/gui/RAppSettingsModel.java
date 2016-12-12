@@ -53,6 +53,7 @@ public class RAppSettingsModel
       sourceBean.setApiKey("mySecureAPIKeyGeneratedByRedmine");
       sourceBean.setPollingInterval(PollingServer.DEFAULT_POLLINTERVAL);
       sourceBean.setPageSize(25);
+      sourceBean.setCheckCertificate(true);
       sources.add(sourceBean);
       firePropertyChanged(PROP_SOURCES, null, sourceBean);
     }

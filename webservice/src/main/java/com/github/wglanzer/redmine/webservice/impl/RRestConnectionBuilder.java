@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 public class RRestConnectionBuilder
 {
 
-  public static IRRestConnection createConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pURL, String pAPIKey, Integer pPageSize)
+  public static IRRestConnection createConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pURL, String pAPIKey, Integer pPageSize, boolean pVerifySSL)
   {
-    return new RRestConnection(pLoggingFacade, pURL, pAPIKey, pPageSize);
+    return new RRestConnection(pLoggingFacade, pURL, pAPIKey, pPageSize, pVerifySSL);
   }
 
 }

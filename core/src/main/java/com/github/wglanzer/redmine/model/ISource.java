@@ -53,4 +53,11 @@ public interface ISource
   @Nullable
   Integer getPageSize();
 
+  /**
+   * Returns if the SSL-Certificate should be checked or not
+   *
+   * @return <tt>true</tt> -> it should be checked
+   */
+  boolean isCheckCeritifacte();
+
 }

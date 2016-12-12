@@ -45,6 +45,8 @@ public class RAppSettingsComponent extends JPanel
   private JTabbedPane tab;
   private JTextField displayName;
   private JLabel displayNamePanel;
+  private JCheckBox checkCertificate;
+  private JLabel checkCertificatePanel;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -146,6 +148,16 @@ public class RAppSettingsComponent extends JPanel
       }
     });
 
+    // CheckCertificate
+    checkCertificate.addActionListener(e ->
+    {
+      if(selectedSource != null)
+      {
+        _fireChange("checkCertificate", selectedSource.isCheckCeritifacte(), checkCertificate.isSelected());
+        selectedSource.setCheckCertificate(checkCertificate.isSelected());
+      }
+    });
+
     // If a source was added, select it!
     model.addPropertyChangeListener(evt ->
     {
@@ -192,6 +204,8 @@ public class RAppSettingsComponent extends JPanel
     intervalPanel.setEnabled(enableSelected);
     pageSizePanel.setEnabled(enableSelected);
     displayNamePanel.setEnabled(enableSelected);
+    checkCertificatePanel.setEnabled(enableSelected);
+    checkCertificate.setEnabled(enableSelected);
     apiKeyPanel.setEnabled(enableSelected);
     urlField.setEnabled(enableSelected);
     apiKeyField.setEnabled(enableSelected);
@@ -203,6 +217,7 @@ public class RAppSettingsComponent extends JPanel
     displayName.setText(pSelectedSource != null ? pSelectedSource.getDisplayName() : "");
     pollIntervall.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPollInterval() : null, 0));
     pageSize.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPageSize() : null, 0));
+    checkCertificate.setSelected(pSelectedSource != null && pSelectedSource.isCheckCeritifacte());
   }
 
   /**
@@ -348,28 +363,28 @@ public class RAppSettingsComponent extends JPanel
     final JPanel spacer1 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     gbc.weightx = 0.1;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer1, gbc);
     final JPanel spacer2 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 2;
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     gbc.weightx = 0.15;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer2, gbc);
     final JPanel spacer3 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 3;
-    gbc.gridy = 5;
+    gbc.gridy = 6;
     gbc.weightx = 0.35;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(spacer3, gbc);
     final JPanel spacer4 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 3;
-    gbc.gridy = 6;
+    gbc.gridy = 7;
     gbc.weighty = 0.1;
     gbc.fill = GridBagConstraints.VERTICAL;
     panel1.add(spacer4, gbc);
@@ -392,6 +407,25 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(0, 0, 0, 5);
     panel1.add(displayNamePanel, gbc);
+    checkCertificatePanel = new JLabel();
+    checkCertificatePanel.setEnabled(false);
+    checkCertificatePanel.setText("Check Certificate:");
+    checkCertificatePanel.setToolTipText("Minimum: 1\nMaximum: 100");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 5;
+    gbc.anchor = GridBagConstraints.EAST;
+    gbc.insets = new Insets(5, 0, 0, 5);
+    panel1.add(checkCertificatePanel, gbc);
+    checkCertificate = new JCheckBox();
+    checkCertificate.setEnabled(false);
+    checkCertificate.setText("");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 5;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.insets = new Insets(5, 0, 0, 0);
+    panel1.add(checkCertificate, gbc);
     final JPanel panel2 = new JPanel();
     panel2.setLayout(new GridBagLayout());
     panel2.setEnabled(true);

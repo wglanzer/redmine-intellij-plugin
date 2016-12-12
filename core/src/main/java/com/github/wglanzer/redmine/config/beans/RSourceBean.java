@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.config.beans;
 
 import com.github.wglanzer.redmine.model.ISource;
+import com.google.common.base.MoreObjects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,13 +15,14 @@ import java.io.Serializable;
 public class RSourceBean implements ISource, Serializable
 {
 
-  private static final long serialVersionUID = -5253459215423359704L;
+  private static final long serialVersionUID = -5253459215323359704L;
 
   public String displayName;
   public String url;
   public String apiKey;
   public Integer pollingInterval;
   public Integer pageSize;
+  public Boolean checkCertificate;
 
   @Nullable
   @Override
@@ -56,10 +58,16 @@ public class RSourceBean implements ISource, Serializable
     return pageSize;
   }
 
+  @Override
+  public boolean isCheckCeritifacte()
+  {
+    return MoreObjects.firstNonNull(checkCertificate, true);
+  }
+
   /**
    * Sets the URL to the server
    *
-   * @param pUrl  URL to server
+   * @param pUrl URL to server
    */
   public void setUrl(String pUrl)
   {
@@ -104,5 +112,15 @@ public class RSourceBean implements ISource, Serializable
   public void setDisplayName(String pDisplayName)
   {
     displayName = pDisplayName;
+  }
+
+  /**
+   * Sets that the certificate should be checked or not
+   *
+   * @param pCheck <tt>true</tt> if it should be checked
+   */
+  public void setCheckCertificate(boolean pCheck)
+  {
+    checkCertificate = pCheck;
   }
 }

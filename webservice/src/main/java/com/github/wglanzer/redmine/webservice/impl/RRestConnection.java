@@ -5,6 +5,8 @@ import com.github.wglanzer.redmine.webservice.spi.*;
 import com.google.common.base.Stopwatch;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -29,6 +31,15 @@ class RRestConnection implements IRRestConnection
   private static final int _DEFAULT_PAGESIZE = 25;
   private static final int _MAX_PAGESIZE = 100; // Maximum elements are limited to 100 per page (Redmine-REST-API)
 
+  static
+  {
+    // Set Custom SSL Factory to allow only specific hostnames permanently
+    CloseableHttpClient client = HttpClients.custom()
+        .setSSLHostnameVerifier(RHostnameVerifier.getInstance())
+        .build();
+    Unirest.setHttpClient(client);
+  }
+
   private final int pagesize;
   private final String url;
   private final String apiKey;
@@ -36,12 +47,13 @@ class RRestConnection implements IRRestConnection
   private final ExecutorService executor = Executors.newFixedThreadPool(8); //todo why 8?
   private final AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
 
-  public RRestConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pUrl, String pAPIKey, Integer pPageSize)
+  public RRestConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pUrl, String pAPIKey, Integer pPageSize, boolean pVerifySSL)
   {
     url = pUrl;
     apiKey = pAPIKey;
     loggingFacade = pLoggingFacade;
     pagesize = pPageSize == null ? _DEFAULT_PAGESIZE : (pPageSize > _MAX_PAGESIZE ? _MAX_PAGESIZE : pPageSize);
+    RHostnameVerifier.getInstance().setVerify(pUrl, pVerifySSL); // Add / Remove it from Hostname-Checking-List
   }
 
   @NotNull
