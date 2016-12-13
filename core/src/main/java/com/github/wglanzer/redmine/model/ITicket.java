@@ -132,6 +132,17 @@ public interface ITicket
   interface ITicketListener extends EventListener
   {
 
+    String PROP_SUBJECT = "subject";
+    String PROP_DESCRIPTION = "description";
+    String PROP_CREATEDON = "createdOn";
+    String PROP_UPDATEDON = "updatedOn";
+    String PROP_STATUS = "status";
+    String PROP_AUTHOR = "author";
+    String PROP_PRIORITY = "priority";
+    String PROP_TRACKER = "tracker";
+    String PROP_CATEGORY = "category";
+    String PROP_ASSIGNEE = "assignee";
+
     /**
      * Fires, that redmine properties have changed
      *

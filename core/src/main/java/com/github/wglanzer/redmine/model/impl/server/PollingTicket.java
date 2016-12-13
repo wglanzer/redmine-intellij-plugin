@@ -150,61 +150,61 @@ class PollingTicket implements ITicket
 
     if(!Objects.equals(subject, pSubject))
     {
-      changedProps.put("subject", new AbstractMap.SimpleEntry<>(subject, pSubject));
+      changedProps.put(ITicketListener.PROP_SUBJECT, new AbstractMap.SimpleEntry<>(subject, pSubject));
       subject = pSubject;
     }
 
     if(!Objects.equals(description, pDescription))
     {
-      changedProps.put("description", new AbstractMap.SimpleEntry<>(description, pDescription));
+      changedProps.put(ITicketListener.PROP_DESCRIPTION, new AbstractMap.SimpleEntry<>(description, pDescription));
       description = pDescription;
     }
 
     if(!Objects.equals(createdOn, pCreatedOn))
     {
-      changedProps.put("createdOn", new AbstractMap.SimpleEntry<>(createdOn, pCreatedOn));
+      changedProps.put(ITicketListener.PROP_CREATEDON, new AbstractMap.SimpleEntry<>(createdOn, pCreatedOn));
       createdOn = pCreatedOn;
     }
 
     if(!Objects.equals(updatedOn, pUpdatedOn))
     {
-      changedProps.put("updatedOn", new AbstractMap.SimpleEntry<>(updatedOn, pUpdatedOn));
+      changedProps.put(ITicketListener.PROP_UPDATEDON, new AbstractMap.SimpleEntry<>(updatedOn, pUpdatedOn));
       updatedOn = pUpdatedOn;
     }
 
     if(!Objects.equals(status, pStatus))
     {
-      changedProps.put("status", new AbstractMap.SimpleEntry<>(status, pStatus));
+      changedProps.put(ITicketListener.PROP_STATUS, new AbstractMap.SimpleEntry<>(status, pStatus));
       status = pStatus;
     }
 
     if(!Objects.equals(author, pAuthor))
     {
-      changedProps.put("author", new AbstractMap.SimpleEntry<>(author, pAuthor));
+      changedProps.put(ITicketListener.PROP_AUTHOR, new AbstractMap.SimpleEntry<>(author, pAuthor));
       author = pAuthor;
     }
 
     if(!Objects.equals(priority, pPriority))
     {
-      changedProps.put("priority", new AbstractMap.SimpleEntry<>(priority, pPriority));
+      changedProps.put(ITicketListener.PROP_PRIORITY, new AbstractMap.SimpleEntry<>(priority, pPriority));
       priority = pPriority;
     }
 
     if(!Objects.equals(tracker, pTracker))
     {
-      changedProps.put("tracker", new AbstractMap.SimpleEntry<>(tracker, pTracker));
+      changedProps.put(ITicketListener.PROP_TRACKER, new AbstractMap.SimpleEntry<>(tracker, pTracker));
       tracker = pTracker;
     }
 
     if(!Objects.equals(category, pCategory))
     {
-      changedProps.put("category", new AbstractMap.SimpleEntry<>(category, pCategory));
+      changedProps.put(ITicketListener.PROP_CATEGORY, new AbstractMap.SimpleEntry<>(category, pCategory));
       category = pCategory;
     }
 
     if(!Objects.equals(assignee, pAssignee))
     {
-      changedProps.put("assignee", new AbstractMap.SimpleEntry<>(assignee, pAssignee));
+      changedProps.put(ITicketListener.PROP_ASSIGNEE, new AbstractMap.SimpleEntry<>(assignee, pAssignee));
       assignee = pAssignee;
     }
 

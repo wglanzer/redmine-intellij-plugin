@@ -35,7 +35,7 @@ public class RTicketListener extends AbstractNotifiableListener implements ITick
       String propName = pProperties[i];
 
       // Only notify about "updated_on" when it was the only property that has changed
-      if(!Objects.equals(propName, "updatedOn") || pProperties.length == 1)
+      if(!Objects.equals(propName, PROP_UPDATEDON) || pProperties.length == 1)
         getNotifier().notifyTicketPropertyChanged(server, ticket, propName, pOldValue[i], pNewValue[i]);
     }
   }

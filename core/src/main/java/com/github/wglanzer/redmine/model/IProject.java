@@ -89,14 +89,19 @@ public interface IProject
   interface IProjectListener extends EventListener
   {
 
+    String PROP_NAME = "name";
+    String PROP_DESCRIPTION = "description";
+    String PROP_CREATEDON = "createdOn";
+    String PROP_UPDATEDON = "updatedOn";
+
     /**
-     * Fires, if a redmine property was updated (id, name, description, createddate, updateddate, ispublic)
+     * Fires, that redmine properties have changed
      *
-     * @param pName     Name of the changed property
-     * @param pOldValue Old value for this property
-     * @param pNewValue New value for this property
+     * @param pProperties Properties that were changed
+     * @param pOldValue   Array of old values
+     * @param pNewValue   Array of new values
      */
-    default void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
+    default void redminePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
     {
     }
 

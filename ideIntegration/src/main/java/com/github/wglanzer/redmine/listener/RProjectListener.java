@@ -24,9 +24,10 @@ public class RProjectListener extends AbstractNotifiableListener implements IPro
   }
 
   @Override
-  public void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
+  public void redminePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
   {
-    getNotifier().notifyProjectPropertyChanged(server, project, pName, pOldValue, pNewValue);
+    for(int i = 0; i < pProperties.length; i++)
+      getNotifier().notifyProjectPropertyChanged(server, project, pProperties[i], pOldValue[i], pNewValue[i]);
   }
 
   @Override

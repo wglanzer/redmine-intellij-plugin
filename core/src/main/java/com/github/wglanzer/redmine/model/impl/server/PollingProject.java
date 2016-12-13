@@ -116,32 +116,47 @@ class PollingProject implements IProject
 
     if(!Objects.equals(name, pName))
     {
-      changedProps.put("name", new AbstractMap.SimpleEntry<>(name, pName));
+      changedProps.put(IProjectListener.PROP_NAME, new AbstractMap.SimpleEntry<>(name, pName));
       name = pName;
     }
 
     if(!Objects.equals(description, pDescription))
     {
-      changedProps.put("description", new AbstractMap.SimpleEntry<>(description, pDescription));
+      changedProps.put(IProjectListener.PROP_DESCRIPTION, new AbstractMap.SimpleEntry<>(description, pDescription));
       description = pDescription;
     }
 
     if(!Objects.equals(createdOn, pCreatedOn))
     {
-      changedProps.put("createdOn", new AbstractMap.SimpleEntry<>(createdOn, pCreatedOn));
+      changedProps.put(IProjectListener.PROP_CREATEDON, new AbstractMap.SimpleEntry<>(createdOn, pCreatedOn));
       createdOn = pCreatedOn;
     }
 
     if(!Objects.equals(updatedOn, pUpdatedOn))
     {
-      changedProps.put("updatedOn", new AbstractMap.SimpleEntry<>(updatedOn, pUpdatedOn));
+      changedProps.put(IProjectListener.PROP_UPDATEDON, new AbstractMap.SimpleEntry<>(updatedOn, pUpdatedOn));
       updatedOn = pUpdatedOn;
     }
 
     valid = true;
 
-    if(pFireChanges)
-      changedProps.forEach((pChangedKey, pOldNewValues) -> _firePropertyChange(pChangedKey, pOldNewValues.getKey(), pOldNewValues.getValue()));
+    // Fire changed properties
+    if(pFireChanges && !changedProps.isEmpty())
+    {
+      String[] props = new String[changedProps.size()];
+      Object[] oldVals = new Object[changedProps.size()];
+      Object[] newVals = new Object[changedProps.size()];
+      int counter = 0;
+      for(Map.Entry<String, Map.Entry<Object, Object>> currentry : changedProps.entrySet())
+      {
+        props[counter] = currentry.getKey();
+        oldVals[counter] = currentry.getValue().getKey();
+        newVals[counter] = currentry.getValue().getValue();
+        counter++;
+      }
+
+      _firePropertiesChanged(props, oldVals, newVals);
+    }
   }
 
   /**
@@ -204,17 +219,17 @@ class PollingProject implements IProject
   }
 
   /**
-   * Fires, that a redmine property has Changed
+   * Fires, that redmine properties have changed
    *
-   * @param pProperty Property that has changed
-   * @param pOldValue Old value of this property
-   * @param pNewValue New value for this property
+   * @param pProperties Properties that were changed
+   * @param pOldValue   Array of old values
+   * @param pNewValue   Array of new values
    */
-  private void _firePropertyChange(String pProperty, Object pOldValue, Object pNewValue)
+  private void _firePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
   {
     synchronized(projectListeners)
     {
-      projectListeners.forEach(pListener -> pListener.redminePropertyChanged(pProperty, pOldValue, pNewValue));
+      projectListeners.forEach(pListener -> pListener.redminePropertiesChanged(pProperties, pOldValue, pNewValue));
     }
   }
 }
