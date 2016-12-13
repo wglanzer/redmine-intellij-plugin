@@ -15,25 +15,27 @@ public class RProjectListener implements IProject.IProjectListener
 
   private final IServer server;
   private final IProject project;
+  private final INotifier notifier;
 
-  public RProjectListener(IServer pServer, IProject pProject)
+  public RProjectListener(IServer pServer, IProject pProject, @NotNull INotifier pNotifier)
   {
     server = pServer;
     project = pProject;
+    notifier = pNotifier;
   }
 
   @Override
   public void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
   {
-    Notifier.notifyProjectPropertyChanged(server, project, pName, pOldValue, pNewValue);
+    notifier.notifyProjectPropertyChanged(server, project, pName, pOldValue, pNewValue);
   }
 
   @Override
   public void ticketAdded(@NotNull ITicket pTicketAdded, boolean pCreatedDuringPreload)
   {
-    pTicketAdded.addTicketListener(new RTicketListener(server, project, pTicketAdded)); // New ticket -> listen on it
+    pTicketAdded.addTicketListener(new RTicketListener(server, project, pTicketAdded, notifier)); // New ticket -> listen on it
     if(!pCreatedDuringPreload)
-      Notifier.notifyNewTicket(server, pTicketAdded);
+      notifier.notifyNewTicket(server, pTicketAdded);
   }
 
 }
