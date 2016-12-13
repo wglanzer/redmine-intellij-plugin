@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,7 @@ public class RAppSettingsComponent extends JPanel
 {
 
   private static final Color _MANDATORY_INPUT_COLOR = Color.ORANGE;
+  private final PropertyChangeListener modelChangeListenerStrongRef;
 
   private RAppSettingsModel model;
   private RSourceBean selectedSource;
@@ -159,7 +161,7 @@ public class RAppSettingsComponent extends JPanel
     });
 
     // If a source was added, select it!
-    model.addPropertyChangeListener(evt ->
+    modelChangeListenerStrongRef = evt ->
     {
       if(Objects.equals(evt.getPropertyName(), RAppSettingsModel.PROP_SOURCES))
       {
@@ -173,7 +175,8 @@ public class RAppSettingsComponent extends JPanel
         else if(evt.getOldValue() == null && evt.getNewValue() != null)
           sourceList.setSelectedIndex(sourceList.indexOf((ISource) evt.getNewValue()));
       }
-    });
+    };
+    model.addWeakPropertyChangeListener(modelChangeListenerStrongRef);
 
     // Select first entry
     SwingUtilities.invokeLater(() ->

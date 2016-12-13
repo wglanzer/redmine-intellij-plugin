@@ -4,6 +4,7 @@ import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
+import com.github.wglanzer.redmine.util.WeakListenerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class RServerManager
 {
 
+  private final WeakListenerList<IRServerManagerListener> serverManagerListeners = new WeakListenerList<>();
   private final List<IServer> availableServers = new ArrayList<>();
   private final IRLoggingFacade loggingFacade;
   private final IRTaskCreator taskCreator;
@@ -36,7 +38,8 @@ public class RServerManager
 
   /**
    * Reloads the configuration from AppSettings
-   * @param pNewSettings
+   *
+   * @param pNewSettings Newly created settings
    */
   public void reloadConfiguration(ISettings pNewSettings)
   {
@@ -44,11 +47,17 @@ public class RServerManager
     {
       availableServers.stream()
           .filter(IServer::isValid)
-          .forEach(IServer::disconnect);
+          .forEach((pServer) -> {
+            serverManagerListeners.forEach(pListener -> pListener.serverWillBeDisconnected(pServer));
+            pServer.disconnect();
+            serverManagerListeners.forEach(pListener -> pListener.serverDisconnected(pServer));
+          });
       availableServers.clear();
       availableServers.addAll(pNewSettings.getSources().stream()
+          .peek(pSource -> serverManagerListeners.forEach(pListener -> pListener.serverWillBeCreated(pSource)))
           .map(this::_toServer)
           .filter(Objects::nonNull)
+          .peek(pServer -> serverManagerListeners.forEach(pListener -> pListener.serverCreated(pServer)))
           .collect(Collectors.toList()));
 
       if(isRunning.get())
@@ -77,7 +86,11 @@ public class RServerManager
     {
       availableServers.stream()
           .filter(IServer::isValid)
-          .forEach(IServer::disconnect);
+          .forEach((pServer) -> {
+            serverManagerListeners.forEach(pListener -> pListener.serverWillBeDisconnected(pServer));
+            pServer.disconnect();
+            serverManagerListeners.forEach(pListener -> pListener.serverDisconnected(pServer));
+          });
       availableServers.clear();
       isRunning.set(false);
     }
@@ -98,9 +111,35 @@ public class RServerManager
   }
 
   /**
+   * Adds a new ServerManagerListener to this ServerManager
+   *
+   * @param pListener Listener that should be added
+   */
+  public void addWeakServerManagerListener(IRServerManagerListener pListener)
+  {
+    synchronized(serverManagerListeners)
+    {
+      serverManagerListeners.add(pListener);
+    }
+  }
+
+  /**
+   * Removes a specific listener
+   *
+   * @param pListener Listener that should be removed
+   */
+  public void removeServerManagerListener(IRServerManagerListener pListener)
+  {
+    synchronized(serverManagerListeners)
+    {
+      serverManagerListeners.remove(pListener);
+    }
+  }
+
+  /**
    * Converts a source to a server
    *
-   * @param pSource  source which should be converted
+   * @param pSource source which should be converted
    * @return the server instance, <tt>null</tt> if it can't be created
    */
   @Nullable

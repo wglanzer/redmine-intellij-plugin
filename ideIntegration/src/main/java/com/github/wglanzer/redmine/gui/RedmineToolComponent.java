@@ -104,13 +104,15 @@ public class RedmineToolComponent extends JPanel
    */
   private static class _ServerNode extends DefaultMutableTreeNode
   {
+    private final IServer.IServerListener serverListenerStrongRef;
+
     public _ServerNode(IServer pMyServer)
     {
       setUserObject(pMyServer.getDisplayName());
       for(IProject currProject : pMyServer.getProjects())
         add(new _ProjectNode(currProject));
 
-      pMyServer.addServerListener(new IServer.IServerListener()
+      serverListenerStrongRef = new IServer.IServerListener()
       {
         @Override
         public void projectCreated(IProject pCreated, boolean pCreatedDuringPreload)
@@ -131,7 +133,8 @@ public class RedmineToolComponent extends JPanel
             }
           }
         }
-      });
+      };
+      pMyServer.addWeakServerListener(serverListenerStrongRef);
     }
   }
 

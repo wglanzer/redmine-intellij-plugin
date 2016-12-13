@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBList;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,12 +82,14 @@ class SourcesList extends JBList
    */
   private static class _Model extends AbstractListModel<ISource>
   {
-    private RAppSettingsModel model;
+    private final PropertyChangeListener propertyChangeListener;
+    private final RAppSettingsModel model;
 
     public _Model(RAppSettingsModel pModel)
     {
       model = pModel;
-      model.addPropertyChangeListener(evt -> fireContentsChanged(this, 0, Math.max(getSize() - 1, 0)));
+      propertyChangeListener = evt -> fireContentsChanged(this, 0, Math.max(getSize() - 1, 0));
+      model.addWeakPropertyChangeListener(propertyChangeListener);
     }
 
     @Override

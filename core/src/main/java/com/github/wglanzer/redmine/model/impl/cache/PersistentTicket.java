@@ -130,14 +130,14 @@ class PersistentTicket implements ITicket, Serializable
   }
 
   @Override
-  public void addTicketListener(@NotNull ITicketListener pListener)
+  public void addWeakTicketListener(@NotNull ITicketListener pListener)
   {
-    throw new UnsupportedOperationException("addTicketListener() not implemented");
+    throw new UnsupportedOperationException("addWeakTicketListener() not implemented");
   }
 
   @Override
-  public void removeTicketListener(@NotNull ITicketListener pListener)
+  public void removeWeakTicketListener(@NotNull ITicketListener pListener)
   {
-    throw new UnsupportedOperationException("removeTicketListener() not implemented");
+    throw new UnsupportedOperationException("removeWeakTicketListener() not implemented");
   }
 }

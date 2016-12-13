@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.EventListener;
 
 /**
  * Represents one redmine server
@@ -13,6 +14,14 @@ import java.util.Collection;
  */
 public interface IServer
 {
+
+  /**
+   * Returns an unique identifier for this server
+   *
+   * @return ID, not <tt>null</tt>
+   */
+  @NotNull
+  String getID();
 
   /**
    * Connects the server to its destination
@@ -61,19 +70,19 @@ public interface IServer
    *
    * @param pListener Listener that should be added
    */
-  void addServerListener(IServerListener pListener);
+  void addWeakServerListener(IServerListener pListener);
 
   /**
    * Removes an IServerListener
    *
    * @param pListener Listener that should be removed
    */
-  void removeServerListener(IServerListener pListener);
+  void removeWeakServerListener(IServerListener pListener);
 
   /**
    * Listener for server events
    */
-  interface IServerListener
+  interface IServerListener extends EventListener
   {
     /**
      * Fired, when the status of the connection changed

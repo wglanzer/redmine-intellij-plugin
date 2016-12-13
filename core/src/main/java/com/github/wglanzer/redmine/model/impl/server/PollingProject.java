@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.ITicket;
+import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  */
 class PollingProject implements IProject
 {
-  private final List<IProjectListener> projectListeners = new ArrayList<>();
+  private final WeakListenerList<IProjectListener> projectListeners = new WeakListenerList<>();
   private final PollingTicketDirectory ticketDirectory;
   private final IRRestConnection connection;
   private final String id;
@@ -83,7 +84,7 @@ class PollingProject implements IProject
   }
 
   @Override
-  public void addProjectListener(@NotNull IProjectListener pListener)
+  public void addWeakProjectListener(@NotNull IProjectListener pListener)
   {
     synchronized(projectListeners)
     {
@@ -92,7 +93,7 @@ class PollingProject implements IProject
   }
 
   @Override
-  public void removeProjectListener(@NotNull IProjectListener pListener)
+  public void removeWeakProjectListener(@NotNull IProjectListener pListener)
   {
     synchronized(projectListeners)
     {

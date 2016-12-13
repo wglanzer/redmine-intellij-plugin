@@ -5,15 +5,16 @@ import com.github.wglanzer.redmine.IRTaskCreator;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
+import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +32,8 @@ public class PollingServer implements IServer
   private final IRTaskCreator taskCreator;
   private final PollingProjectDirectory directory;
   private final PollingExecutor executor;
-  private final List<IServerListener> listenerList = new ArrayList<>();
+  private final WeakListenerList<IServerListener> listenerList = new WeakListenerList<>();
+  private final String id = UUID.randomUUID().toString();
 
   public PollingServer(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, ISource pSource)
   {
@@ -46,6 +48,13 @@ public class PollingServer implements IServer
       for(IProject currProject : getProjects())
         ((PollingProject) currProject).pollTickets(false);
     }, pSource.getPollInterval(), false);
+  }
+
+  @NotNull
+  @Override
+  public String getID()
+  {
+    return id;
   }
 
   @Override
@@ -119,7 +128,7 @@ public class PollingServer implements IServer
   }
 
   @Override
-  public void addServerListener(IServerListener pListener)
+  public void addWeakServerListener(IServerListener pListener)
   {
     synchronized(listenerList)
     {
@@ -128,7 +137,7 @@ public class PollingServer implements IServer
   }
 
   @Override
-  public void removeServerListener(IServerListener pListener)
+  public void removeWeakServerListener(IServerListener pListener)
   {
     synchronized(listenerList)
     {

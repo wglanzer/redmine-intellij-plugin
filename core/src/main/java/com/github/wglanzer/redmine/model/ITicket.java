@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.EventListener;
 import java.util.Map;
 
 /**
@@ -114,21 +115,21 @@ public interface ITicket
    *
    * @param pListener Listener to add
    */
-  void addTicketListener(@NotNull ITicketListener pListener);
+  void addWeakTicketListener(@NotNull ITicketListener pListener);
 
   /**
    * Removes an ITicketListener from this ticket
    *
    * @param pListener Listener to remove
    */
-  void removeTicketListener(@NotNull ITicketListener pListener);
+  void removeWeakTicketListener(@NotNull ITicketListener pListener);
 
   /**
    * Listens on one ITicket
    *
    * @see ITicket
    */
-  interface ITicketListener
+  interface ITicketListener extends EventListener
   {
 
     /**

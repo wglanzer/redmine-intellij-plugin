@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.model.impl.server;
 
 import com.github.wglanzer.redmine.model.ITicket;
+import com.github.wglanzer.redmine.util.WeakListenerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import java.util.*;
  */
 class PollingTicket implements ITicket
 {
-  private final List<ITicketListener> listenerList = new ArrayList<>();
+  private final WeakListenerList<ITicketListener> listenerList = new WeakListenerList<>();
   private final long id;
   private String subject;
   private String description;
@@ -115,7 +116,7 @@ class PollingTicket implements ITicket
   }
 
   @Override
-  public void addTicketListener(@NotNull ITicketListener pListener)
+  public void addWeakTicketListener(@NotNull ITicketListener pListener)
   {
     synchronized(listenerList)
     {
@@ -124,7 +125,7 @@ class PollingTicket implements ITicket
   }
 
   @Override
-  public void removeTicketListener(@NotNull ITicketListener pListener)
+  public void removeWeakTicketListener(@NotNull ITicketListener pListener)
   {
     synchronized(listenerList)
     {

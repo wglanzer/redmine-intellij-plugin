@@ -5,6 +5,7 @@ import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.config.beans.RSourceBean;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
+import com.github.wglanzer.redmine.util.WeakListenerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +30,7 @@ public class RAppSettingsModel
   public static final String PROP_SOURCES = "sources";
 
   private final AtomicBoolean modified = new AtomicBoolean(false);
-  private final List<PropertyChangeListener> listeners = new ArrayList<>();
+  private final WeakListenerList<PropertyChangeListener> listeners = new WeakListenerList<>();
 
   // All model fields
   private List<RSourceBean> sources = new ArrayList<>();
@@ -147,7 +148,7 @@ public class RAppSettingsModel
    *
    * @param pListener Listener which will be added
    */
-  public void addPropertyChangeListener(PropertyChangeListener pListener)
+  public void addWeakPropertyChangeListener(PropertyChangeListener pListener)
   {
     synchronized(listeners)
     {
@@ -160,7 +161,7 @@ public class RAppSettingsModel
    *
    * @param pListener  Listener which will be removed
    */
-  public void removePropertyChangeListener(PropertyChangeListener pListener)
+  public void removeWeakPropertyChangeListener(PropertyChangeListener pListener)
   {
     synchronized(listeners)
     {

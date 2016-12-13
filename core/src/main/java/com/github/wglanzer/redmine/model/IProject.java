@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.EventListener;
 
 /**
  * Represents a complete Redmine project,
@@ -71,21 +72,21 @@ public interface IProject
    *
    * @param pListener Listener to add
    */
-  void addProjectListener(@NotNull IProjectListener pListener);
+  void addWeakProjectListener(@NotNull IProjectListener pListener);
 
   /**
    * Removes an IProjectListener from this project
    *
    * @param pListener Listener to remove
    */
-  void removeProjectListener(@NotNull IProjectListener pListener);
+  void removeWeakProjectListener(@NotNull IProjectListener pListener);
 
   /**
    * Listens on one IProject
    *
    * @see IProject
    */
-  interface IProjectListener
+  interface IProjectListener extends EventListener
   {
 
     /**
