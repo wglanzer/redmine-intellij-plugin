@@ -5,6 +5,8 @@ import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * Listener on each ticket.
  *
@@ -26,8 +28,15 @@ public class RTicketListener extends AbstractNotifiableListener implements ITick
   }
 
   @Override
-  public void redminePropertyChanged(String pName, Object pOldValue, Object pNewValue)
+  public void redminePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
   {
-    getNotifier().notifyTicketPropertyChanged(server, ticket, pName, pOldValue, pNewValue);
+    for(int i = 0; i < pProperties.length; i++)
+    {
+      String propName = pProperties[i];
+
+      // Only notify about "updated_on" when it was the only property that has changed
+      if(!Objects.equals(propName, "updatedOn") || pProperties.length == 1)
+        getNotifier().notifyTicketPropertyChanged(server, ticket, propName, pOldValue[i], pNewValue[i]);
+    }
   }
 }

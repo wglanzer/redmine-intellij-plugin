@@ -208,23 +208,38 @@ class PollingTicket implements ITicket
       assignee = pAssignee;
     }
 
+    // Fire changed properties
     if(pFireChanges && !changedProps.isEmpty())
-      changedProps.forEach((pChangedKey, pOldNewValues) -> _firePropertyChange(pChangedKey, pOldNewValues.getKey(), pOldNewValues.getValue()));
+    {
+      String[] props = new String[changedProps.size()];
+      Object[] oldVals = new Object[changedProps.size()];
+      Object[] newVals = new Object[changedProps.size()];
+      int counter = 0;
+      for(Map.Entry<String, Map.Entry<Object, Object>> currentry : changedProps.entrySet())
+      {
+        props[counter] = currentry.getKey();
+        oldVals[counter] = currentry.getValue().getKey();
+        newVals[counter] = currentry.getValue().getValue();
+        counter++;
+      }
+
+      _firePropertiesChanged(props, oldVals, newVals);
+    }
     return !changedProps.isEmpty();
   }
 
   /**
-   * Fires, that a redmine property has Changed
+   * Fires, that redmine properties have changed
    *
-   * @param pProperty Property that has changed
-   * @param pOldValue Old value of this property
-   * @param pNewValue New value for this property
+   * @param pProperties Properties that were changed
+   * @param pOldValue   Array of old values
+   * @param pNewValue   Array of new values
    */
-  private void _firePropertyChange(String pProperty, Object pOldValue, Object pNewValue)
+  private void _firePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
   {
     synchronized(listenerList)
     {
-      listenerList.forEach(pListener -> pListener.redminePropertyChanged(pProperty, pOldValue, pNewValue));
+      listenerList.forEach(pListener -> pListener.redminePropertiesChanged(pProperties, pOldValue, pNewValue));
     }
   }
 
