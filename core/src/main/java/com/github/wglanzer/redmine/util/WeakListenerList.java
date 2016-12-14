@@ -31,6 +31,7 @@ public class WeakListenerList<T> extends AbstractList<T>
     }
   }
 
+  @Override
   public boolean add(T pListener)
   {
     synchronized(listenerList)
@@ -39,6 +40,7 @@ public class WeakListenerList<T> extends AbstractList<T>
     }
   }
 
+  @Override
   public boolean remove(Object pListener)
   {
     synchronized(listenerList)
@@ -47,4 +49,12 @@ public class WeakListenerList<T> extends AbstractList<T>
     }
   }
 
+  @Override
+  public void clear()
+  {
+    synchronized(listenerList)
+    {
+      listenerList.clear();
+    }
+  }
 }
