@@ -55,6 +55,12 @@
       <version>${intellij.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.intellij</groupId>
+      <artifactId>forms_rt</artifactId>
+      <version>${intellij.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

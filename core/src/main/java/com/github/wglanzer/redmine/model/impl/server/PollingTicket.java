@@ -210,21 +210,8 @@ class PollingTicket implements ITicket
 
     // Fire changed properties
     if(pFireChanges && !changedProps.isEmpty())
-    {
-      String[] props = new String[changedProps.size()];
-      Object[] oldVals = new Object[changedProps.size()];
-      Object[] newVals = new Object[changedProps.size()];
-      int counter = 0;
-      for(Map.Entry<String, Map.Entry<Object, Object>> currentry : changedProps.entrySet())
-      {
-        props[counter] = currentry.getKey();
-        oldVals[counter] = currentry.getValue().getKey();
-        newVals[counter] = currentry.getValue().getValue();
-        counter++;
-      }
+      _firePropertiesChanged(Collections.unmodifiableMap(changedProps));
 
-      _firePropertiesChanged(props, oldVals, newVals);
-    }
     return !changedProps.isEmpty();
   }
 
@@ -232,14 +219,12 @@ class PollingTicket implements ITicket
    * Fires, that redmine properties have changed
    *
    * @param pProperties Properties that were changed
-   * @param pOldValue   Array of old values
-   * @param pNewValue   Array of new values
    */
-  private void _firePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
+  private void _firePropertiesChanged(Map<String, Map.Entry<Object, Object>> pProperties)
   {
     synchronized(listenerList)
     {
-      listenerList.forEach(pListener -> pListener.redminePropertiesChanged(pProperties, pOldValue, pNewValue));
+      listenerList.forEach(pListener -> pListener.redminePropertiesChanged(pProperties));
     }
   }
 

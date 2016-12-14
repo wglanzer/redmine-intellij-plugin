@@ -5,18 +5,21 @@ import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Listeners, that does things when a ticket was added / changed
  *
  * @author w.glanzer, 11.12.2016.
  */
-public class RProjectListener extends AbstractNotifiableListener implements IProject.IProjectListener
+class RProjectListener extends AbstractNotifiableListener implements IProject.IProjectListener
 {
 
   private final IServer server;
   private final IProject project;
 
-  public RProjectListener(IServer pServer, IProject pProject, @NotNull INotifier pNotifier)
+  RProjectListener(IServer pServer, IProject pProject, @NotNull IChangeNotifier pNotifier)
   {
     super(pNotifier);
     server = pServer;
@@ -24,10 +27,13 @@ public class RProjectListener extends AbstractNotifiableListener implements IPro
   }
 
   @Override
-  public void redminePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
+  public void redminePropertiesChanged(Map<String, Map.Entry<Object, Object>> pProperties)
   {
-    for(int i = 0; i < pProperties.length; i++)
-      getNotifier().notifyProjectPropertyChanged(server, project, pProperties[i], pOldValue[i], pNewValue[i]);
+    HashMap<String, Map.Entry<Object, Object>> copy = new HashMap<>(pProperties);
+    if(copy.size() > 1)
+      copy.remove(PROP_UPDATEDON);
+
+    getNotifier().notifyProjectPropertyChanged(server, project, copy);
   }
 
   @Override

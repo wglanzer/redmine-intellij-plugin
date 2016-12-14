@@ -9,12 +9,12 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author w.glanzer, 11.12.2016.
  */
-public class RServerListener extends AbstractNotifiableListener implements IServer.IServerListener
+class RServerListener extends AbstractNotifiableListener implements IServer.IServerListener
 {
 
   private final IServer server;
 
-  public RServerListener(IServer pServer, @NotNull INotifier pNotifier)
+  RServerListener(IServer pServer, @NotNull IChangeNotifier pNotifier)
   {
     super(pNotifier);
     server = pServer;

@@ -147,10 +147,8 @@ public interface ITicket
      * Fires, that redmine properties have changed
      *
      * @param pProperties Properties that were changed
-     * @param pOldValue   Array of old values
-     * @param pNewValue   Array of new values
      */
-    default void redminePropertiesChanged(String[] pProperties, Object[] pOldValue, Object[] pNewValue)
+    default void redminePropertiesChanged(Map<String, Map.Entry<Object, Object>> pProperties)
     {
     }
 

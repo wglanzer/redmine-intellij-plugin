@@ -2,23 +2,25 @@ package com.github.wglanzer.redmine;
 
 import com.github.wglanzer.redmine.config.ISettings;
 import com.github.wglanzer.redmine.config.RAppSettings;
+import com.github.wglanzer.redmine.notifiers.INotifier;
 import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 
 import java.io.File;
 
 /**
- * Implementation of IManagerPrefs to work with IntelliJ
+ * Implementation of IManagerPrefs to work with IntelliJ.
+ * Contains all necessary implementations for redmine plugin
  *
  * @author w.glanzer, 03.12.2016.
  */
 class RManagerPrefsImpl implements IRManagerPrefs
 {
-  private IRLoggingFacade loggingFacade;
-  private IRTaskCreator taskCreator;
+  private final IRLoggingFacade loggingFacade;
+  private final IRTaskCreator taskCreator;
 
-  public RManagerPrefsImpl()
+  public RManagerPrefsImpl(INotifier pNotifier)
   {
-    loggingFacade = new RLoggingFacadeImpl();
+    loggingFacade = new RLoggingFacadeImpl(pNotifier);
     taskCreator = new RTaskCreatorImpl();
   }
 

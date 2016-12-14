@@ -5,12 +5,14 @@ import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 /**
  * Notifies the user that something has changed in redmine
  *
  * @author w.glanzer, 13.12.2016.
  */
-public interface INotifier
+public interface IChangeNotifier
 {
   /**
    * Notifies the user, that a ticket was added
@@ -23,13 +25,11 @@ public interface INotifier
   /**
    * Notifies the user, that a ticket was changed
    *
-   * @param pServer          Server
-   * @param pTicket          Added ticket
-   * @param pChangedProperty Property that has changed
-   * @param pOldValue        Old value for the given property
-   * @param pNewValue        New value
+   * @param pServer     Server
+   * @param pTicket     Added ticket
+   * @param pProperties Property that has changed
    */
-  void notifyTicketPropertyChanged(@NotNull IServer pServer, @NotNull ITicket pTicket, String pChangedProperty, Object pOldValue, Object pNewValue);
+  void notifyTicketPropertyChanged(@NotNull IServer pServer, @NotNull ITicket pTicket, @NotNull Map<String, Map.Entry<Object, Object>> pProperties);
 
   /**
    * Notifies the user, that a project was added
@@ -42,11 +42,9 @@ public interface INotifier
   /**
    * Notifies the user, that a project was changed
    *
-   * @param pServer          Server
-   * @param pProject         Added project
-   * @param pChangedProperty Property that has changed
-   * @param pOldValue        Old value for the given property
-   * @param pNewValue        New value
+   * @param pServer     Server
+   * @param pProject    Added project
+   * @param pProperties Property that has changed
    */
-  void notifyProjectPropertyChanged(@NotNull IServer pServer, @NotNull IProject pProject, String pChangedProperty, Object pOldValue, Object pNewValue);
+  void notifyProjectPropertyChanged(@NotNull IServer pServer, @NotNull IProject pProject, @NotNull Map<String, Map.Entry<Object, Object>> pProperties);
 }

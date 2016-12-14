@@ -12,12 +12,12 @@ import java.util.List;
 abstract class AbstractNotifiableListener
 {
 
-  private final INotifier notifier;
+  private final IChangeNotifier notifier;
 
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private final List<EventListener> strongListenerRefs = new ArrayList<>();
 
-  public AbstractNotifiableListener(INotifier pNotifier)
+  public AbstractNotifiableListener(IChangeNotifier pNotifier)
   {
     notifier = pNotifier;
   }
@@ -31,7 +31,7 @@ abstract class AbstractNotifiableListener
     }
   }
 
-  protected INotifier getNotifier()
+  protected IChangeNotifier getNotifier()
   {
     return notifier;
   }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.wglanzer.redmine.notifiers.balloons.BalloonRedmineChanged">
+  <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="0" vgap="0">
+    <margin top="2" left="2" bottom="2" right="2"/>
+    <constraints>
+      <xy x="20" y="20" width="242" height="78"/>
+    </constraints>
+    <properties>
+      <maximumSize width="300" height="500"/>
+      <minimumSize width="150" height="-1"/>
+      <opaque value="false"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <component id="87f97" class="javax.swing.JLabel" binding="lblLine1">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="10"/>
+          <opaque value="false"/>
+          <text value="Assignee: DUMMY"/>
+        </properties>
+      </component>
+      <component id="5a08a" class="javax.swing.JLabel" binding="lblLine2">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="10"/>
+          <opaque value="false"/>
+          <text value="Priority: DUMMY"/>
+        </properties>
+      </component>
+      <grid id="4739a" layout-manager="BorderLayout" hgap="2" vgap="0">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <opaque value="false"/>
+        </properties>
+        <border type="empty">
+          <size top="0" left="0" bottom="0" right="0"/>
+        </border>
+        <children>
+          <component id="fbc07" class="javax.swing.JLabel" binding="lblTitle">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <font style="2"/>
+              <opaque value="false"/>
+              <text value="DUMMY TEXT"/>
+            </properties>
+          </component>
+          <grid id="b162e" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="West"/>
+            <properties>
+              <opaque value="false"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="307a4" class="javax.swing.JEditorPane" binding="lblTicketURL" custom-create="true">
+                <constraints border-constraint="Center"/>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

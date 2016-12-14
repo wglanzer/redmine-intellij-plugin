@@ -26,13 +26,6 @@ public interface IRLoggingFacade extends IRRestLoggingFacade
   void error(String pMessage, Exception pCause);
 
   /**
-   * Logs a string
-   *
-   * @param pLogString String that should be logged
-   */
-  void log(String pLogString);
-
-  /**
    * Logs a debug string
    *
    * @param pDebugString String that should be logged as debuglevel
