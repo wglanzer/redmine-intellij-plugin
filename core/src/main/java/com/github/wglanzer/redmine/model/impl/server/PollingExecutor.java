@@ -45,10 +45,17 @@ class PollingExecutor
         {
           _Task task = new _Task(pollRunnable);
 
-          if(showAsBackgroundTask)
-            taskCreator.executeInBackground(task).waitUntilFinished();
-          else
-            task.accept(new _DummyIndicator());
+          try
+          {
+            if(showAsBackgroundTask)
+              taskCreator.executeInBackground(task).waitUntilFinished();
+            else
+              task.accept(new _DummyIndicator());
+          }
+          catch(Throwable ex)
+          {
+            loggingFacade.error("Error executing task", new Exception(ex));
+          }
 
           if(!interruped.get())
           {
