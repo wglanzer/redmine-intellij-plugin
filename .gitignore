@@ -1,20 +1,13 @@
-#	Allgemeine Ignores
-
-*.ipr
-*.iml
-*.iws
-/.idea
-/artifacts
-
 #	IntelliJ Ignores
-
-/install-intellij-libs.bat
+*.iml
+/.idea/*
+!/.idea/vcs.xml
 !ideBridge/ideBridge.iml
 
 #	Target Ignores
-
-/target
+*/target
 /out
+/artifacts
 
 # IGNORE-Files can be ignored
 IGNORE_*
