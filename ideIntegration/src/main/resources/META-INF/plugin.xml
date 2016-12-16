@@ -24,7 +24,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.github.wglanzer.redmine.config.RAppSettings"/>
         <applicationConfigurable instance="com.github.wglanzer.redmine.config.RAppSettingsConfigurable"/>
-        <toolWindow id="Redmine" anchor="right" factoryClass="com.github.wglanzer.redmine.gui.RedmineToolWindowFactory" icon="/com/github/wglanzer/redmine/redmine_12.png" canCloseContents="true"/>
     </extensions>
 
 </idea-plugin>

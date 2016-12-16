@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine.notifiers;
 
+import com.github.wglanzer.redmine.gui.RedmineStatusBarWidget;
 import com.github.wglanzer.redmine.listener.IChangeNotifier;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
@@ -87,7 +88,9 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
     for(Project project : ProjectManager.getInstance().getOpenProjects())
     {
       StatusBar statusbar = WindowManager.getInstance().getStatusBar(project);
-      pBalloon.show(RelativePoint.getCenterOf(statusbar.getComponent()), Balloon.Position.above);
+      RedmineStatusBarWidget myWidget = (RedmineStatusBarWidget) statusbar.getWidget(RedmineStatusBarWidget.REDMINE_STATUSBAR_ID);
+      assert myWidget != null;
+      pBalloon.show(RelativePoint.getCenterOf(myWidget.getComponent()), Balloon.Position.above);
     }
   }
 

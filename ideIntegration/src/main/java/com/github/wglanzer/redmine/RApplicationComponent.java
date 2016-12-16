@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine;
 
+import com.github.wglanzer.redmine.gui.RedmineStatusBarWidget;
 import com.github.wglanzer.redmine.listener.ServerListenerManager;
 import com.github.wglanzer.redmine.notifiers.SimpleNotifier;
 import com.intellij.openapi.components.ApplicationComponent;
@@ -19,6 +20,9 @@ public class RApplicationComponent implements ApplicationComponent
   public void initComponent()
   {
     RManager manager = RManager.getInstance();
+
+    // Init custom widget to ALL projects
+    RedmineStatusBarWidget.init();
 
     // Init "background"-tasks
     manager.init(new RManagerPrefsImpl(notifier));
