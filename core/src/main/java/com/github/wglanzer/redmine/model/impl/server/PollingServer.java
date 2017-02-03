@@ -9,6 +9,8 @@ import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
+import com.github.wglanzer.redmine.webservice.spi.IRRestResult;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +36,7 @@ public class PollingServer implements IServer
   private final PollingExecutor executor;
   private final WeakListenerList<IServerListener> listenerList = new WeakListenerList<>();
   private final String id = UUID.randomUUID().toString();
+  private final SimpleBooleanProperty invalidated = new SimpleBooleanProperty(false);
 
   public PollingServer(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, ISource pSource)
   {
@@ -60,6 +63,9 @@ public class PollingServer implements IServer
   @Override
   public void connectAsync()
   {
+    if(invalidated.get())
+      throw new UnsupportedOperationException("A PollingServer can not be reopened!");
+
     taskCreator.executeInBackground(new IRTaskCreator.ITask()
     {
       @Override
@@ -96,6 +102,7 @@ public class PollingServer implements IServer
     // end listening
     _fireConnectionStatusChanged(false);
     listenerList.clear();
+    invalidated.set(true);
     executor.stop();
     directory.clearCaches();
   }
@@ -103,7 +110,7 @@ public class PollingServer implements IServer
   @Override
   public boolean isValid()
   {
-    return connection.isValid();
+    return !invalidated.get() && connection.isValid();
   }
 
   @NotNull
@@ -183,7 +190,11 @@ public class PollingServer implements IServer
         .map(IProject::getID)
         .collect(Collectors.toList());
 
-    List<IProject> allNewProjects = connection.doGET(IRRestRequest.GET_PROJECTS).getResultNodes()
+    IRRestResult result = connection.doGET(IRRestRequest.GET_PROJECTS, invalidated::not);
+    if(result == null) // invalidated during loading
+      return;
+
+    List<IProject> allNewProjects = result.getResultNodes()
         .map(directory::updateProject)
         .collect(Collectors.toList());
 

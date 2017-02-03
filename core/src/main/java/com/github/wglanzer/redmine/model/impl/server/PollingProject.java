@@ -6,6 +6,8 @@ import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
+import com.github.wglanzer.redmine.webservice.spi.IRRestResult;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -29,7 +31,7 @@ class PollingProject implements IProject
   private String description;
   private Instant createdOn;
   private Instant updatedOn;
-  private boolean valid;
+  private SimpleBooleanProperty invalidated;
 
   public PollingProject(IRRestConnection pRestConnection, String pID, String pName, String pDescription, Instant pCreatedOn, Instant pUpdatedOn)
   {
@@ -37,7 +39,7 @@ class PollingProject implements IProject
     ticketDirectory = new PollingTicketDirectory(pID);
     updateProperties(pName, pDescription, pCreatedOn, pUpdatedOn, false);
     id = pID;
-    valid = true;
+    invalidated = new SimpleBooleanProperty(false);
   }
 
   @Override
@@ -73,7 +75,7 @@ class PollingProject implements IProject
   @Override
   public boolean isValid()
   {
-    return valid;
+    return !invalidated.get();
   }
 
   @NotNull
@@ -108,10 +110,9 @@ class PollingProject implements IProject
    */
   protected void updateProperties(String pName, String pDescription, Instant pCreatedOn, Instant pUpdatedOn, boolean pFireChanges)
   {
-    if(!valid && pFireChanges)
+    if(invalidated.get() && pFireChanges)
       throw new RuntimeException("updated invalid project (projectID: " + id + ")");
 
-    valid = false;
     Map<String, Map.Entry<Object, Object>> changedProps = new HashMap<>();
 
     if(!Objects.equals(name, pName))
@@ -138,8 +139,6 @@ class PollingProject implements IProject
       updatedOn = pUpdatedOn;
     }
 
-    valid = true;
-
     // Fire changed properties
     if(pFireChanges && !changedProps.isEmpty())
       _firePropertiesChanged(Collections.unmodifiableMap(changedProps));
@@ -151,12 +150,12 @@ class PollingProject implements IProject
   protected void destroy()
   {
     projectListeners.clear();
+    invalidated.set(true);
     ticketDirectory.clearCaches();
     name = null;
     description = null;
     createdOn = null;
     updatedOn = null;
-    valid = false;
   }
 
   /**
@@ -182,7 +181,11 @@ class PollingProject implements IProject
       request = request.argument(IRRestArgument.UPDATED_ON.value("%3E%3D" + lastUpdatedTicket.getUpdatedOn().plusSeconds(1))); //>2014-01-02T08:12:32Z
 
     // Execute Request
-    List<ITicket> allNewTickets = ticketDirectory.updateTickets(connection.doGET(request).getResultNodes());
+    IRRestResult result = connection.doGET(request, invalidated::not);
+    if(result == null) // project invalidated during loading
+      return;
+
+    List<ITicket> allNewTickets = ticketDirectory.updateTickets(result.getResultNodes());
 
     // Fire that a ticket was added
     allNewTickets.stream()

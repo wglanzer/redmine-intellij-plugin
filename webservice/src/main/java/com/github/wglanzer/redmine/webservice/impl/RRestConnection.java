@@ -2,9 +2,13 @@ package com.github.wglanzer.redmine.webservice.impl;
 
 import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
 import com.github.wglanzer.redmine.webservice.spi.*;
-import com.google.common.base.Stopwatch;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.NotNull;
@@ -15,11 +19,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * RestConnection to a redmine server
@@ -60,11 +65,24 @@ class RRestConnection implements IRRestConnection
   @Override
   public IRRestResult doGET(IRRestRequest pGETRequest) throws Exception
   {
+    IRRestResult result = doGET(pGETRequest, new _AlwaysAliveIndicator());
+    assert result != null; // DummyIndicator -> alive -> true
+    return result;
+  }
+
+  @Nullable
+  @Override
+  public IRRestResult doGET(IRRestRequest pGETRequest, @NotNull IRRestProgressIndicator pProgressIndicator) throws Exception
+  {
     if(!(pGETRequest instanceof RRestRequestImpl))
       throw new UnsupportedOperationException(pGETRequest.getClass() + " not supported as request-type");
 
     RRestRequestImpl request = (RRestRequestImpl) pGETRequest;
-    JSONObject GETResponse = _doGET(pGETRequest, request.getSubPage() + ".json", request.getArguments()).getObject();
+    JsonNode node = _doGET(pGETRequest, pProgressIndicator, request.getSubPage() + ".json", request.getArguments());
+    if(node == null) // cancelled request
+      return null;
+
+    JSONObject GETResponse = node.getObject();
     JSONArray result;
 
     if(request.getResultTopLevel() == null)
@@ -87,8 +105,8 @@ class RRestConnection implements IRRestConnection
    * @param pPageKey Subpage ("projects", "issues", etc.)
    * @return Result as JsonNode
    */
-  @NotNull
-  private JsonNode _doGET(@NotNull IRRestRequest pRequest, @NotNull String pPageKey, @Nullable ArrayList<IRRestArgument> pAdditionalArguments) throws Exception
+  @Nullable
+  private JsonNode _doGET(@NotNull IRRestRequest pRequest, @NotNull IRRestProgressIndicator pProgressIndicator, @NotNull String pPageKey, @Nullable ArrayList<IRRestArgument> pAdditionalArguments) throws Exception
   {
     StringBuilder urlBuilder = new StringBuilder();
 
@@ -106,9 +124,26 @@ class RRestConnection implements IRRestConnection
 
     JsonNode response;
     if(pRequest.isPageable())
-      response = _executePaged(pRequest, urlBuilder.toString(), arguments);
+      response = _executePaged(pRequest, urlBuilder.toString(), pProgressIndicator, arguments);
     else
-      response = _executePlain(urlBuilder.toString(), arguments);
+    {
+      try
+      {
+        HttpResponse<JsonNode> resp = _executePlain(urlBuilder.toString(), pProgressIndicator, arguments).get();
+        if(resp == null)
+          return null;
+
+        response = resp.getBody();
+      }
+      catch(InterruptedException e)
+      {
+        response = null;
+      }
+    }
+
+    // Cancelled request
+    if(response == null)
+      return null;
 
     if(_isException(response))
       throw new ResultHasErrorException(response, urlBuilder.toString());
@@ -121,49 +156,60 @@ class RRestConnection implements IRRestConnection
    *
    * @param pURL       URL that should be executed
    * @param pArguments Additional arguments, not <tt>null</tt>
-   * @return result, not wrapped
+   * @return result, not wrapped, <tt>null</tt> if it was cancelled
    * @throws Exception if an error occured
    */
-  private JsonNode _executePaged(IRRestRequest pRequest, @NotNull String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  @Nullable
+  private JsonNode _executePaged(IRRestRequest pRequest, @NotNull String pURL, IRRestProgressIndicator pProgressIndicator, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
   {
     synchronized(executor)
     {
       try
       {
-        int total_count = _getTotalCount(pURL, pArguments);
+        int total_count = _getTotalCount(pURL, pProgressIndicator, pArguments);
 
         // Add pagelimit and sort, always the same during request
         pArguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(pagesize)));
         pArguments.add(IRRestArgument.SORT.value(":desc"));
-        List<JsonNode> results = Collections.synchronizedList(new ArrayList<>());
-        List<CompletableFuture<Void>> resultFutures = new ArrayList<>();
+        List<Future<HttpResponse<JsonNode>>> resultFutures = new ArrayList<>();
 
         for(int i = 0; i < total_count; i += pagesize)
         {
           final ArrayList<IRRestArgument> currentArguments = new ArrayList<>(pArguments);
           currentArguments.add(IRRestArgument.PAGE_OFFSET.value(String.valueOf(i)));
-          resultFutures.add(CompletableFuture.runAsync(() ->
-          {
-            try
-            {
-              results.add(_executePlain(pURL, currentArguments));
-            }
-            catch(Exception e)
-            {
-              throw new RuntimeException("Error executing request: url -> " + pURL + ", arguments -> " + currentArguments, e);
-            }
-          }, executor));
+          resultFutures.add(_executePlain(pURL, pProgressIndicator, currentArguments));
         }
 
         // Wait to finish all tasks
-        CompletableFuture.allOf(resultFutures.toArray(new CompletableFuture[resultFutures.size()])).get();
+        List<JsonNode> results = resultFutures.stream()
+            .map(pFuture -> {
+              try
+              {
+                if(pProgressIndicator.alive().get())
+                  return pFuture.get();
+              }
+              catch(Exception ignored)
+              {
+              }
+
+              return null;
+            })
+            .filter(Objects::nonNull)
+            .map(HttpResponse::getBody)
+            .collect(Collectors.toList());
+
+        // It was cancelled -> NULL
+        if(!pProgressIndicator.alive().get())
+          return null;
 
         // Merge to one jsonnode
         return _merge(results, ((RRestRequestImpl) pRequest).getResultTopLevel());
       }
       catch(Exception e)
       {
-        throw new Exception("Error executing request (url: " + pURL + ")", e);
+        if(pProgressIndicator.alive().get()) //only throw if it is still alive
+          throw new Exception("Error executing request (url: " + pURL + ")", e);
+        return null;
       }
     }
   }
@@ -176,13 +222,13 @@ class RRestConnection implements IRRestConnection
    * @return total_count-Attribute
    * @throws Exception if an error occured
    */
-  private int _getTotalCount(String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  private int _getTotalCount(String pURL, @NotNull IRRestProgressIndicator pProgressIndicator, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
   {
     try
     {
       ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
       arguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(0)));
-      JsonNode node = _executePlain(pURL, arguments);
+      JsonNode node = _executePlain(pURL, pProgressIndicator, arguments).get().getBody();
       return node.getObject().getInt(IRRestArgument.PAGE_TOTALCOUNT.getRequestName());
     }
     catch(Exception e)
@@ -195,11 +241,10 @@ class RRestConnection implements IRRestConnection
    * Executes the REST-URL, NO pageing
    *
    * @param pURL       URL that should be executed
-   * @param pArguments Additional arguments, not <tt>null</tt>
-   * @return result, not wrapped
+   * @param pArguments Additional arguments, not <tt>null</tt>  @return result, not wrapped
    * @throws Exception if an error occured
    */
-  private JsonNode _executePlain(@NotNull String pURL, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
+  private Future<HttpResponse<JsonNode>> _executePlain(@NotNull String pURL, @NotNull IRRestProgressIndicator pProgressIndicator, @NotNull ArrayList<IRRestArgument> pArguments) throws Exception
   {
     StringBuilder urlBuilder = new StringBuilder(pURL);
     ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
@@ -209,20 +254,31 @@ class RRestConnection implements IRRestConnection
     {
       IRRestArgument firstArg = arguments.get(0);
       urlBuilder.append("?").append(firstArg.getRequestName()).append("=").append(firstArg.getValue());
-     arguments.remove(0);
+      arguments.remove(0);
     }
     arguments.forEach((pArgument) -> urlBuilder.append("&").append(pArgument.getRequestName()).append("=").append(pArgument.getValue()));
 
-    // Log output
-    loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString());
+    Future<HttpResponse<JsonNode>> future = Unirest.get(urlBuilder.toString()).asJsonAsync();
 
-    Stopwatch watch = Stopwatch.createStarted();
-    JsonNode result = Unirest.get(urlBuilder.toString()).asJson().getBody();
-    watch.stop();
+    // Instant cancel
+    if(!pProgressIndicator.alive().get())
+      future.cancel(true);
 
-    // Log output + time
-    loggingFacade.debug(getClass().getSimpleName() + ": GET -> " + urlBuilder.toString() + " -> took " + watch.elapsed(TimeUnit.MILLISECONDS) + " ms");
-    return result;
+    // Wait for cancel
+    pProgressIndicator.alive().addListener(new ChangeListener<Boolean>()
+    {
+      @Override
+      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
+      {
+        if(oldValue && !newValue)
+        {
+          pProgressIndicator.alive().removeListener(this);
+          if(!future.isDone() && !future.isCancelled())
+            future.cancel(true);
+        }
+      }
+    });
+    return future;
   }
 
   /**
@@ -259,6 +315,18 @@ class RRestConnection implements IRRestConnection
   {
     JSONObject obj = pNode.getObject();
     return obj.has("errors");
+  }
+
+  /**
+   * IRRestProgressIndicator-Impl for dummy use
+   */
+  private static class _AlwaysAliveIndicator implements IRRestProgressIndicator
+  {
+    @Override
+    public ObservableBooleanValue alive()
+    {
+      return new SimpleBooleanProperty(true);
+    }
   }
 
 }
