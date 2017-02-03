@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.ISettings;
+import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
@@ -29,7 +29,7 @@ public class RServerManager
   private final IRTaskCreator taskCreator;
   private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-  public RServerManager(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, ISettings pSettings)
+  public RServerManager(IRLoggingFacade pLoggingFacade, IRTaskCreator pTaskCreator, SettingsDataModel pSettings)
   {
     loggingFacade = pLoggingFacade;
     taskCreator = pTaskCreator;
@@ -41,7 +41,7 @@ public class RServerManager
    *
    * @param pNewSettings Newly created settings
    */
-  public void reloadConfiguration(ISettings pNewSettings)
+  public void reloadConfiguration(SettingsDataModel pNewSettings)
   {
     synchronized(availableServers)
     {

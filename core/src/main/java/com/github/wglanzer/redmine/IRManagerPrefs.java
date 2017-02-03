@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.ISettings;
+import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ public interface IRManagerPrefs
 
   IRTaskCreator getTaskCreator();
 
-  ISettings getCurrentSettings();
+  SettingsDataModel getCurrentSettings();
 
   File getTicketCacheDirectory();
 

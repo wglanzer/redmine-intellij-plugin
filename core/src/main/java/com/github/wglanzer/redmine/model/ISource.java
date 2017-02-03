@@ -14,6 +14,13 @@ public interface ISource
 {
 
   /**
+   * Returns a unique name for this Source-Object
+   *
+   * @return Unique ID/Name
+   */
+  String getName();
+
+  /**
    * Displayable name representing this ISource-object
    *
    * @return displayable name, or <tt>null</tt> if no name is specified

@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.beans.RSourceBean;
+import com.github.wglanzer.redmine.config.beans.SourceDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.MoreObjects;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
@@ -27,7 +27,7 @@ public class RAppSettingsComponent extends JPanel
   private final PropertyChangeListener modelChangeListenerStrongRef;
 
   private RAppSettingsModel model;
-  private RSourceBean selectedSource;
+  private SourceDataModel selectedSource;
 
   private Splitter splitter;
   private SourcesList sourceList;
@@ -199,7 +199,7 @@ public class RAppSettingsComponent extends JPanel
    *
    * @param pSelectedSource Currently active SourceBean
    */
-  private void _selectedSourceChanged(@Nullable RSourceBean pSelectedSource)
+  private void _selectedSourceChanged(@Nullable SourceDataModel pSelectedSource)
   {
     selectedSource = pSelectedSource;
     boolean enableSelected = pSelectedSource != null;
@@ -232,7 +232,7 @@ public class RAppSettingsComponent extends JPanel
     sourceList.addListSelectionListener(e ->
     {
       if(sourceList.getSelectedIndices().length == 1) // only 1 selected entry
-        _selectedSourceChanged((RSourceBean) sourceList.getSelectedValue());
+        _selectedSourceChanged((SourceDataModel) sourceList.getSelectedValue());
       else
         _selectedSourceChanged(null);
     });

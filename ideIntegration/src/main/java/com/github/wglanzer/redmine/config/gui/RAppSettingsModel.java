@@ -1,27 +1,25 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.IMutableSettings;
-import com.github.wglanzer.redmine.config.ISettings;
-import com.github.wglanzer.redmine.config.beans.RSourceBean;
+import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
+import com.github.wglanzer.redmine.config.beans.SourceDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import com.github.wglanzer.redmine.util.WeakListenerList;
+import com.github.wglanzer.redmine.util.propertly.BulkModifyHierarchy;
+import com.github.wglanzer.redmine.util.propertly.DataModelFactory;
+import de.adito.propertly.core.spi.IHierarchy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 /**
  * Model for global configuration.
- * It won't be saved to disk. All the settings will be "cached" and stored
- * to RMutableSettings when calling {@link RAppSettingsModel#applyTo(com.github.wglanzer.redmine.config.IMutableSettings)}
+ * It won't be saved to disk. All the settings will be "cached" and stored asynchronously
  *
  * @author w.glanzer, 06.10.2016.
  */
@@ -31,11 +29,9 @@ public class RAppSettingsModel
 
   private final AtomicBoolean modified = new AtomicBoolean(false);
   private final WeakListenerList<PropertyChangeListener> listeners = new WeakListenerList<>();
+  private BulkModifyHierarchy<SettingsDataModel> bulkedSettingsHierarchy;
 
-  // All model fields
-  private List<RSourceBean> sources = new ArrayList<>();
-
-  public RAppSettingsModel(@Nullable ISettings pCurrentSettings)
+  public RAppSettingsModel(@Nullable SettingsDataModel pCurrentSettings)
   {
     if(pCurrentSettings != null)
       resetTo(pCurrentSettings);
@@ -48,40 +44,34 @@ public class RAppSettingsModel
   {
     synchronized(modified)
     {
-      RSourceBean sourceBean = new RSourceBean();
-      sourceBean.setDisplayName("Redmine Server");
-      sourceBean.setUrl("https://example.mydomain.com/");
-      sourceBean.setApiKey("mySecureAPIKeyGeneratedByRedmine");
-      sourceBean.setPollingInterval(PollingServer.DEFAULT_POLLINTERVAL);
-      sourceBean.setPageSize(25);
-      sourceBean.setCheckCertificate(true);
-      sources.add(sourceBean);
-      firePropertyChanged(PROP_SOURCES, null, sourceBean);
+      SourceDataModel source = DataModelFactory.createModel(SourceDataModel.class);
+      source.setDisplayName("Redmine Server");
+      source.setUrl("https://example.mydomain.com/");
+      source.setApiKey("mySecureAPIKeyGeneratedByRedmine");
+      source.setPollingInterval(PollingServer.DEFAULT_POLLINTERVAL);
+      source.setPageSize(25);
+      source.setCheckCertificate(true);
+      SettingsDataModel.Sources sources = bulkedSettingsHierarchy.getValue().getPit().getProperty(SettingsDataModel.sources).getValue();
+      assert sources != null;
+      sources.addProperty(source);
+      firePropertyChanged(PROP_SOURCES, null, source);
     }
   }
 
   /**
    * Removes one source from the list
    *
-   * @param pSource  Source, which will be removed
+   * @param pSourceName  Source, which will be removed
    * @return <tt>true</tt> if something was changed
    */
-  public boolean removeSource(ISource pSource)
+  public boolean removeSource(@NotNull String pSourceName)
   {
     synchronized(modified)
     {
-      RSourceBean deletedBean = sources.stream()
-          .filter(pStreamSource -> pStreamSource.equals(pSource))
-          .findAny().orElse(null);
-
-      if(deletedBean != null)
-      {
-        boolean remove = sources.remove(deletedBean);
-        firePropertyChanged(PROP_SOURCES, deletedBean, null);
-        return remove;
-      }
-
-      return false;
+      boolean removed = bulkedSettingsHierarchy.getValue().removeSource(pSourceName);
+      if(removed)
+        firePropertyChanged(PROP_SOURCES, pSourceName, null);
+      return removed;
     }
   }
 
@@ -95,7 +85,7 @@ public class RAppSettingsModel
   {
     synchronized(modified)
     {
-      return Collections.unmodifiableList(sources);
+      return bulkedSettingsHierarchy.getValue().getSources();
     }
   }
 
@@ -113,15 +103,14 @@ public class RAppSettingsModel
   }
 
   /**
-   * Applies this visualization to an settings instance
-   *
-   * @param pSettings  instance
+   * Applies this visualization to the
+   * underlying source-Hierarchy
    */
-  public void applyTo(IMutableSettings pSettings)
+  public void apply()
   {
     synchronized(modified)
     {
-      pSettings.setSources(sources);
+      bulkedSettingsHierarchy.writeBack();
       modified.set(false);
     }
   }
@@ -131,13 +120,12 @@ public class RAppSettingsModel
    *
    * @param pSettings container for all settings
    */
-  public synchronized void resetTo(ISettings pSettings)
+  public synchronized void resetTo(SettingsDataModel pSettings)
   {
     synchronized(modified)
     {
-      sources = pSettings.getSources().stream()
-          .map(pSource -> (RSourceBean) pSource)
-          .collect(Collectors.toList());
+      IHierarchy<SettingsDataModel> hierarchy = (IHierarchy<SettingsDataModel>) pSettings.getPit().getHierarchy();
+      bulkedSettingsHierarchy = new BulkModifyHierarchy<>(hierarchy);
       modified.set(false);
     }
   }
@@ -148,7 +136,7 @@ public class RAppSettingsModel
    *
    * @param pListener Listener which will be added
    */
-  public void addWeakPropertyChangeListener(PropertyChangeListener pListener)
+  public void addWeakPropertyChangeListener(PropertyChangeListener pListener) //todo PropertyPitEventListener
   {
     synchronized(listeners)
     {

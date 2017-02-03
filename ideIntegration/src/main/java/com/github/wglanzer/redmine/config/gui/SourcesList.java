@@ -46,7 +46,7 @@ class SourcesList extends JBList
   {
     List<ISource> selectedValues = (List<ISource>) getSelectedValuesList();
     if(selectedValues != null)
-      selectedValues.forEach(pValue -> model.removeSource(pValue));
+      selectedValues.forEach(pValue -> model.removeSource(pValue.getName()));
   }
 
   /**
@@ -101,6 +101,8 @@ class SourcesList extends JBList
     @Override
     public ISource getElementAt(int index)
     {
+      if(getSize() <= index)
+        return null;
       return model.getSources().get(index);
     }
   }
