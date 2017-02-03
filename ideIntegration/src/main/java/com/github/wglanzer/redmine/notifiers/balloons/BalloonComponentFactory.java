@@ -76,8 +76,10 @@ public class BalloonComponentFactory
   public static Balloon createHTMLBalloon(String pMessage, MessageType pType)
   {
     return JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(pMessage, pType, new BalloonHyperlinkListener())
+        .setHideOnClickOutside(false)
         .setFadeoutTime(_FADEOUT_TIME)
         .setHideOnLinkClick(true)
+        .setCloseButtonEnabled(true)
         .createBalloon();
   }
 
@@ -100,6 +102,7 @@ public class BalloonComponentFactory
         .setFadeoutTime(_FADEOUT_TIME)
         .setCloseButtonEnabled(true)
         .setHideOnLinkClick(true)
+        .setHideOnClickOutside(false)
         .createBalloon();
   }
 

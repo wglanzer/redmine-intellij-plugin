@@ -13,6 +13,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupAdapter;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.awt.RelativePoint;
@@ -20,7 +22,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 1. Notifies the user that something has changed in redmine
@@ -32,6 +37,7 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
 {
 
   public static final String NOTIFICATION_ID = "Redmine";
+  private final _BalloonDispatcher balloonDispatcher = new _BalloonDispatcher();
 
   @Override
   public void notifyNewTicket(@NotNull IServer pServer, @NotNull ITicket pTicket)
@@ -90,7 +96,7 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
       StatusBar statusbar = WindowManager.getInstance().getStatusBar(project);
       RedmineStatusBarWidget myWidget = (RedmineStatusBarWidget) statusbar.getWidget(RedmineStatusBarWidget.REDMINE_STATUSBAR_ID);
       assert myWidget != null;
-      pBalloon.show(RelativePoint.getCenterOf(myWidget.getComponent()), Balloon.Position.above);
+      balloonDispatcher.next(RelativePoint.getCenterOf(myWidget.getComponent()), pBalloon);
     }
   }
 
@@ -140,6 +146,75 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
       builder.append(myExLine);
     }
     return builder.toString();
+  }
+
+  /**
+   * Dispatcher to show only one Balloon at a time
+   */
+  private class _BalloonDispatcher
+  {
+    private final List<_Entry> queue = new ArrayList<>();
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
+    /**
+     * Adds a new Ballon to this queue
+     *
+     * @param pPoint   Point, at which the balloon should be shown
+     * @param pBalloon Balloon which should be shown
+     */
+    public void next(RelativePoint pPoint, Balloon pBalloon)
+    {
+      synchronized(queue)
+      {
+        queue.add(new _Entry(pPoint, pBalloon));
+        if(!isRunning.get())
+          _dispatchNext();
+      }
+    }
+
+    private void _dispatchNext()
+    {
+      synchronized(queue)
+      {
+        isRunning.set(true);
+
+        if(!queue.isEmpty())
+        {
+          _Entry next = queue.remove(0);
+          next.balloon.show(next.point, Balloon.Position.above);
+          next.balloon.addListener(new JBPopupAdapter()
+          {
+            @Override
+            public void onClosed(LightweightWindowEvent event)
+            {
+              if(event.asBalloon().wasFadedOut()) //todo notice if balloon was "killed" or normally disposed
+                _dispatchNext();
+              else
+              {
+                // Balloon was killed
+                int lostMessages = queue.size();
+                queue.clear();
+                SimpleNotifier.this.notify(null, lostMessages + " remaining messages");
+              }
+            }
+          });
+        }
+        else
+          isRunning.set(false);
+      }
+    }
+
+    private class _Entry
+    {
+      private RelativePoint point;
+      private Balloon balloon;
+
+      public _Entry(RelativePoint pPoint, Balloon pBalloon)
+      {
+        point = pPoint;
+        balloon = pBalloon;
+      }
+    }
   }
 
 }
