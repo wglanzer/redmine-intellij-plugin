@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine;
 
-import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
+import com.github.wglanzer.redmine.config.SettingsDataModel;
 
 import java.io.File;
 

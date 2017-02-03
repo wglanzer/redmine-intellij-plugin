@@ -1,7 +1,7 @@
 package com.github.wglanzer.redmine;
 
 import com.github.wglanzer.redmine.config.RAppSettings;
-import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
+import com.github.wglanzer.redmine.config.SettingsDataModel;
 import com.github.wglanzer.redmine.notifiers.INotifier;
 import com.github.wglanzer.redmine.util.IntelliJIDEAUtility;
 

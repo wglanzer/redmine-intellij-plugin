@@ -1,4 +1,4 @@
-package com.github.wglanzer.redmine.config.beans;
+package com.github.wglanzer.redmine.config;
 
 import com.github.wglanzer.redmine.model.ISource;
 import de.adito.propertly.core.common.PD;

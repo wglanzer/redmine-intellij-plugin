@@ -1,7 +1,7 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
-import com.github.wglanzer.redmine.config.beans.SourceDataModel;
+import com.github.wglanzer.redmine.config.SettingsDataModel;
+import com.github.wglanzer.redmine.config.SourceDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import com.github.wglanzer.redmine.util.WeakListenerList;

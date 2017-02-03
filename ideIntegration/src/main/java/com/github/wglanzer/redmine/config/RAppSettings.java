@@ -2,7 +2,6 @@ package com.github.wglanzer.redmine.config;
 
 import com.github.wglanzer.redmine.IRLoggingFacade;
 import com.github.wglanzer.redmine.RManager;
-import com.github.wglanzer.redmine.config.beans.SettingsDataModel;
 import com.github.wglanzer.redmine.util.propertly.DataModelFactory;
 import com.google.common.base.Objects;
 import com.intellij.openapi.components.*;

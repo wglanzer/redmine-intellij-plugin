@@ -1,6 +1,6 @@
 package com.github.wglanzer.redmine.config.gui;
 
-import com.github.wglanzer.redmine.config.beans.SourceDataModel;
+import com.github.wglanzer.redmine.config.SourceDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.MoreObjects;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
