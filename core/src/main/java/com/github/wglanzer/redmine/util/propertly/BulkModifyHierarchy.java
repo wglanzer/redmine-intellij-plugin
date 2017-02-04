@@ -24,6 +24,12 @@ public class BulkModifyHierarchy<T extends IPropertyPitProvider> extends Hierarc
     sourceHierarchy = pSourceHierarchy;
   }
 
+  @NotNull
+  public IHierarchy<T> getSourceHierarchy()
+  {
+    return sourceHierarchy;
+  }
+
   public synchronized void writeBack()
   {
     Collection<_Change> writeables = _prepareWrite(getValue().getPit(), sourceHierarchy.getValue().getPit());

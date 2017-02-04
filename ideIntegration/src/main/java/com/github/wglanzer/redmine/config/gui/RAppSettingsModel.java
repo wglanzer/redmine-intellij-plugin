@@ -9,7 +9,6 @@ import com.github.wglanzer.redmine.util.propertly.BulkModifyHierarchy;
 import com.github.wglanzer.redmine.util.propertly.DataModelFactory;
 import de.adito.propertly.core.spi.IHierarchy;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -31,10 +30,10 @@ public class RAppSettingsModel
   private final WeakListenerList<PropertyChangeListener> listeners = new WeakListenerList<>();
   private BulkModifyHierarchy<SettingsDataModel> bulkedSettingsHierarchy;
 
-  public RAppSettingsModel(@Nullable SettingsDataModel pCurrentSettings)
+  public RAppSettingsModel(@NotNull SettingsDataModel pCurrentSettings)
   {
-    if(pCurrentSettings != null)
-      resetTo(pCurrentSettings);
+    IHierarchy<SettingsDataModel> hierarchy = (IHierarchy<SettingsDataModel>) pCurrentSettings.getPit().getHierarchy();
+    bulkedSettingsHierarchy = new BulkModifyHierarchy<>(hierarchy);
   }
 
   /**
@@ -116,16 +115,13 @@ public class RAppSettingsModel
   }
 
   /**
-   * Resets this complete model to the settings instance
-   *
-   * @param pSettings container for all settings
+   * Resets this complete model to default state
    */
-  public synchronized void resetTo(SettingsDataModel pSettings)
+  public synchronized void reset()
   {
     synchronized(modified)
     {
-      IHierarchy<SettingsDataModel> hierarchy = (IHierarchy<SettingsDataModel>) pSettings.getPit().getHierarchy();
-      bulkedSettingsHierarchy = new BulkModifyHierarchy<>(hierarchy);
+      bulkedSettingsHierarchy = new BulkModifyHierarchy<>(bulkedSettingsHierarchy.getSourceHierarchy());
       modified.set(false);
     }
   }

@@ -12,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
@@ -48,6 +50,8 @@ public class RAppSettingsComponent extends JPanel
   private JCheckBox disableCertCheck;
   private JLabel intervalLabelDesc;
   private JLabel pagesizeLabelDesc;
+  private JPanel generalTabPanel;
+  private JPanel watchesTabPanel;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -104,48 +108,54 @@ public class RAppSettingsComponent extends JPanel
     });
 
     // PollIntervall
+    Runnable renewPollingInterval = () ->
+    {
+      if(selectedSource != null && pollIntervall.getValue() != null && !Objects.equals(pollIntervall.getValue(), selectedSource.getPollInterval()))
+      {
+        Integer newVal = Integer.valueOf(String.valueOf(pollIntervall.getValue()));
+        if(newVal >= 5)
+        {
+          _fireChange("pollinterval", selectedSource.getPollInterval(), newVal);
+          selectedSource.setPollingInterval(newVal);
+        }
+        else
+          pollIntervall.setValue(selectedSource.getPollInterval());
+      }
+    };
     pollIntervall.addFocusListener(new FocusAdapter()
     {
       @Override
       public void focusLost(FocusEvent e)
       {
-        if(selectedSource != null)
-        {
-          _fireChange("pollinterval", selectedSource.getPollInterval(), pollIntervall.getValue());
-          selectedSource.setPollingInterval(Integer.valueOf(String.valueOf(pollIntervall.getValue())));
-        }
+        renewPollingInterval.run();
       }
     });
-    pollIntervall.addChangeListener(e ->
-    {
-      if(selectedSource != null && pollIntervall.getValue() != null)
-      {
-        _fireChange("pollinterval", selectedSource.getPollInterval(), pollIntervall.getValue());
-        selectedSource.setPollingInterval(Integer.valueOf(String.valueOf(pollIntervall.getValue())));
-      }
-    });
+    pollIntervall.addChangeListener(e -> renewPollingInterval.run());
 
     // PageSize
+    Runnable renewPageSize = () ->
+    {
+      if(selectedSource != null && pageSize.getValue() != null && !Objects.equals(pageSize.getValue(), selectedSource.getPageSize()))
+      {
+        Integer newVal = Integer.valueOf(String.valueOf(pageSize.getValue()));
+        if(newVal >= 1 && newVal <= 100)
+        {
+          _fireChange("pagesize", selectedSource.getPageSize(), newVal);
+          selectedSource.setPageSize(newVal);
+        }
+        else
+          pageSize.setValue(selectedSource.getPageSize());
+      }
+    };
     pageSize.addFocusListener(new FocusAdapter()
     {
       @Override
       public void focusLost(FocusEvent e)
       {
-        if(selectedSource != null && pageSize.getValue() != null)
-        {
-          _fireChange("pagesize", selectedSource.getPageSize(), pageSize.getValue());
-          selectedSource.setPageSize(Integer.valueOf(String.valueOf(pageSize.getValue())));
-        }
+        renewPageSize.run();
       }
     });
-    pageSize.addChangeListener(e ->
-    {
-      if(selectedSource != null && pageSize.getValue() != null)
-      {
-        _fireChange("pagesize", selectedSource.getPageSize(), pageSize.getValue());
-        selectedSource.setPageSize(Integer.valueOf(String.valueOf(pageSize.getValue())));
-      }
-    });
+    pageSize.addChangeListener(e -> renewPageSize.run());
 
     // CheckCertificate
     disableCertCheck.addActionListener(e ->
@@ -175,6 +185,18 @@ public class RAppSettingsComponent extends JPanel
     };
     model.addWeakPropertyChangeListener(modelChangeListenerStrongRef);
 
+    // Steal focus listeners
+    MouseAdapter ma = new MouseAdapter()
+    {
+      @Override
+      public void mousePressed(MouseEvent e)
+      {
+        generalTabPanel.requestFocusInWindow();
+      }
+    };
+    generalTabPanel.addMouseListener(ma);
+    watchesTabPanel.addMouseListener(ma);
+
     // Select first entry
     SwingUtilities.invokeLater(() ->
     {
@@ -189,6 +211,12 @@ public class RAppSettingsComponent extends JPanel
    */
   public void dispose()
   {
+  }
+
+  public void reset()
+  {
+    sourceList.clearSelection();
+    _selectedSourceChanged(null); //just to go safe
   }
 
   /**
@@ -280,10 +308,10 @@ public class RAppSettingsComponent extends JPanel
     contentPane.setLayout(new BorderLayout(0, 0));
     tab = new JTabbedPane();
     contentPane.add(tab, BorderLayout.CENTER);
-    final JPanel panel1 = new JPanel();
-    panel1.setLayout(new GridBagLayout());
-    tab.addTab("General", panel1);
-    panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
+    generalTabPanel = new JPanel();
+    generalTabPanel.setLayout(new GridBagLayout());
+    tab.addTab("General", generalTabPanel);
+    generalTabPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
     urlPanel = new JLabel();
     urlPanel.setEnabled(false);
     urlPanel.setText("URL*:");
@@ -293,7 +321,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 1;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 10);
-    panel1.add(urlPanel, gbc);
+    generalTabPanel.add(urlPanel, gbc);
     urlField = new JTextField();
     urlField.setEnabled(false);
     urlField.setText("");
@@ -305,7 +333,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(urlField, gbc);
+    generalTabPanel.add(urlField, gbc);
     apiKeyPanel = new JLabel();
     apiKeyPanel.setEnabled(false);
     apiKeyPanel.setText("API-Key*:");
@@ -314,7 +342,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 2;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 10);
-    panel1.add(apiKeyPanel, gbc);
+    generalTabPanel.add(apiKeyPanel, gbc);
     apiKeyField = new JTextField();
     apiKeyField.setEnabled(false);
     gbc = new GridBagConstraints();
@@ -325,7 +353,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(apiKeyField, gbc);
+    generalTabPanel.add(apiKeyField, gbc);
     intervalPanel = new JLabel();
     intervalPanel.setEnabled(false);
     intervalPanel.setText("Interval:");
@@ -334,10 +362,12 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 3;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 10);
-    panel1.add(intervalPanel, gbc);
+    generalTabPanel.add(intervalPanel, gbc);
     pollIntervall = new JSpinner();
     pollIntervall.setEnabled(false);
-    pollIntervall.setPreferredSize(new Dimension(36, 26));
+    pollIntervall.setMaximumSize(new Dimension(75, 32767));
+    pollIntervall.setMinimumSize(new Dimension(75, 26));
+    pollIntervall.setPreferredSize(new Dimension(75, 26));
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 3;
@@ -345,7 +375,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(pollIntervall, gbc);
+    generalTabPanel.add(pollIntervall, gbc);
     pageSizePanel = new JLabel();
     pageSizePanel.setEnabled(false);
     pageSizePanel.setText("PageSize:");
@@ -355,9 +385,12 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 4;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(5, 0, 0, 10);
-    panel1.add(pageSizePanel, gbc);
+    generalTabPanel.add(pageSizePanel, gbc);
     pageSize = new JSpinner();
     pageSize.setEnabled(false);
+    pageSize.setMaximumSize(new Dimension(75, 32767));
+    pageSize.setMinimumSize(new Dimension(75, 26));
+    pageSize.setPreferredSize(new Dimension(75, 26));
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 4;
@@ -365,7 +398,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(pageSize, gbc);
+    generalTabPanel.add(pageSize, gbc);
     displayName = new JTextField();
     displayName.setEnabled(false);
     displayName.setText("");
@@ -376,7 +409,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.weightx = 1.0;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(displayName, gbc);
+    generalTabPanel.add(displayName, gbc);
     displayNamePanel = new JLabel();
     displayNamePanel.setEnabled(false);
     displayNamePanel.setText("Name:");
@@ -385,7 +418,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 0;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.insets = new Insets(0, 0, 0, 10);
-    panel1.add(displayNamePanel, gbc);
+    generalTabPanel.add(displayNamePanel, gbc);
     disableCertCheck = new JCheckBox();
     disableCertCheck.setEnabled(false);
     disableCertCheck.setLabel("disable Cert-Check");
@@ -395,7 +428,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 1;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(disableCertCheck, gbc);
+    generalTabPanel.add(disableCertCheck, gbc);
     final JPanel spacer1 = new JPanel();
     gbc = new GridBagConstraints();
     gbc.gridx = 5;
@@ -403,7 +436,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.weighty = 1.0;
     gbc.anchor = GridBagConstraints.EAST;
     gbc.fill = GridBagConstraints.VERTICAL;
-    panel1.add(spacer1, gbc);
+    generalTabPanel.add(spacer1, gbc);
     intervalLabelDesc = new JLabel();
     intervalLabelDesc.setEnabled(false);
     intervalLabelDesc.setText("sec");
@@ -412,7 +445,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 3;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 5, 0, 0);
-    panel1.add(intervalLabelDesc, gbc);
+    generalTabPanel.add(intervalLabelDesc, gbc);
     pagesizeLabelDesc = new JLabel();
     pagesizeLabelDesc.setEnabled(false);
     pagesizeLabelDesc.setText("min: 1, max: 100");
@@ -422,7 +455,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 5, 0, 0);
-    panel1.add(pagesizeLabelDesc, gbc);
+    generalTabPanel.add(pagesizeLabelDesc, gbc);
     final JLabel label1 = new JLabel();
     label1.setText("* Mandatory input");
     gbc = new GridBagConstraints();
@@ -430,26 +463,12 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridy = 6;
     gbc.gridwidth = 6;
     gbc.anchor = GridBagConstraints.WEST;
-    panel1.add(label1, gbc);
-    final JPanel spacer2 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 2;
-    gbc.gridy = 5;
-    gbc.weightx = 0.3;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(spacer2, gbc);
-    final JPanel spacer3 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 4;
-    gbc.gridy = 5;
-    gbc.weightx = 0.6;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(spacer3, gbc);
-    final JPanel panel2 = new JPanel();
-    panel2.setLayout(new GridBagLayout());
-    panel2.setEnabled(true);
-    panel2.setVisible(false);
-    tab.addTab("Watches", panel2);
+    generalTabPanel.add(label1, gbc);
+    watchesTabPanel = new JPanel();
+    watchesTabPanel.setLayout(new GridBagLayout());
+    watchesTabPanel.setEnabled(true);
+    watchesTabPanel.setVisible(false);
+    tab.addTab("Watches", watchesTabPanel);
     tab.setEnabledAt(1, false);
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
@@ -457,7 +476,7 @@ public class RAppSettingsComponent extends JPanel
     gbc.weightx = 0.9;
     gbc.weighty = 0.8;
     gbc.fill = GridBagConstraints.BOTH;
-    panel2.add(watchesListPanel, gbc);
+    watchesTabPanel.add(watchesListPanel, gbc);
   }
 
   /**

@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.wglanzer.redmine.config.gui.RAppSettingsComponent">
   <grid id="27dc6" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="656" height="502"/>
+      <xy x="20" y="20" width="643" height="361"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -12,7 +12,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="f9ad8" layout-manager="GridBagLayout">
+          <grid id="f9ad8" binding="generalTabPanel" layout-manager="GridBagLayout">
             <constraints>
               <tabbedpane title="General"/>
             </constraints>
@@ -83,7 +83,9 @@
                 </constraints>
                 <properties>
                   <enabled value="false"/>
-                  <preferredSize width="36" height="26"/>
+                  <maximumSize width="75" height="32767"/>
+                  <minimumSize width="75" height="26"/>
+                  <preferredSize width="75" height="26"/>
                 </properties>
               </component>
               <component id="6ff9" class="javax.swing.JLabel" binding="pageSizePanel">
@@ -106,6 +108,9 @@
                 </constraints>
                 <properties>
                   <enabled value="false"/>
+                  <maximumSize width="75" height="32767"/>
+                  <minimumSize width="75" height="26"/>
+                  <preferredSize width="75" height="26"/>
                 </properties>
               </component>
               <component id="b183f" class="javax.swing.JTextField" binding="displayName">
@@ -178,21 +183,9 @@
                   <text value="* Mandatory input"/>
                 </properties>
               </component>
-              <hspacer id="1f79">
-                <constraints>
-                  <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="0.3" weighty="0.0"/>
-                </constraints>
-              </hspacer>
-              <hspacer id="6b7be">
-                <constraints>
-                  <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="0.6" weighty="0.0"/>
-                </constraints>
-              </hspacer>
             </children>
           </grid>
-          <grid id="95452" layout-manager="GridBagLayout">
+          <grid id="95452" binding="watchesTabPanel" layout-manager="GridBagLayout">
             <constraints>
               <tabbedpane title="Watches" enabled="false"/>
             </constraints>

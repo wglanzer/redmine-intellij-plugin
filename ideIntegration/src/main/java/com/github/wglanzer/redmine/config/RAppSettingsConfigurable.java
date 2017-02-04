@@ -37,7 +37,8 @@ public class RAppSettingsConfigurable implements SearchableConfigurable
   public void reset()
   {
     if(myCompModel != null)
-      myCompModel.resetTo(RAppSettings.getSettings());
+      myCompModel.reset();
+    myComp.reset();
   }
 
   @Override
