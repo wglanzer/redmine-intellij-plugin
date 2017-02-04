@@ -1,17 +1,16 @@
 package com.github.wglanzer.redmine.gui;
 
+import com.github.wglanzer.redmine.RManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.wm.CustomStatusBarWidget;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.MouseEvent;
 
 /**
  * Widget for IntelliJ
@@ -51,7 +50,7 @@ public class RedmineStatusBarWidget implements CustomStatusBarWidget
 
   private RedmineStatusBarWidget()
   {
-    component = new RedmineStatusBarComponent();
+    component = new RedmineStatusBarComponent(RManager.getInstance());
   }
 
   @NotNull
@@ -65,22 +64,7 @@ public class RedmineStatusBarWidget implements CustomStatusBarWidget
   @Override
   public WidgetPresentation getPresentation(@NotNull PlatformType pPlatformType)
   {
-    return new WidgetPresentation()
-    {
-      @Nullable
-      @Override
-      public String getTooltipText()
-      {
-        return component.getToolTipText();
-      }
-
-      @Nullable
-      @Override
-      public Consumer<MouseEvent> getClickConsumer()
-      {
-        return component::onClick;
-      }
-    };
+    return null;
   }
 
   @Override
