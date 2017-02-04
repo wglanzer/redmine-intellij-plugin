@@ -1,6 +1,7 @@
 package com.github.wglanzer.redmine.config;
 
 import com.github.wglanzer.redmine.model.ISource;
+import com.google.common.base.MoreObjects;
 import de.adito.propertly.core.common.PD;
 import de.adito.propertly.core.spi.IProperty;
 import de.adito.propertly.core.spi.IPropertyDescription;
@@ -22,6 +23,8 @@ public class SettingsDataModel extends AbstractPPP<IPropertyPitProvider, Setting
 {
 
   public static final IPropertyDescription<SettingsDataModel, Sources> sources = PD.create(SettingsDataModel.class);
+  public static final IPropertyDescription<SettingsDataModel, Boolean> enableNotifications = PD.create(SettingsDataModel.class);
+  public static final IPropertyDescription<SettingsDataModel, Boolean> enableLog = PD.create(SettingsDataModel.class);
 
   @NotNull
   public List<ISource> getSources()
@@ -34,7 +37,7 @@ public class SettingsDataModel extends AbstractPPP<IPropertyPitProvider, Setting
   /**
    * Removes one source from the list
    *
-   * @param pSourceName  Source, which will be removed
+   * @param pSourceName Source, which will be removed
    * @return <tt>true</tt> if something was changed
    */
   public boolean removeSource(@NotNull String pSourceName)
@@ -46,6 +49,46 @@ public class SettingsDataModel extends AbstractPPP<IPropertyPitProvider, Setting
         .findAny().orElse(null);
 
     return deletedProp != null && sources.removeProperty(deletedProp);
+  }
+
+  /**
+   * Returns <tt>true</tt> if notifications can be shown
+   *
+   * @return <tt>true</tt> = show notifications
+   */
+  public boolean isEnableNotifications()
+  {
+    return MoreObjects.firstNonNull(getPit().getValue(enableNotifications), true);
+  }
+
+  /**
+   * Sets, if notifications should be shown
+   *
+   * @param pEnable <tt>true</tt> if they should be shown
+   */
+  public void setEnableNotifications(boolean pEnable)
+  {
+    getPit().setValue(enableNotifications, pEnable);
+  }
+
+  /**
+   * Returns <tt>true</tt> if log-messages can be shown
+   *
+   * @return <tt>true</tt> = show log-messages
+   */
+  public boolean isEnableLog()
+  {
+    return MoreObjects.firstNonNull(getPit().getValue(enableLog), true);
+  }
+
+  /**
+   * Sets, if log-messages should be shown
+   *
+   * @param pEnable <tt>true</tt> if they should be shown
+   */
+  public void setEnableLog(boolean pEnable)
+  {
+    getPit().setValue(enableLog, pEnable);
   }
 
   /**

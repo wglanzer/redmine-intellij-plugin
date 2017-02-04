@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine.notifiers;
 
+import com.github.wglanzer.redmine.config.SettingsDataModel;
 import com.github.wglanzer.redmine.gui.RedmineStatusBarWidget;
 import com.github.wglanzer.redmine.listener.IChangeNotifier;
 import com.github.wglanzer.redmine.model.IProject;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 1. Notifies the user that something has changed in redmine
@@ -38,6 +41,12 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
 
   public static final String NOTIFICATION_ID = "Redmine";
   private final _BalloonDispatcher balloonDispatcher = new _BalloonDispatcher();
+  private final Supplier<SettingsDataModel> preferences;
+
+  public SimpleNotifier(Supplier<SettingsDataModel> pSettings)
+  {
+    preferences = pSettings;
+  }
 
   @Override
   public void notifyNewTicket(@NotNull IServer pServer, @NotNull ITicket pTicket)
@@ -109,10 +118,13 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
    */
   private void _logInEventLog(@Nullable String pTitle, @Nullable String pDetails, @NotNull NotificationType pType)
   {
-    Notification notification = new Notification(NOTIFICATION_ID, new ImageIcon(), NOTIFICATION_ID, pTitle != null ? pTitle : "", pDetails, pType, null);
-    notification.expire();
-    for(Project project : ProjectManager.getInstance().getOpenProjects())
-      Notifications.Bus.notify(notification, project);
+    if(preferences.get().isEnableLog())
+    {
+      Notification notification = new Notification(NOTIFICATION_ID, new ImageIcon(), NOTIFICATION_ID, pTitle != null ? pTitle : "", pDetails, pType, null);
+      notification.expire();
+      for(Project project : ProjectManager.getInstance().getOpenProjects())
+        Notifications.Bus.notify(notification, project);
+    }
   }
 
   /**
@@ -181,21 +193,15 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
         if(!queue.isEmpty())
         {
           _Entry next = queue.remove(0);
-          next.balloon.show(next.point, Balloon.Position.above);
-          next.balloon.addListener(new JBPopupAdapter()
-          {
-            @Override
-            public void onClosed(LightweightWindowEvent event)
+          _showBallon(next, event -> {
+            if(event == null || event.asBalloon().wasFadedOut()) //todo notice if balloon was "killed" or normally disposed
+              _dispatchNext();
+            else
             {
-              if(event.asBalloon().wasFadedOut()) //todo notice if balloon was "killed" or normally disposed
-                _dispatchNext();
-              else
-              {
-                // Balloon was killed
-                int lostMessages = queue.size();
-                queue.clear();
-                SimpleNotifier.this.notify(null, lostMessages + " remaining messages");
-              }
+              // Balloon was killed
+              int lostMessages = queue.size();
+              queue.clear();
+              SimpleNotifier.this.notify(null, lostMessages + " remaining messages");
             }
           });
         }
@@ -204,6 +210,33 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
       }
     }
 
+    /**
+     * Shows a balloon instantly
+     *
+     * @param pNextEntry Entry that should be shown
+     * @param pOnClose   Consumer which will be executed on balloon closed
+     */
+    private void _showBallon(_Entry pNextEntry, Consumer<LightweightWindowEvent> pOnClose)
+    {
+      if(preferences.get().isEnableNotifications())
+      {
+        pNextEntry.balloon.show(pNextEntry.point, Balloon.Position.above);
+        pNextEntry.balloon.addListener(new JBPopupAdapter()
+        {
+          @Override
+          public void onClosed(LightweightWindowEvent event)
+          {
+            pOnClose.accept(event);
+          }
+        });
+      }
+      else
+        pOnClose.accept(null);
+    }
+
+    /**
+     * Holder Balloon + Point
+     */
     private class _Entry
     {
       private RelativePoint point;

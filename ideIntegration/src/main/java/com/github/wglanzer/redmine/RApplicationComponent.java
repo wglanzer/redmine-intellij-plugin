@@ -14,12 +14,14 @@ import org.jetbrains.annotations.NotNull;
 public class RApplicationComponent implements ApplicationComponent
 {
   public static final String REDMINE_INTEGRATION_PLUGIN_NAME = "Redmine Integration";
-  private final SimpleNotifier notifier = new SimpleNotifier();
 
   @Override
   public void initComponent()
   {
     RManager manager = RManager.getInstance();
+
+    // Notifier
+    SimpleNotifier notifier = new SimpleNotifier(() -> manager.getPreferences().getCurrentSettings());
 
     // Init custom widget to ALL projects
     RedmineStatusBarWidget.init();
