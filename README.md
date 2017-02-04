@@ -1,5 +1,6 @@
 # Redmine Integration for IntelliJ-IDEA
-[![Build Status](https://travis-ci.org/wglanzer/redmine-intellij-plugin.svg?branch=master)](https://travis-ci.org/wglanzer/redmine-intellij-plugin)
+[![Travis](https://img.shields.io/travis/wglanzer/redmine-intellij-plugin.svg)](https://travis-ci.org/wglanzer/redmine-intellij-plugin)
+[![version](https://img.shields.io/github/release/wglanzer/redmine-intellij-plugin.svg)](https://github.com/wglanzer/redmine-intellij-plugin/blob/master/CHANGELOG.md)
 
 Status: In Progress
 
