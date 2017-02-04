@@ -22,8 +22,6 @@ import java.util.Objects;
  */
 public class RAppSettingsComponent extends JPanel
 {
-
-  private static final Color _MANDATORY_INPUT_COLOR = Color.ORANGE;
   private final PropertyChangeListener modelChangeListenerStrongRef;
 
   private RAppSettingsModel model;
@@ -47,8 +45,9 @@ public class RAppSettingsComponent extends JPanel
   private JTabbedPane tab;
   private JTextField displayName;
   private JLabel displayNamePanel;
-  private JCheckBox checkCertificate;
-  private JLabel checkCertificatePanel;
+  private JCheckBox disableCertCheck;
+  private JLabel intervalLabelDesc;
+  private JLabel pagesizeLabelDesc;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -63,7 +62,6 @@ public class RAppSettingsComponent extends JPanel
     _selectedSourceChanged(null);
 
     // URL-Field
-    urlField.setBackground(_MANDATORY_INPUT_COLOR);
     urlField.addFocusListener(new FocusAdapter()
     {
       @Override
@@ -78,7 +76,6 @@ public class RAppSettingsComponent extends JPanel
     });
 
     // API-Key
-    apiKeyField.setBackground(_MANDATORY_INPUT_COLOR);
     apiKeyField.addFocusListener(new FocusAdapter()
     {
       @Override
@@ -151,12 +148,12 @@ public class RAppSettingsComponent extends JPanel
     });
 
     // CheckCertificate
-    checkCertificate.addActionListener(e ->
+    disableCertCheck.addActionListener(e ->
     {
       if(selectedSource != null)
       {
-        _fireChange("checkCertificate", selectedSource.isCheckCeritifacte(), checkCertificate.isSelected());
-        selectedSource.setCheckCertificate(checkCertificate.isSelected());
+        _fireChange("checkCertificate", selectedSource.isCheckCeritifacte(), !disableCertCheck.isSelected());
+        selectedSource.setCheckCertificate(!disableCertCheck.isSelected());
       }
     });
 
@@ -207,8 +204,9 @@ public class RAppSettingsComponent extends JPanel
     intervalPanel.setEnabled(enableSelected);
     pageSizePanel.setEnabled(enableSelected);
     displayNamePanel.setEnabled(enableSelected);
-    checkCertificatePanel.setEnabled(enableSelected);
-    checkCertificate.setEnabled(enableSelected);
+    intervalLabelDesc.setEnabled(enableSelected);
+    pagesizeLabelDesc.setEnabled(enableSelected);
+    disableCertCheck.setEnabled(enableSelected);
     apiKeyPanel.setEnabled(enableSelected);
     urlField.setEnabled(enableSelected);
     apiKeyField.setEnabled(enableSelected);
@@ -220,7 +218,7 @@ public class RAppSettingsComponent extends JPanel
     displayName.setText(pSelectedSource != null ? pSelectedSource.getDisplayName() : "");
     pollIntervall.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPollInterval() : null, 0));
     pageSize.setValue(MoreObjects.firstNonNull(pSelectedSource != null ? pSelectedSource.getPageSize() : null, 0));
-    checkCertificate.setSelected(pSelectedSource != null && pSelectedSource.isCheckCeritifacte());
+    disableCertCheck.setSelected(pSelectedSource != null && !pSelectedSource.isCheckCeritifacte());
   }
 
   /**
@@ -285,16 +283,16 @@ public class RAppSettingsComponent extends JPanel
     final JPanel panel1 = new JPanel();
     panel1.setLayout(new GridBagLayout());
     tab.addTab("General", panel1);
-    panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
+    panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
     urlPanel = new JLabel();
     urlPanel.setEnabled(false);
-    urlPanel.setText("URL:");
+    urlPanel.setText("URL*:");
     GridBagConstraints gbc;
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(5, 0, 0, 5);
+    gbc.insets = new Insets(5, 0, 0, 10);
     panel1.add(urlPanel, gbc);
     urlField = new JTextField();
     urlField.setEnabled(false);
@@ -302,44 +300,48 @@ public class RAppSettingsComponent extends JPanel
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 1;
-    gbc.gridwidth = 3;
+    gbc.gridwidth = 4;
+    gbc.weightx = 1.0;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
     panel1.add(urlField, gbc);
     apiKeyPanel = new JLabel();
     apiKeyPanel.setEnabled(false);
-    apiKeyPanel.setText("API-Key:");
+    apiKeyPanel.setText("API-Key*:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 2;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(5, 0, 0, 5);
+    gbc.insets = new Insets(5, 0, 0, 10);
     panel1.add(apiKeyPanel, gbc);
     apiKeyField = new JTextField();
     apiKeyField.setEnabled(false);
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 2;
-    gbc.gridwidth = 3;
+    gbc.gridwidth = 5;
+    gbc.weightx = 1.0;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
     panel1.add(apiKeyField, gbc);
     intervalPanel = new JLabel();
     intervalPanel.setEnabled(false);
-    intervalPanel.setText("Interval (sec):");
+    intervalPanel.setText("Interval:");
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(5, 0, 0, 5);
+    gbc.insets = new Insets(5, 0, 0, 10);
     panel1.add(intervalPanel, gbc);
     pollIntervall = new JSpinner();
     pollIntervall.setEnabled(false);
+    pollIntervall.setPreferredSize(new Dimension(36, 26));
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 3;
+    gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
@@ -352,52 +354,26 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridx = 0;
     gbc.gridy = 4;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(5, 0, 0, 5);
+    gbc.insets = new Insets(5, 0, 0, 10);
     panel1.add(pageSizePanel, gbc);
     pageSize = new JSpinner();
     pageSize.setEnabled(false);
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 4;
+    gbc.gridwidth = 2;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.insets = new Insets(5, 0, 0, 0);
     panel1.add(pageSize, gbc);
-    final JPanel spacer1 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 1;
-    gbc.gridy = 6;
-    gbc.weightx = 0.1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(spacer1, gbc);
-    final JPanel spacer2 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 2;
-    gbc.gridy = 6;
-    gbc.weightx = 0.15;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(spacer2, gbc);
-    final JPanel spacer3 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 3;
-    gbc.gridy = 6;
-    gbc.weightx = 0.35;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel1.add(spacer3, gbc);
-    final JPanel spacer4 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 3;
-    gbc.gridy = 7;
-    gbc.weighty = 0.1;
-    gbc.fill = GridBagConstraints.VERTICAL;
-    panel1.add(spacer4, gbc);
     displayName = new JTextField();
     displayName.setEnabled(false);
     displayName.setText("");
     gbc = new GridBagConstraints();
     gbc.gridx = 1;
     gbc.gridy = 0;
-    gbc.gridwidth = 3;
+    gbc.gridwidth = 5;
+    gbc.weightx = 1.0;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     panel1.add(displayName, gbc);
@@ -408,27 +384,67 @@ public class RAppSettingsComponent extends JPanel
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(0, 0, 0, 5);
+    gbc.insets = new Insets(0, 0, 0, 10);
     panel1.add(displayNamePanel, gbc);
-    checkCertificatePanel = new JLabel();
-    checkCertificatePanel.setEnabled(false);
-    checkCertificatePanel.setText("Check Certificate:");
-    checkCertificatePanel.setToolTipText("Minimum: 1\nMaximum: 100");
+    disableCertCheck = new JCheckBox();
+    disableCertCheck.setEnabled(false);
+    disableCertCheck.setLabel("disable Cert-Check");
+    disableCertCheck.setText("disable Cert-Check");
     gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 5;
-    gbc.anchor = GridBagConstraints.EAST;
-    gbc.insets = new Insets(5, 0, 0, 5);
-    panel1.add(checkCertificatePanel, gbc);
-    checkCertificate = new JCheckBox();
-    checkCertificate.setEnabled(false);
-    checkCertificate.setText("");
-    gbc = new GridBagConstraints();
-    gbc.gridx = 1;
-    gbc.gridy = 5;
+    gbc.gridx = 5;
+    gbc.gridy = 1;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 0, 0, 0);
-    panel1.add(checkCertificate, gbc);
+    panel1.add(disableCertCheck, gbc);
+    final JPanel spacer1 = new JPanel();
+    gbc = new GridBagConstraints();
+    gbc.gridx = 5;
+    gbc.gridy = 5;
+    gbc.weighty = 1.0;
+    gbc.anchor = GridBagConstraints.EAST;
+    gbc.fill = GridBagConstraints.VERTICAL;
+    panel1.add(spacer1, gbc);
+    intervalLabelDesc = new JLabel();
+    intervalLabelDesc.setEnabled(false);
+    intervalLabelDesc.setText("sec");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 3;
+    gbc.gridy = 3;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.insets = new Insets(5, 5, 0, 0);
+    panel1.add(intervalLabelDesc, gbc);
+    pagesizeLabelDesc = new JLabel();
+    pagesizeLabelDesc.setEnabled(false);
+    pagesizeLabelDesc.setText("min: 1, max: 100");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 3;
+    gbc.gridy = 4;
+    gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.insets = new Insets(5, 5, 0, 0);
+    panel1.add(pagesizeLabelDesc, gbc);
+    final JLabel label1 = new JLabel();
+    label1.setText("* Mandatory input");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 6;
+    gbc.gridwidth = 6;
+    gbc.anchor = GridBagConstraints.WEST;
+    panel1.add(label1, gbc);
+    final JPanel spacer2 = new JPanel();
+    gbc = new GridBagConstraints();
+    gbc.gridx = 2;
+    gbc.gridy = 5;
+    gbc.weightx = 0.3;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel1.add(spacer2, gbc);
+    final JPanel spacer3 = new JPanel();
+    gbc = new GridBagConstraints();
+    gbc.gridx = 4;
+    gbc.gridy = 5;
+    gbc.weightx = 0.6;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel1.add(spacer3, gbc);
     final JPanel panel2 = new JPanel();
     panel2.setLayout(new GridBagLayout());
     panel2.setEnabled(true);
