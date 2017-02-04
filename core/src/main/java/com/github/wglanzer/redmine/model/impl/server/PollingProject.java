@@ -37,9 +37,9 @@ class PollingProject implements IProject
   {
     connection = pRestConnection;
     ticketDirectory = new PollingTicketDirectory(pID);
+    invalidated = new SimpleBooleanProperty(false);
     updateProperties(pName, pDescription, pCreatedOn, pUpdatedOn, false);
     id = pID;
-    invalidated = new SimpleBooleanProperty(false);
   }
 
   @Override
