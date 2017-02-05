@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 This project versioning is based on [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2017-02-05
+### Added
+- \#17: CHANGELOG.md
+- Tooltip for StatusBarWidget ("Loaded 1 server, containg 5 projects and 1337 tickets")
+- "enableNotifications", "enableLog", configurable inside new ContextMenu at widget
+
+### Changed
+- Settings-Dialog looks much cleaner now
+- "Reset" in Settings-Component; Interval/PageSize min/max range
+
 ## [0.3] - 2017-02-04
 ### Changed
 - \#4: Is the RedmineTopComponent really needed?
@@ -42,6 +52,7 @@ This project versioning is based on [Semantic Versioning](http://semver.org/).
 ### Added
 - General base functionality
 
+[0.3.1]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.3.1
 [0.3]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.3
 [0.2]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.2
 [0.1.2_1213160835]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/0.1.2_1213160835
