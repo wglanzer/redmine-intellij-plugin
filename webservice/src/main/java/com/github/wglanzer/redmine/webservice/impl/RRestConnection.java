@@ -67,6 +67,7 @@ class RRestConnection implements IRRestConnection
     apiKey = pAPIKey;
     loggingFacade = pLoggingFacade;
     pagesize = pPageSize == null ? _DEFAULT_PAGESIZE : (pPageSize > _MAX_PAGESIZE ? _MAX_PAGESIZE : pPageSize);
+    _warmupUnirest();
   }
 
   @NotNull
@@ -343,6 +344,21 @@ class RRestConnection implements IRRestConnection
       // As default we do nothing!
       default:
         break;
+    }
+  }
+
+  /**
+   * Unirest causes "java.lang.IllegalThreadStateException"s sometimes...
+   * This should fix it ( https://github.com/Mashape/unirest-java/issues/92 )
+   */
+  private void _warmupUnirest()
+  {
+    try
+    {
+      Unirest.get("localhost").asBinaryAsync().get().getBody();
+    }
+    catch(Throwable ignored)
+    {
     }
   }
 
