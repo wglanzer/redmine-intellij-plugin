@@ -218,7 +218,7 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
      */
     private void _showBallon(_Entry pNextEntry, Consumer<LightweightWindowEvent> pOnClose)
     {
-      if(preferences.get().isEnableNotifications())
+      if(preferences.get().isEnableNotifications() && !pNextEntry.balloon.isDisposed())
       {
         pNextEntry.balloon.show(pNextEntry.point, Balloon.Position.above);
         pNextEntry.balloon.addListener(new JBPopupAdapter()
