@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>redmine-plugin</id>
     <name>Redmine Integration</name>
-    <version>v0.3.1</version>
+    <version>v0.4</version>
     <vendor email="wernerglanzer@googlemail.com">Werner Glanzer</vendor>
 
     <description><![CDATA[

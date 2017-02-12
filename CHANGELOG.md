@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 This project versioning is based on [Semantic Versioning](http://semver.org/).
 
+## [0.4] - 2017-02-12
+### Added
+- \#14: Exception, if API-Key is invalid
+
+### Changed
+- \#20: Temporarily disable SSL
+
+### Fixed
+- \#19: Exception: Balloon is already disposed
+- Unirest has to warm up to work correctly ( https://github.com/Mashape/unirest-java/issues/92 )
+
 ## [0.3.1] - 2017-02-05
 ### Added
 - \#17: CHANGELOG.md
@@ -52,6 +63,7 @@ This project versioning is based on [Semantic Versioning](http://semver.org/).
 ### Added
 - General base functionality
 
+[0.4]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.4
 [0.3.1]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.3.1
 [0.3]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.3
 [0.2]: https://github.com/wglanzer/redmine-intellij-plugin/releases/tag/v0.2
