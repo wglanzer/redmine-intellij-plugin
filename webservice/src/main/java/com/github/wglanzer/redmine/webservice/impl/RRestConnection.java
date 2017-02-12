@@ -9,8 +9,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -38,11 +38,20 @@ class RRestConnection implements IRRestConnection
 
   static
   {
-    // Set Custom SSL Factory to allow only specific hostnames permanently
-    CloseableHttpClient client = HttpClients.custom()
-        .setSSLHostnameVerifier(RHostnameVerifier.getInstance())
-        .build();
-    Unirest.setHttpClient(client);
+    try
+    {
+      // Set Custom SSL Factory to allow only specific hostnames permanently
+      Unirest.setAsyncHttpClient(HttpAsyncClients.custom()
+          .setSSLHostnameVerifier(RHostnameVerifier.getInstance())
+          .setSSLContext(SSLContexts.custom()
+              .loadTrustMaterial(null, RHostnameVerifier.getInstance())
+              .build())
+          .build());
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
   }
 
   private final int pagesize;
@@ -52,13 +61,13 @@ class RRestConnection implements IRRestConnection
   private final ExecutorService executor = Executors.newFixedThreadPool(8); //todo why 8?
   private final AtomicReference<Exception> wasError = new AtomicReference<>(null); //todo does nothing, remove?
 
-  public RRestConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pUrl, String pAPIKey, Integer pPageSize, boolean pVerifySSL)
+  public RRestConnection(@NotNull IRRestLoggingFacade pLoggingFacade, String pUrl, String pAPIKey, Integer pPageSize, boolean pCheckCertificate)
   {
     url = pUrl;
     apiKey = pAPIKey;
     loggingFacade = pLoggingFacade;
     pagesize = pPageSize == null ? _DEFAULT_PAGESIZE : (pPageSize > _MAX_PAGESIZE ? _MAX_PAGESIZE : pPageSize);
-    RHostnameVerifier.getInstance().setVerify(pUrl, pVerifySSL); // Add / Remove it from Hostname-Checking-List
+    RHostnameVerifier.getInstance().setVerify(pUrl, pCheckCertificate); // Add / Remove it from Hostname-Checking-List
   }
 
   @NotNull
@@ -182,7 +191,8 @@ class RRestConnection implements IRRestConnection
 
         // Wait to finish all tasks
         List<JsonNode> results = resultFutures.stream()
-            .map(pFuture -> {
+            .map(pFuture ->
+            {
               try
               {
                 if(pProgressIndicator.alive().get())
@@ -298,7 +308,8 @@ class RRestConnection implements IRRestConnection
     pNodes.stream()
         .map(JsonNode::getObject)
         .map(pJSONObject -> pJSONObject.getJSONArray(pTopLevelResult))
-        .forEach(pTopLevelArray -> {
+        .forEach(pTopLevelArray ->
+        {
           for(Object entry : pTopLevelArray)
             resultTopLevelArray.put(entry);
         });
