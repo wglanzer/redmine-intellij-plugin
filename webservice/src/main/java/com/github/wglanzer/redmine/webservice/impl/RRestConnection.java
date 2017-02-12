@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
+import com.github.wglanzer.redmine.webservice.impl.exceptions.AuthorizationException;
 import com.github.wglanzer.redmine.webservice.impl.exceptions.ResultHasErrorException;
 import com.github.wglanzer.redmine.webservice.spi.*;
 import com.mashape.unirest.http.HttpResponse;
@@ -9,6 +10,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
+import org.apache.http.HttpStatus;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.ssl.SSLContexts;
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +21,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * RestConnection to a redmine server
@@ -135,18 +135,22 @@ class RRestConnection implements IRRestConnection
       response = _executePaged(pRequest, urlBuilder.toString(), pProgressIndicator, arguments);
     else
     {
+      HttpResponse<JsonNode> resp = null;
+
       try
       {
-        HttpResponse<JsonNode> resp = _executePlain(urlBuilder.toString(), pProgressIndicator, arguments).get();
-        if(resp == null)
-          return null;
-
-        response = resp.getBody();
+        resp = _executePlain(urlBuilder.toString(), pProgressIndicator, arguments).get();
       }
-      catch(InterruptedException e)
+      catch(InterruptedException ignored)
       {
-        response = null;
       }
+
+      if(resp == null)
+        return null;
+
+      // Handle Error-/Other-Statuscodes
+      _handleStatusCode(resp);
+      response = resp.getBody();
     }
 
     // Cancelled request
@@ -189,22 +193,16 @@ class RRestConnection implements IRRestConnection
         }
 
         // Wait to finish all tasks
-        List<JsonNode> results = resultFutures.stream()
-            .map(pFuture -> {
-              try
-              {
-                if(pProgressIndicator.alive().get())
-                  return pFuture.get();
-              }
-              catch(Exception ignored)
-              {
-              }
+        List<JsonNode> results = new ArrayList<>();
+        for(Future<HttpResponse<JsonNode>> future : resultFutures)
+        {
+          if(!pProgressIndicator.alive().get())
+            break;
 
-              return null;
-            })
-            .filter(Objects::nonNull)
-            .map(HttpResponse::getBody)
-            .collect(Collectors.toList());
+          HttpResponse<JsonNode> respone = future.get();
+          _handleStatusCode(respone);
+          results.add(respone.getBody());
+        }
 
         // It was cancelled -> NULL
         if(!pProgressIndicator.alive().get())
@@ -236,7 +234,9 @@ class RRestConnection implements IRRestConnection
     {
       ArrayList<IRRestArgument> arguments = new ArrayList<>(pArguments);
       arguments.add(IRRestArgument.PAGE_LIMIT.value(String.valueOf(0)));
-      JsonNode node = _executePlain(pURL, pProgressIndicator, arguments).get().getBody();
+      HttpResponse<JsonNode> response = _executePlain(pURL, pProgressIndicator, arguments).get();
+      _handleStatusCode(response);
+      JsonNode node = response.getBody();
       return node.getObject().getInt(IRRestArgument.PAGE_TOTALCOUNT.getRequestName());
     }
     catch(Exception e)
@@ -306,7 +306,8 @@ class RRestConnection implements IRRestConnection
     pNodes.stream()
         .map(JsonNode::getObject)
         .map(pJSONObject -> pJSONObject.getJSONArray(pTopLevelResult))
-        .forEach(pTopLevelArray -> {
+        .forEach(pTopLevelArray ->
+        {
           for(Object entry : pTopLevelArray)
             resultTopLevelArray.put(entry);
         });
@@ -323,6 +324,26 @@ class RRestConnection implements IRRestConnection
   {
     JSONObject obj = pNode.getObject();
     return obj.has("errors");
+  }
+
+  /**
+   * Handles the Status-Code of the HttpRespone and throws exceptions, if it is not ok
+   *
+   * @param pResponse Response
+   * @throws Exception Exception if something is not ok
+   */
+  private void _handleStatusCode(@NotNull HttpResponse<JsonNode> pResponse) throws Exception
+  {
+    int status = pResponse.getStatus();
+    switch(status)
+    {
+      case HttpStatus.SC_UNAUTHORIZED:
+        throw new AuthorizationException(pResponse, url, apiKey);
+
+      // As default we do nothing!
+      default:
+        break;
+    }
   }
 
   /**

@@ -4,6 +4,7 @@ import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
 import com.github.wglanzer.redmine.util.StringUtility;
+import com.github.wglanzer.redmine.webservice.impl.exceptions.AuthorizationException;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -81,6 +82,30 @@ public class BalloonComponentFactory
         .setHideOnLinkClick(true)
         .setCloseButtonEnabled(true)
         .createBalloon();
+  }
+
+  /**
+   * Creates a Balloon for an exception
+   *
+   * @param pMessage Additional message
+   * @param pEx      Exception which should be shown
+   * @return the balloon, not <tt>null</tt>
+   */
+  @NotNull
+  public static Balloon createExceptionBalloon(String pMessage, Throwable pEx)
+  {
+    String html;
+    Throwable originException = pEx;
+    while(originException.getCause() != null)
+      originException = originException.getCause();
+
+    if(originException instanceof AuthorizationException)
+      html = "Authorization failed (url: " + ((AuthorizationException) originException).getUrl() + ")";
+    else
+      html = pMessage + "</br>" + StringUtility.toLogString(pEx);
+
+    html = "<html>" + html + "</html>";
+    return createHTMLBalloon(html, MessageType.ERROR);
   }
 
   /**

@@ -1,8 +1,10 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
+import com.github.wglanzer.redmine.webservice.impl.exceptions.AuthorizationException;
 import com.github.wglanzer.redmine.webservice.spi.IRRestArgument;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
 import com.github.wglanzer.redmine.webservice.spi.IRRestRequest;
+import com.github.wglanzer.redmine.webservice.spi.IRRestResult;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,6 +18,29 @@ import java.security.GeneralSecurityException;
  */
 public class Test_RRestConnection
 {
+
+  @Test
+  public void test_validAPIKey() throws Exception
+  {
+    IRRestConnection con = RRestConnectionBuilder.createConnection(new DummyRRestLoggingFacade(), "http://wglanzer.m.redmine.org", "cebe0b29b08ef68fbbea113826199461eccae5b4", 100);
+    IRRestResult result = con.doGET(IRRestRequest.GET_PROJECTS);
+    Assert.assertTrue(result.getResultNodes().findAny().isPresent()); //There is at least one project defined
+  }
+
+  @Test
+  public void test_invalidAPIKey() throws Exception
+  {
+    try
+    {
+      IRRestConnection con = RRestConnectionBuilder.createConnection(new DummyRRestLoggingFacade(), "http://wglanzer.m.redmine.org", "myInvalidAPIKey", 100);
+      con.doGET(IRRestRequest.GET_PROJECTS);
+      Assert.fail();
+    }
+    catch(Exception e)
+    {
+      Assert.assertTrue(_exceptionChainContains(e, AuthorizationException.class));
+    }
+  }
 
   @Test
   public void test_expiredCert() throws Exception
@@ -75,7 +100,7 @@ public class Test_RRestConnection
    * @param pSearch The searched Exception-Type
    * @return <tt>true</tt>, if it does contain the searched class
    */
-  private boolean _exceptionChainContains(Throwable pEx, Class<? extends Throwable> pSearch)
+  private static boolean _exceptionChainContains(Throwable pEx, Class<? extends Throwable> pSearch)
   {
     Throwable ex = pEx;
     while(ex != null)

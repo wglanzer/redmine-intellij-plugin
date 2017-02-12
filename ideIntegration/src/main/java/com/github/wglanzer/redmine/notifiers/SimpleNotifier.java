@@ -7,6 +7,7 @@ import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
 import com.github.wglanzer.redmine.notifiers.balloons.BalloonComponentFactory;
+import com.github.wglanzer.redmine.util.StringUtility;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -87,10 +88,8 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
   @Override
   public void error(String pMessage, Exception pException)
   {
-    String logString = _toLogableString(pException);
-    String html = "<html>" + pMessage + "</br>" + logString + "</html>";
-    _showCustomBalloon(BalloonComponentFactory.createHTMLBalloon(html, MessageType.ERROR));
-    _logInEventLog(pMessage.trim().isEmpty() ? "Exception" : pMessage, logString, NotificationType.ERROR);
+    _showCustomBalloon(BalloonComponentFactory.createExceptionBalloon(pMessage, pException));
+    _logInEventLog(pMessage.trim().isEmpty() ? "Exception" : pMessage, StringUtility.toLogString(pException), NotificationType.ERROR);
   }
 
   /**
@@ -125,39 +124,6 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
       for(Project project : ProjectManager.getInstance().getOpenProjects())
         Notifications.Bus.notify(notification, project);
     }
-  }
-
-  /**
-   * Converts an exception to a readable string
-   *
-   * @param e Exception which is about to be shown
-   * @return String
-   */
-  private String _toLogableString(Throwable e)
-  {
-    Throwable currEx = e;
-    StringBuilder builder = new StringBuilder();
-    for(int i = 0; currEx != null; i++)
-    {
-      StringBuilder myExLine = new StringBuilder();
-      for(int whitespaces = 0; whitespaces < i; whitespaces++)
-        myExLine.append("  ");
-
-      // Log exception
-      myExLine.append(currEx.getClass()).append(": ").append(currEx.getLocalizedMessage());
-      for(StackTraceElement currElement : currEx.getStackTrace())
-        myExLine.append(" [->] ").append(currElement);
-
-      // Shorten it
-      if(myExLine.length() > 255)
-        myExLine.delete(255, myExLine.length()).append("[...continued...]");
-
-      currEx = currEx.getCause();
-      if(currEx != null)
-        myExLine.append("\n");
-      builder.append(myExLine);
-    }
-    return builder.toString();
   }
 
   /**
