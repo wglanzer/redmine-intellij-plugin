@@ -1,17 +1,16 @@
 package com.github.wglanzer.redmine.webservice.impl;
 
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author w.glanzer, 12.12.2016.
  */
-public class RHostnameVerifier implements HostnameVerifier
+public class RHostnameVerifier implements HostnameVerifier, TrustStrategy
 {
   private static RHostnameVerifier INSTANCE;
 
@@ -22,8 +21,6 @@ public class RHostnameVerifier implements HostnameVerifier
     return INSTANCE;
   }
 
-  private final List<String> doNotVerify = new ArrayList<>();
-
   private RHostnameVerifier()
   {
   }
@@ -31,33 +28,12 @@ public class RHostnameVerifier implements HostnameVerifier
   @Override
   public boolean verify(String pURL, SSLSession pSSLSession)
   {
-    if(doNotVerify.contains(pURL))
-      return true;
-    return SSLConnectionSocketFactory.getDefaultHostnameVerifier().verify(pURL, pSSLSession);
+    return true;
   }
 
-  /**
-   * Adds an URL, that should (not) be verified by this verifier
-   *
-   * @param pURL    URL
-   * @param pVerify <tt>true</tt> if this url should be verified
-   */
-  public void setVerify(String pURL, boolean pVerify)
+  @Override
+  public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
   {
-    try
-    {
-      synchronized(doNotVerify)
-      {
-        pURL = new URL(pURL).getHost();
-        if(pVerify)
-          doNotVerify.remove(pURL);
-        else
-          doNotVerify.add(pURL);
-      }
-    }
-    catch(Exception e)
-    {
-      throw new RuntimeException("Could not mark url as notVerify-URL (url: " + pURL + ")", e);
-    }
+    return true;
   }
 }

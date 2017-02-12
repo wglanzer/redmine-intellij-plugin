@@ -157,16 +157,6 @@ public class RAppSettingsComponent extends JPanel
     });
     pageSize.addChangeListener(e -> renewPageSize.run());
 
-    // CheckCertificate
-    disableCertCheck.addActionListener(e ->
-    {
-      if(selectedSource != null)
-      {
-        _fireChange("checkCertificate", selectedSource.isCheckCeritifacte(), !disableCertCheck.isSelected());
-        selectedSource.setCheckCertificate(!disableCertCheck.isSelected());
-      }
-    });
-
     // If a source was added, select it!
     modelChangeListenerStrongRef = evt ->
     {
@@ -234,7 +224,6 @@ public class RAppSettingsComponent extends JPanel
     displayNamePanel.setEnabled(enableSelected);
     intervalLabelDesc.setEnabled(enableSelected);
     pagesizeLabelDesc.setEnabled(enableSelected);
-    disableCertCheck.setEnabled(enableSelected);
     apiKeyPanel.setEnabled(enableSelected);
     urlField.setEnabled(enableSelected);
     apiKeyField.setEnabled(enableSelected);
@@ -423,6 +412,7 @@ public class RAppSettingsComponent extends JPanel
     disableCertCheck.setEnabled(false);
     disableCertCheck.setLabel("disable Cert-Check");
     disableCertCheck.setText("disable Cert-Check");
+    disableCertCheck.setToolTipText("Certificate-Check is disabled temporarily");
     gbc = new GridBagConstraints();
     gbc.gridx = 5;
     gbc.gridy = 1;

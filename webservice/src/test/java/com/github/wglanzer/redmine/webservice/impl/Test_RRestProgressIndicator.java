@@ -24,7 +24,7 @@ public class Test_RRestProgressIndicator
   @Before
   public void setUp()
   {
-    connection = RRestConnectionBuilder.createConnection(new DummyRRestLoggingFacade(), "http://wglanzer.m.redmine.org", "cebe0b29b08ef68fbbea113826199461eccae5b4", 100, false);
+    connection = RRestConnectionBuilder.createConnection(new DummyRRestLoggingFacade(), "http://wglanzer.m.redmine.org", "cebe0b29b08ef68fbbea113826199461eccae5b4", 100);
   }
 
   /**

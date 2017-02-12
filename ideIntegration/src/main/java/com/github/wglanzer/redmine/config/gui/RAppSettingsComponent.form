@@ -146,6 +146,7 @@
                   <enabled value="false"/>
                   <label value="disable Cert-Check"/>
                   <text value="disable Cert-Check"/>
+                  <toolTipText value="Certificate-Check is disabled temporarily"/>
                 </properties>
               </component>
               <vspacer id="f4f0a">
