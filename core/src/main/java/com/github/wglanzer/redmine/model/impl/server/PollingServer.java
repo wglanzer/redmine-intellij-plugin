@@ -47,9 +47,11 @@ public class PollingServer implements IServer
     directory = new PollingProjectDirectory(connection);
     executor = new PollingExecutor(pLoggingFacade, pTaskCreator, () ->
     {
+      _fireBusyStateChanged(true);
       pollProjects(false);
       for(IProject currProject : getProjects())
         ((PollingProject) currProject).pollTickets(false);
+      _fireBusyStateChanged(false);
     }, pSource.getPollInterval(), false);
   }
 
@@ -250,6 +252,20 @@ public class PollingServer implements IServer
     synchronized(listenerList)
     {
       listenerList.forEach(pListener -> pListener.connectionStatusChanged(pIsConnectedNow));
+    }
+  }
+
+
+  /**
+   * Fires, that the busy-state of the connection changed
+   *
+   * @param pIsBusyNow <tt>true</tt>, if the server is busy now
+   */
+  private void _fireBusyStateChanged(boolean pIsBusyNow)
+  {
+    synchronized(listenerList)
+    {
+      listenerList.forEach(pListener -> pListener.busyStateChanged(pIsBusyNow));
     }
   }
 

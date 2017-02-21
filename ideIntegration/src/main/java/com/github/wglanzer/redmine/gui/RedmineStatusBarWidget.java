@@ -1,6 +1,8 @@
 package com.github.wglanzer.redmine.gui;
 
+import com.github.wglanzer.redmine.IRServerManagerListener;
 import com.github.wglanzer.redmine.RManager;
+import com.github.wglanzer.redmine.model.IServer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -47,10 +49,31 @@ public class RedmineStatusBarWidget implements CustomStatusBarWidget
   }
 
   private RedmineStatusBarComponent component;
+  @SuppressWarnings("FieldCanBeLocal") //strongRef
+  private IRServerManagerListener serverManagerListener;
+  private IServer.IServerListener serverListener;
 
   private RedmineStatusBarWidget()
   {
     component = new RedmineStatusBarComponent(RManager.getInstance());
+    serverListener = new IServer.IServerListener()
+    {
+      @Override
+      public void busyStateChanged(boolean pIsBusy)
+      {
+        component.setBusy(pIsBusy);
+      }
+    };
+    serverManagerListener = new IRServerManagerListener()
+    {
+      @Override
+      public void serverCreated(IServer pServer)
+      {
+        pServer.addWeakServerListener(serverListener);
+      }
+    };
+    RManager.getInstance().getServerManager().addWeakServerManagerListener(serverManagerListener);
+    RManager.getInstance().getServerManager().getAvailableServers().forEach(pIServer -> pIServer.addWeakServerListener(serverListener));
   }
 
   @NotNull

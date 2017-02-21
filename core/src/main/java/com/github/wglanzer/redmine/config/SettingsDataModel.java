@@ -25,6 +25,7 @@ public class SettingsDataModel extends AbstractPPP<IPropertyPitProvider, Setting
   public static final IPropertyDescription<SettingsDataModel, Sources> sources = PD.create(SettingsDataModel.class);
   public static final IPropertyDescription<SettingsDataModel, Boolean> enableNotifications = PD.create(SettingsDataModel.class);
   public static final IPropertyDescription<SettingsDataModel, Boolean> enableLog = PD.create(SettingsDataModel.class);
+  public static final IPropertyDescription<SettingsDataModel, Boolean> enableVisualFeedback = PD.create(SettingsDataModel.class);
 
   @NotNull
   public List<ISource> getSources()
@@ -89,6 +90,26 @@ public class SettingsDataModel extends AbstractPPP<IPropertyPitProvider, Setting
   public void setEnableLog(boolean pEnable)
   {
     getPit().setValue(enableLog, pEnable);
+  }
+
+  /**
+   * Returns <tt>true</tt> if the visual feedback should be shown
+   *
+   * @return <tt>true</tt> if it should be shown
+   */
+  public boolean isVisualFeedbackEnabled()
+  {
+    return MoreObjects.firstNonNull(getPit().getValue(enableVisualFeedback), true);
+  }
+
+  /**
+   * Sets if the visual feedbackshould be shown
+   *
+   * @param pEnable <tt>true</tt> if it should be shown
+   */
+  public void setEnableVisualFeedback(boolean pEnable)
+  {
+    getPit().setValue(enableVisualFeedback, pEnable);
   }
 
   /**

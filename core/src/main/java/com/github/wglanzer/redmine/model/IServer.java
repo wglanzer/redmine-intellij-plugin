@@ -111,6 +111,16 @@ public interface IServer
     default void projectRemoved(IProject pRemoved)
     {
     }
+
+    /**
+     * Fires, when the busy-State changes
+     * (busy = is some work to do)
+     *
+     * @param pIsBusy  <tt>true</tt> if some work will be done now
+     */
+    default void busyStateChanged(boolean pIsBusy)
+    {
+    }
   }
 
 }
