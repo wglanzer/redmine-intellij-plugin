@@ -131,27 +131,41 @@ class RRestConnection implements IRRestConnection
     ArrayList<IRRestArgument> arguments = pAdditionalArguments != null ? new ArrayList<>(pAdditionalArguments) : new ArrayList<>();
     arguments.add(IRRestArgument.API_KEY.value(apiKey));
 
-    JsonNode response;
-    if(pRequest.isPageable())
-      response = _executePaged(pRequest, urlBuilder.toString(), pProgressIndicator, arguments);
-    else
+    JsonNode response = null;
+
+    try
     {
-      HttpResponse<JsonNode> resp = null;
-
-      try
+      if(pRequest.isPageable())
+        response = _executePaged(pRequest, urlBuilder.toString(), pProgressIndicator, arguments);
+      else
       {
-        resp = _executePlain(urlBuilder.toString(), pProgressIndicator, arguments).get();
+        HttpResponse<JsonNode> resp = null;
+
+        try
+        {
+          resp = _executePlain(urlBuilder.toString(), pProgressIndicator, arguments).get();
+        }
+        catch(InterruptedException ignored)
+        {
+        }
+
+        if(resp == null)
+          return null;
+
+        // Handle Error-/Other-Statuscodes
+        _handleStatusCode(resp);
+        response = resp.getBody();
       }
-      catch(InterruptedException ignored)
+
+      wasError.set(null);
+    }
+    catch(Exception e)
+    {
+      if(wasError.get() == null)
       {
+        wasError.set(e);
+        throw e;
       }
-
-      if(resp == null)
-        return null;
-
-      // Handle Error-/Other-Statuscodes
-      _handleStatusCode(resp);
-      response = resp.getBody();
     }
 
     // Cancelled request
