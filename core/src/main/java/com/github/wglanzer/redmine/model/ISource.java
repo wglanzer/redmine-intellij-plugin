@@ -3,6 +3,8 @@ package com.github.wglanzer.redmine.model;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Describes a source for a server to connect.
  * It contains all information that a server
@@ -66,5 +68,13 @@ public interface ISource
    * @return <tt>true</tt> -> it should be checked
    */
   boolean isCheckCeritifacte();
+
+  /**
+   * Returns a list containing all available watches
+   *
+   * @return a list of all watches
+   */
+  @NotNull
+  List<IWatch> getWatches();
 
 }

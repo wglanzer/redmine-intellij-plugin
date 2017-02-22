@@ -9,6 +9,9 @@ import com.intellij.ui.ToolbarDecorator;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -24,6 +27,7 @@ import java.util.Objects;
  */
 public class RAppSettingsComponent extends JPanel
 {
+  @SuppressWarnings("FieldCanBeLocal")
   private final PropertyChangeListener modelChangeListenerStrongRef;
 
   private RAppSettingsModel model;
@@ -259,13 +263,14 @@ public class RAppSettingsComponent extends JPanel
         .disableDownAction()
         .createPanel();
 
-    WatchesList watchesList = new WatchesList(model);
+    WatchesList watchesList = new WatchesList(model, () -> selectedSource, event -> _fireChange(event.getPropertyName(), event.getOldValue(), event.getNewValue()));
     watchesListPanel = ToolbarDecorator.createDecorator(watchesList)
         .setToolbarPosition(ActionToolbarPosition.LEFT)
-        .setAddAction(watchesList)
-        .setRemoveAction(watchesList)
+        .setAddAction(watchesList::onAddClick)
+        .setRemoveAction(watchesList::onRemoveClick)
         .disableUpAction()
         .disableDownAction()
+        .setPanelBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5), new LineBorder(Color.LIGHT_GRAY)))
         .createPanel();
 
     splitter = new Splitter(false, 0.3F);
@@ -457,9 +462,8 @@ public class RAppSettingsComponent extends JPanel
     watchesTabPanel = new JPanel();
     watchesTabPanel.setLayout(new GridBagLayout());
     watchesTabPanel.setEnabled(true);
-    watchesTabPanel.setVisible(false);
+    watchesTabPanel.setVisible(true);
     tab.addTab("Watches", watchesTabPanel);
-    tab.setEnabledAt(1, false);
     gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 0;

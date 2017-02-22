@@ -2,12 +2,14 @@ package com.github.wglanzer.redmine.config.gui;
 
 import com.github.wglanzer.redmine.config.SettingsDataModel;
 import com.github.wglanzer.redmine.config.SourceDataModel;
+import com.github.wglanzer.redmine.config.WatchDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.util.propertly.BulkModifyHierarchy;
 import com.github.wglanzer.redmine.util.propertly.DataModelFactory;
 import de.adito.propertly.core.spi.IHierarchy;
+import de.adito.propertly.core.spi.IProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.beans.PropertyChangeEvent;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RAppSettingsModel
 {
   public static final String PROP_SOURCES = "sources";
+  public static final String PROP_WATCHES = "watches";
 
   private final AtomicBoolean modified = new AtomicBoolean(false);
   private final WeakListenerList<PropertyChangeListener> listeners = new WeakListenerList<>();
@@ -71,6 +74,54 @@ public class RAppSettingsModel
       if(removed)
         firePropertyChanged(PROP_SOURCES, pSourceName, null);
       return removed;
+    }
+  }
+
+  /**
+   * Adds an empty redmine watch
+   */
+  public void addEmptyWatch(String pSourceName)
+  {
+    synchronized(modified)
+    {
+      IProperty<SettingsDataModel.Sources, SourceDataModel> propSource =
+          bulkedSettingsHierarchy.getValue().getValue(SettingsDataModel.sources).findProperty(pSourceName);
+      if(propSource != null)
+      {
+        SourceDataModel source = propSource.getValue();
+        assert source != null;
+        WatchDataModel watch = DataModelFactory.createModel(WatchDataModel.class);
+        SourceDataModel.Watches watches = source.getPit().getProperty(SourceDataModel.watches).getValue();
+        assert watches != null;
+        watches.addProperty(watch);
+        firePropertyChanged(PROP_WATCHES, null, watch);
+      }
+    }
+  }
+
+  /**
+   * Removes one watch from the list
+   *
+   * @param pWatchName  Watch, which will be removed
+   * @return <tt>true</tt> if something was changed
+   */
+  public boolean removeWatch(@NotNull String pWatchName)
+  {
+    synchronized(modified)
+    {
+      SourceDataModel sourceContainingWatch = bulkedSettingsHierarchy.getValue().getValue(SettingsDataModel.sources).getValues().stream()
+          .filter(pSourceModel -> pSourceModel.getWatches().stream()
+              .anyMatch(pWatch -> pWatch.getName().equals(pWatchName)))
+          .findFirst().orElse(null);
+      if(sourceContainingWatch != null)
+      {
+        boolean removed = sourceContainingWatch.removeWatch(pWatchName);
+        if(removed)
+          firePropertyChanged(PROP_WATCHES, pWatchName, null);
+        return removed;
+      }
+
+      return false;
     }
   }
 

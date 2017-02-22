@@ -1,12 +1,18 @@
 package com.github.wglanzer.redmine.config;
 
 import com.github.wglanzer.redmine.model.ISource;
+import com.github.wglanzer.redmine.model.IWatch;
 import de.adito.propertly.core.common.PD;
+import de.adito.propertly.core.spi.IProperty;
 import de.adito.propertly.core.spi.IPropertyDescription;
 import de.adito.propertly.core.spi.IPropertyPitProvider;
+import de.adito.propertly.core.spi.extension.AbstractMutablePPP;
 import de.adito.propertly.core.spi.extension.AbstractPPP;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * PPP for one Redmine-Source
@@ -23,6 +29,7 @@ public class SourceDataModel extends AbstractPPP<IPropertyPitProvider, SourceDat
   public static final IPropertyDescription<SourceDataModel, Integer> pollingInterval = PD.create(SourceDataModel.class);
   public static final IPropertyDescription<SourceDataModel, Integer> pageSize = PD.create(SourceDataModel.class);
   public static final IPropertyDescription<SourceDataModel, Boolean> checkCertificate = PD.create(SourceDataModel.class);
+  public static final IPropertyDescription<SourceDataModel, Watches> watches = PD.create(SourceDataModel.class);
 
   @NotNull
   public String getName()
@@ -129,4 +136,42 @@ public class SourceDataModel extends AbstractPPP<IPropertyPitProvider, SourceDat
   {
     getPit().setValue(checkCertificate, pCheck);
   }
+
+  @NotNull
+  @Override
+  public List<IWatch> getWatches()
+  {
+    Watches watches = getPit().getValue(SourceDataModel.watches);
+    assert watches != null;
+    return new ArrayList<>(watches.getValues());
+  }
+
+  /**
+   * Removes one watch from the list
+   *
+   * @param pWatchName watch, which will be removed
+   * @return <tt>true</tt> if something was changed
+   */
+  public boolean removeWatch(@NotNull String pWatchName)
+  {
+    SourceDataModel.Watches watches = getPit().getProperty(SourceDataModel.watches).getValue();
+    assert watches != null;
+    IProperty<SourceDataModel.Watches, WatchDataModel> deletedProp = watches.getProperties().stream()
+        .filter(pSourceProp -> pSourceProp.getName().equals(pWatchName))
+        .findAny().orElse(null);
+
+    return deletedProp != null && watches.removeProperty(deletedProp);
+  }
+
+  /**
+   * PPP to hold a set of watches
+   */
+  public static class Watches extends AbstractMutablePPP<SourceDataModel, Watches, WatchDataModel>
+  {
+    public Watches()
+    {
+      super(WatchDataModel.class);
+    }
+  }
+
 }
