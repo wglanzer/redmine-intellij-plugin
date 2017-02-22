@@ -1,0 +1,25 @@
+engines:
+  checkstyle:
+    enabled: true
+    channel: beta
+    checks:
+      com.puppycrawl.tools.checkstyle.checks.javadoc.SummaryJavadocCheck:
+        enabled: false
+      com.puppycrawl.tools.checkstyle.checks.naming.AbbreviationAsWordInNameCheck:
+        enabled: false
+      com.puppycrawl.tools.checkstyle.checks.naming.ParameterNameCheck:
+        format: "^p[a-z][a-zA-Z0-9]*$"
+  fixme:
+    enabled: true
+  pmd:
+    enabled: true
+    channel: beta
+  duplication:
+    enabled: true
+    config:
+        languages:
+      - java
+ratings:
+  paths:
+  - "**.java"
+exclude_paths: []
