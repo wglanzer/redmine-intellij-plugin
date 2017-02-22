@@ -14,11 +14,6 @@ engines:
   pmd:
     enabled: true
     channel: beta
-  duplication:
-    enabled: true
-    config:
-        languages:
-      - java
 ratings:
   paths:
   - "**.java"
