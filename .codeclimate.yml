@@ -8,6 +8,7 @@ engines:
       com.puppycrawl.tools.checkstyle.checks.naming.AbbreviationAsWordInNameCheck:
         enabled: false
       com.puppycrawl.tools.checkstyle.checks.naming.ParameterNameCheck:
+        enabled: true
         format: "^p[a-z][a-zA-Z0-9]*$"
   fixme:
     enabled: true
