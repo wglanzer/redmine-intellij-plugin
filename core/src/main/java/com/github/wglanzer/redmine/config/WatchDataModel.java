@@ -1,8 +1,10 @@
 package com.github.wglanzer.redmine.config;
 
-import com.github.wglanzer.redmine.model.ICondition;
+import com.github.wglanzer.redmine.model.IConditionDescription;
 import com.github.wglanzer.redmine.model.IWatch;
+import com.google.common.base.MoreObjects;
 import de.adito.propertly.core.common.PD;
+import de.adito.propertly.core.spi.IProperty;
 import de.adito.propertly.core.spi.IPropertyDescription;
 import de.adito.propertly.core.spi.extension.AbstractMutablePPP;
 import de.adito.propertly.core.spi.extension.AbstractPPP;
@@ -17,7 +19,7 @@ import java.util.List;
  *
  * @author w.glanzer, 22.02.2017.
  */
-public class WatchDataModel extends AbstractPPP<SettingsDataModel, WatchDataModel, Object>
+public class WatchDataModel extends AbstractPPP<SourceDataModel.Watches, WatchDataModel, Object>
     implements IWatch
 {
 
@@ -35,13 +37,22 @@ public class WatchDataModel extends AbstractPPP<SettingsDataModel, WatchDataMode
   @Override
   public String getDisplayName()
   {
-    String value = getPit().getValue(displayName);
-    assert value != null;
-    return value;
+    return getPit().getValue(displayName);
   }
 
+  /**
+   * Sets the displayName of this watch
+   *
+   * @param pDisplayName Name that should be set
+   */
+  public void setDisplayName(String pDisplayName)
+  {
+    getPit().setValue(displayName, MoreObjects.firstNonNull(pDisplayName, getName()));
+  }
+
+  @NotNull
   @Override
-  public List<ICondition> getConditions()
+  public List<IConditionDescription> getConditionDescriptions()
   {
     Conditions conditions = getPit().getValue(WatchDataModel.conditions);
     assert conditions != null;
@@ -49,13 +60,25 @@ public class WatchDataModel extends AbstractPPP<SettingsDataModel, WatchDataMode
   }
 
   /**
+   * Removes a specific condition from this model
+   *
+   * @param pName name of the condition which should be removed
+   * @return <tt>true</tt> if something has changed
+   */
+  public boolean removeCondition(String pName)
+  {
+    IProperty<Conditions, ConditionDescriptionDataModel> descToRemove = getValue(conditions).findProperty(pName);
+    return descToRemove != null && getValue(conditions).removeProperty(descToRemove);
+  }
+
+  /**
    * Container for ConditionDataModels
    */
-  public static class Conditions extends AbstractMutablePPP<WatchDataModel, Conditions, ConditionDataModel>
+  public static class Conditions extends AbstractMutablePPP<WatchDataModel, Conditions, ConditionDescriptionDataModel>
   {
     public Conditions()
     {
-      super(ConditionDataModel.class);
+      super(ConditionDescriptionDataModel.class);
     }
   }
 

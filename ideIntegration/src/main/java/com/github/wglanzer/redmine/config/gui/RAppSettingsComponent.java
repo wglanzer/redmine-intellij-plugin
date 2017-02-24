@@ -1,5 +1,6 @@
 package com.github.wglanzer.redmine.config.gui;
 
+import com.github.wglanzer.redmine.config.SettingsDataModel;
 import com.github.wglanzer.redmine.config.SourceDataModel;
 import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.MoreObjects;
@@ -9,9 +10,7 @@ import com.intellij.ui.ToolbarDecorator;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -36,7 +35,7 @@ public class RAppSettingsComponent extends JPanel
   private Splitter splitter;
   private SourcesList sourceList;
   private JPanel sourcesListPanel;
-  private JPanel watchesListPanel;
+  private JPanel watchesTablePanel;
   private JPanel contentPane;
 
   // UI Components
@@ -48,14 +47,13 @@ public class RAppSettingsComponent extends JPanel
   private JLabel apiKeyPanel;
   private JLabel intervalPanel;
   private JLabel pageSizePanel;
-  private JTabbedPane tab;
   private JTextField displayName;
   private JLabel displayNamePanel;
   private JCheckBox disableCertCheck;
   private JLabel intervalLabelDesc;
   private JLabel pagesizeLabelDesc;
   private JPanel generalTabPanel;
-  private JPanel watchesTabPanel;
+  private WatchesTable watchesTable;
 
   public RAppSettingsComponent(RAppSettingsModel pModel)
   {
@@ -65,6 +63,10 @@ public class RAppSettingsComponent extends JPanel
     splitter.setFirstComponent(sourcesListPanel);
     splitter.setSecondComponent(contentPane);
     add(splitter, BorderLayout.CENTER);
+    add(new JLabel("*: Mandatory input"), BorderLayout.SOUTH);
+
+    // NO GOD DAMN SCROLLBARS!!
+    setPreferredSize(new Dimension(0, 0));
 
     // init
     _selectedSourceChanged(null);
@@ -76,10 +78,7 @@ public class RAppSettingsComponent extends JPanel
       public void focusLost(FocusEvent e)
       {
         if(selectedSource != null)
-        {
-          _fireChange("url", selectedSource.getURL(), urlField.getText());
           selectedSource.setUrl(urlField.getText());
-        }
       }
     });
 
@@ -90,10 +89,7 @@ public class RAppSettingsComponent extends JPanel
       public void focusLost(FocusEvent e)
       {
         if(selectedSource != null)
-        {
-          _fireChange("apikey", selectedSource.getAPIKey(), apiKeyField.getText());
           selectedSource.setApiKey(apiKeyField.getText());
-        }
       }
     });
 
@@ -104,10 +100,7 @@ public class RAppSettingsComponent extends JPanel
       public void focusLost(FocusEvent e)
       {
         if(selectedSource != null)
-        {
-          _fireChange("displayName", selectedSource.getDisplayName(), displayName.getText());
           selectedSource.setDisplayName(displayName.getText());
-        }
       }
     });
 
@@ -118,10 +111,7 @@ public class RAppSettingsComponent extends JPanel
       {
         Integer newVal = Integer.valueOf(String.valueOf(pollIntervall.getValue()));
         if(newVal >= 5)
-        {
-          _fireChange("pollinterval", selectedSource.getPollInterval(), newVal);
           selectedSource.setPollingInterval(newVal);
-        }
         else
           pollIntervall.setValue(selectedSource.getPollInterval());
       }
@@ -143,10 +133,7 @@ public class RAppSettingsComponent extends JPanel
       {
         Integer newVal = Integer.valueOf(String.valueOf(pageSize.getValue()));
         if(newVal >= 1 && newVal <= 100)
-        {
-          _fireChange("pagesize", selectedSource.getPageSize(), newVal);
           selectedSource.setPageSize(newVal);
-        }
         else
           pageSize.setValue(selectedSource.getPageSize());
       }
@@ -164,7 +151,7 @@ public class RAppSettingsComponent extends JPanel
     // If a source was added, select it!
     modelChangeListenerStrongRef = evt ->
     {
-      if(Objects.equals(evt.getPropertyName(), RAppSettingsModel.PROP_SOURCES))
+      if(Objects.equals(evt.getPropertyName(), SettingsDataModel.sources.getName())) // todo does not work...
       {
         // removed
         if(evt.getOldValue() != null && evt.getNewValue() == null)
@@ -189,7 +176,6 @@ public class RAppSettingsComponent extends JPanel
       }
     };
     generalTabPanel.addMouseListener(ma);
-    watchesTabPanel.addMouseListener(ma);
 
     // Select first entry
     SwingUtilities.invokeLater(() ->
@@ -234,6 +220,8 @@ public class RAppSettingsComponent extends JPanel
     pollIntervall.setEnabled(enableSelected);
     pageSize.setEnabled(enableSelected);
     displayName.setEnabled(enableSelected);
+    watchesTable.setEnabled(enableSelected);
+    watchesTable.update();
     urlField.setText(pSelectedSource != null ? pSelectedSource.getURL() : "");
     apiKeyField.setText(pSelectedSource != null ? pSelectedSource.getAPIKey() : "");
     displayName.setText(pSelectedSource != null ? pSelectedSource.getDisplayName() : "");
@@ -263,29 +251,17 @@ public class RAppSettingsComponent extends JPanel
         .disableDownAction()
         .createPanel();
 
-    WatchesList watchesList = new WatchesList(model, () -> selectedSource, event -> _fireChange(event.getPropertyName(), event.getOldValue(), event.getNewValue()));
-    watchesListPanel = ToolbarDecorator.createDecorator(watchesList)
-        .setToolbarPosition(ActionToolbarPosition.LEFT)
-        .setAddAction(watchesList::onAddClick)
-        .setRemoveAction(watchesList::onRemoveClick)
+    watchesTable = new WatchesTable(model, () -> selectedSource);
+    watchesTablePanel = ToolbarDecorator.createDecorator(watchesTable)
+        .setToolbarPosition(ActionToolbarPosition.TOP)
+        .setAddAction(watchesTable::onAddClick)
+        .setRemoveAction(watchesTable::onRemoveClick)
         .disableUpAction()
         .disableDownAction()
-        .setPanelBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5), new LineBorder(Color.LIGHT_GRAY)))
+        .setPanelBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY))
         .createPanel();
 
     splitter = new Splitter(false, 0.3F);
-  }
-
-  /**
-   * Fires, that something has changed on gui
-   *
-   * @param pProperty Property that has changed
-   * @param pOldValue Old value
-   * @param pNewValue New value
-   */
-  private void _fireChange(String pProperty, Object pOldValue, Object pNewValue)
-  {
-    model.firePropertyChanged(pProperty, pOldValue, pNewValue);
   }
 
   /**
@@ -300,11 +276,11 @@ public class RAppSettingsComponent extends JPanel
     createUIComponents();
     contentPane = new JPanel();
     contentPane.setLayout(new BorderLayout(0, 0));
-    tab = new JTabbedPane();
-    contentPane.add(tab, BorderLayout.CENTER);
+    contentPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4144960)), null));
+    contentPane.add(watchesTablePanel, BorderLayout.CENTER);
     generalTabPanel = new JPanel();
     generalTabPanel.setLayout(new GridBagLayout());
-    tab.addTab("General", generalTabPanel);
+    contentPane.add(generalTabPanel, BorderLayout.NORTH);
     generalTabPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
     urlPanel = new JLabel();
     urlPanel.setEnabled(false);
@@ -424,14 +400,6 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 0, 0, 0);
     generalTabPanel.add(disableCertCheck, gbc);
-    final JPanel spacer1 = new JPanel();
-    gbc = new GridBagConstraints();
-    gbc.gridx = 5;
-    gbc.gridy = 5;
-    gbc.weighty = 1.0;
-    gbc.anchor = GridBagConstraints.EAST;
-    gbc.fill = GridBagConstraints.VERTICAL;
-    generalTabPanel.add(spacer1, gbc);
     intervalLabelDesc = new JLabel();
     intervalLabelDesc.setEnabled(false);
     intervalLabelDesc.setText("sec");
@@ -451,26 +419,6 @@ public class RAppSettingsComponent extends JPanel
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets = new Insets(5, 5, 0, 0);
     generalTabPanel.add(pagesizeLabelDesc, gbc);
-    final JLabel label1 = new JLabel();
-    label1.setText("* Mandatory input");
-    gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 6;
-    gbc.gridwidth = 6;
-    gbc.anchor = GridBagConstraints.WEST;
-    generalTabPanel.add(label1, gbc);
-    watchesTabPanel = new JPanel();
-    watchesTabPanel.setLayout(new GridBagLayout());
-    watchesTabPanel.setEnabled(true);
-    watchesTabPanel.setVisible(true);
-    tab.addTab("Watches", watchesTabPanel);
-    gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.weightx = 0.9;
-    gbc.weighty = 0.8;
-    gbc.fill = GridBagConstraints.BOTH;
-    watchesTabPanel.add(watchesListPanel, gbc);
   }
 
   /**

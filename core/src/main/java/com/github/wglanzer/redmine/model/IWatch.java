@@ -30,11 +30,11 @@ public interface IWatch
   String getDisplayName();
 
   /**
-   * Returns all conditions that this watch contains.
-   * Only if ALL of this are positive a specific notification is shown (project / ticket added, etc.)
+   * Returns all condition-descriptions that this watch contains.
    *
-   * @return List of ALL available conditions
+   * @return List of ALL available descriptions
    */
-  List<ICondition> getConditions();
+  @NotNull
+  List<IConditionDescription> getConditionDescriptions();
 
 }

@@ -1,22 +1,30 @@
 package com.github.wglanzer.redmine.config.gui;
 
+import com.github.wglanzer.redmine.config.ConditionDescriptionDataModel;
 import com.github.wglanzer.redmine.config.SettingsDataModel;
 import com.github.wglanzer.redmine.config.SourceDataModel;
 import com.github.wglanzer.redmine.config.WatchDataModel;
+import com.github.wglanzer.redmine.model.EConditionAttribute;
+import com.github.wglanzer.redmine.model.EConditionOperator;
 import com.github.wglanzer.redmine.model.ISource;
 import com.github.wglanzer.redmine.model.impl.server.PollingServer;
 import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.util.propertly.BulkModifyHierarchy;
 import com.github.wglanzer.redmine.util.propertly.DataModelFactory;
+import de.adito.propertly.core.common.PropertyPitEventAdapter;
 import de.adito.propertly.core.spi.IHierarchy;
 import de.adito.propertly.core.spi.IProperty;
+import de.adito.propertly.core.spi.IPropertyPitProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Model for global configuration.
@@ -26,17 +34,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class RAppSettingsModel
 {
-  public static final String PROP_SOURCES = "sources";
-  public static final String PROP_WATCHES = "watches";
-
   private final AtomicBoolean modified = new AtomicBoolean(false);
   private final WeakListenerList<PropertyChangeListener> listeners = new WeakListenerList<>();
+  private final _BulkedHierarchyListener bulkedHierarchyListener = new _BulkedHierarchyListener();
   private BulkModifyHierarchy<SettingsDataModel> bulkedSettingsHierarchy;
 
   public RAppSettingsModel(@NotNull SettingsDataModel pCurrentSettings)
   {
     IHierarchy<SettingsDataModel> hierarchy = (IHierarchy<SettingsDataModel>) pCurrentSettings.getPit().getHierarchy();
     bulkedSettingsHierarchy = new BulkModifyHierarchy<>(hierarchy);
+    bulkedSettingsHierarchy.addWeakListener(bulkedHierarchyListener);
   }
 
   /**
@@ -56,7 +63,6 @@ public class RAppSettingsModel
       SettingsDataModel.Sources sources = bulkedSettingsHierarchy.getValue().getPit().getProperty(SettingsDataModel.sources).getValue();
       assert sources != null;
       sources.addProperty(source);
-      firePropertyChanged(PROP_SOURCES, null, source);
     }
   }
 
@@ -70,10 +76,7 @@ public class RAppSettingsModel
   {
     synchronized(modified)
     {
-      boolean removed = bulkedSettingsHierarchy.getValue().removeSource(pSourceName);
-      if(removed)
-        firePropertyChanged(PROP_SOURCES, pSourceName, null);
-      return removed;
+      return bulkedSettingsHierarchy.getValue().removeSource(pSourceName);
     }
   }
 
@@ -91,10 +94,10 @@ public class RAppSettingsModel
         SourceDataModel source = propSource.getValue();
         assert source != null;
         WatchDataModel watch = DataModelFactory.createModel(WatchDataModel.class);
+        watch.setDisplayName("New Watch");
         SourceDataModel.Watches watches = source.getPit().getProperty(SourceDataModel.watches).getValue();
         assert watches != null;
         watches.addProperty(watch);
-        firePropertyChanged(PROP_WATCHES, null, watch);
       }
     }
   }
@@ -113,12 +116,56 @@ public class RAppSettingsModel
           .filter(pSourceModel -> pSourceModel.getWatches().stream()
               .anyMatch(pWatch -> pWatch.getName().equals(pWatchName)))
           .findFirst().orElse(null);
-      if(sourceContainingWatch != null)
+      return sourceContainingWatch != null && sourceContainingWatch.removeWatch(pWatchName);
+    }
+  }
+
+  /**
+   * Adds an empty condition to a specific watch
+   *
+   * @param pSettings SettingsDataModel because the conditions have its own bulkModify...
+   */
+  public void addEmptyCondition(SettingsDataModel pSettings, String pSourceName, String pWatchName)
+  {
+    synchronized(modified)
+    {
+      IProperty<SettingsDataModel.Sources, SourceDataModel> propSource =
+          pSettings.getValue(SettingsDataModel.sources).findProperty(pSourceName);
+      if(propSource != null && propSource.getValue() != null)
       {
-        boolean removed = sourceContainingWatch.removeWatch(pWatchName);
-        if(removed)
-          firePropertyChanged(PROP_WATCHES, pWatchName, null);
-        return removed;
+        IProperty<SourceDataModel.Watches, WatchDataModel> propWatch =
+            propSource.getValue().getPit().getValue(SourceDataModel.watches).findProperty(pWatchName);
+        if(propWatch != null && propWatch.getValue() != null)
+        {
+          ConditionDescriptionDataModel desc = DataModelFactory.createModel(ConditionDescriptionDataModel.class);
+          desc.setAttribute(EConditionAttribute.ASSIGNEE);
+          desc.setOperator(EConditionOperator.EQUALS);
+          desc.setPossibleValues(Collections.emptyList());
+          propWatch.getValue().getPit().getProperty(WatchDataModel.conditions).getValue().addProperty(desc);
+        }
+      }
+    }
+  }
+
+  /**
+   * Removes one condition from the list
+   *
+   * @param pSettings SettingsDataModel because the conditions have its own bulkModify...
+   * @param pConditionName  Condition, which will be removed
+   * @return <tt>true</tt> if something was changed
+   */
+  public boolean removeCondition(SettingsDataModel pSettings, String pSourceName, String pWatchName, String pConditionName)
+  {
+    synchronized(modified)
+    {
+      IProperty<SettingsDataModel.Sources, SourceDataModel> propSource =
+          pSettings.getValue(SettingsDataModel.sources).findProperty(pSourceName);
+      if(propSource != null && propSource.getValue() != null)
+      {
+        IProperty<SourceDataModel.Watches, WatchDataModel> propWatch =
+            propSource.getValue().getValue(SourceDataModel.watches).findProperty(pWatchName);
+        if(propWatch != null && propWatch.getValue() != null)
+          return propWatch.getValue().removeCondition(pConditionName);
       }
 
       return false;
@@ -172,8 +219,11 @@ public class RAppSettingsModel
   {
     synchronized(modified)
     {
+      bulkedSettingsHierarchy.removeListener(bulkedHierarchyListener);
       bulkedSettingsHierarchy = new BulkModifyHierarchy<>(bulkedSettingsHierarchy.getSourceHierarchy());
+      bulkedSettingsHierarchy.addWeakListener(bulkedHierarchyListener);
       modified.set(false);
+      firePropertyChanged("modified", true, false);
     }
   }
 
@@ -213,7 +263,7 @@ public class RAppSettingsModel
    */
   protected void firePropertyChanged(String pProperty, Object pOldValue, Object pNewValue)
   {
-    if(!Objects.equals(pOldValue, pNewValue))
+    if(!Objects.equals(pProperty, "modified") && !Objects.equals(pOldValue, pNewValue))
       _modified();
 
     synchronized(listeners)
@@ -231,6 +281,26 @@ public class RAppSettingsModel
     synchronized(modified)
     {
       modified.set(true);
+    }
+  }
+
+  /**
+   * EventAdapter for bulkedHierarchy
+   */
+  private class _BulkedHierarchyListener extends PropertyPitEventAdapter<IPropertyPitProvider, Object>
+  {
+    @Override
+    public void propertyWillBeRemoved(@NotNull IProperty<IPropertyPitProvider, Object> pProperty, @NotNull Consumer<Runnable> pOnRemoved, @NotNull Set<Object> pAttributes)
+    {
+      Object oldValue = pProperty.getValue();
+      String name = pProperty.getName();
+      pOnRemoved.accept(() -> firePropertyChanged(name, oldValue, null));
+    }
+
+    @Override
+    public void propertyValueChanged(@NotNull IProperty pProperty, Object pOldValue, Object pNewValue, @NotNull Set pAttributes)
+    {
+      firePropertyChanged(pProperty.getName(), pOldValue, pNewValue);
     }
   }
 

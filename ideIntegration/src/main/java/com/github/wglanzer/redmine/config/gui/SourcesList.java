@@ -22,8 +22,9 @@ class SourcesList extends JBList
 
   public SourcesList(RAppSettingsModel pModel)
   {
-    super(new _Model(pModel));
+    super();
     model = pModel;
+    setModel(new _Model(pModel));
     setCellRenderer(new _Renderer());
   }
 
@@ -80,7 +81,7 @@ class SourcesList extends JBList
   /**
    * ListModel-Impl for SourcesList
    */
-  private static class _Model extends AbstractListModel<ISource>
+  private class _Model extends AbstractListModel<ISource>
   {
     private final PropertyChangeListener propertyChangeListener;
     private final RAppSettingsModel model;
@@ -88,7 +89,11 @@ class SourcesList extends JBList
     public _Model(RAppSettingsModel pModel)
     {
       model = pModel;
-      propertyChangeListener = evt -> fireContentsChanged(this, 0, Math.max(getSize() - 1, 0));
+      propertyChangeListener = evt -> {
+        fireContentsChanged(this, 0, Math.max(getSize() - 1, 0));
+        revalidate();
+        repaint();
+      };
       model.addWeakPropertyChangeListener(propertyChangeListener);
     }
 

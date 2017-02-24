@@ -73,6 +73,12 @@
       <version>${intellij.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
+      <version>1.6.1</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
