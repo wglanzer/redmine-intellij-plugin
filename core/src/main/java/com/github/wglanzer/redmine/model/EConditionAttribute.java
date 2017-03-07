@@ -9,6 +9,7 @@ import java.util.function.Function;
  */
 public enum EConditionAttribute
 {
+  ACCEPT_ALL(pTicket -> null, EConditionOperator.ACCEPT_ALL),
   AUTHOR(ITicket::getAuthor),
   ASSIGNEE(ITicket::getAssignee),
   CATEGORY(ITicket::getCategory),
@@ -30,7 +31,7 @@ public enum EConditionAttribute
   EConditionAttribute(Function<ITicket, String> pValueExtractor, EConditionOperator... pPossibleOperators)
   {
     ticketValueExtractor = pValueExtractor;
-    possibleOperators = pPossibleOperators.length == 0 ? EConditionOperator.values() : pPossibleOperators;
+    possibleOperators = pPossibleOperators.length == 0 ? EConditionOperator.common() : pPossibleOperators;
   }
 
   /**
