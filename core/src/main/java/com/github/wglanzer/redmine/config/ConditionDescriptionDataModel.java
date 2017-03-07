@@ -3,7 +3,6 @@ package com.github.wglanzer.redmine.config;
 import com.github.wglanzer.redmine.model.EConditionAttribute;
 import com.github.wglanzer.redmine.model.EConditionOperator;
 import com.github.wglanzer.redmine.model.IConditionDescription;
-import com.google.common.base.MoreObjects;
 import de.adito.propertly.core.common.PD;
 import de.adito.propertly.core.spi.IProperty;
 import de.adito.propertly.core.spi.IPropertyDescription;
@@ -12,7 +11,6 @@ import de.adito.propertly.core.spi.extension.AbstractMutablePPP;
 import de.adito.propertly.core.spi.extension.AbstractPPP;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,7 +69,7 @@ public class ConditionDescriptionDataModel extends AbstractPPP<IPropertyPitProvi
   {
     Values values = getValue(ConditionDescriptionDataModel.values);
     assert values != null;
-    return MoreObjects.firstNonNull(values.getValues(), Collections.emptyList());
+    return values.getValues();
   }
 
   public void setPossibleValues(List<String> pList)

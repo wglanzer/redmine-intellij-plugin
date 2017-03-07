@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +45,7 @@ public class Test_Condition
     {
       filter = pFilter;
       operator = pOperator;
-      filterValues = MoreObjects.firstNonNull(pFilterValues, Collections.emptyList());
+      filterValues = MoreObjects.firstNonNull(pFilterValues, new ArrayList<>());
     }
 
     @NotNull
