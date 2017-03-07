@@ -48,7 +48,7 @@ public class ConditionFactory
    *
    * @return A map which contains Operator and ConditionClass
    */
-  public static Map<EConditionOperator, Class<? extends AbstractCondition>> _createRegistry()
+  private static Map<EConditionOperator, Class<? extends AbstractCondition>> _createRegistry()
   {
     Map<EConditionOperator, Class<? extends AbstractCondition>> registry = new HashMap<>();
     RPicoRegistry.INSTANCE.find(AbstractCondition.class, ConditionRegistration.class).forEach((key, value) ->

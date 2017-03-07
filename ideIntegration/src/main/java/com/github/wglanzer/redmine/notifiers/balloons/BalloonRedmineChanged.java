@@ -5,6 +5,7 @@ import com.intellij.ui.HintHint;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,13 +18,14 @@ import java.awt.*;
 class BalloonRedmineChanged extends JPanel
 {
   private final String ticketURL;
+  private JLabel lblWatchName;
   private JLabel lblTitle;
   private JLabel lblLine1;
   private JLabel lblLine2;
   private JEditorPane lblTicketURL;
   private JPanel contentPane;
 
-  public BalloonRedmineChanged(String pTicketURL, String pTicketTitle, String pLine1, Color pColorLine1, String pLine2, Color pColorLine2)
+  public BalloonRedmineChanged(@Nullable String pWatchName, String pTicketURL, String pTicketTitle, String pLine1, Color pColorLine1, String pLine2, Color pColorLine2)
   {
     ticketURL = "<i>" + pTicketURL + "</i>";
     $$$setupUI$$$();
@@ -43,6 +45,10 @@ class BalloonRedmineChanged extends JPanel
     int width = Math.min(Math.max(contentPane.getMinimumSize().width, contentPane.getPreferredSize().width), contentPane.getMaximumSize().width);
     int height = Math.min(Math.max(contentPane.getMinimumSize().height, contentPane.getPreferredSize().height), contentPane.getMaximumSize().width);
     setPreferredSize(new Dimension(width, height));
+
+    // Watch
+    lblWatchName.setVisible(pWatchName != null);
+    lblWatchName.setText(pWatchName + ":");
   }
 
   private void createUIComponents()
@@ -65,7 +71,7 @@ class BalloonRedmineChanged extends JPanel
   {
     createUIComponents();
     contentPane = new JPanel();
-    contentPane.setLayout(new GridLayoutManager(3, 1, new Insets(2, 2, 2, 2), 0, 0));
+    contentPane.setLayout(new GridLayoutManager(4, 1, new Insets(2, 2, 2, 2), 0, 0));
     contentPane.setMaximumSize(new Dimension(300, 500));
     contentPane.setMinimumSize(new Dimension(150, -1));
     contentPane.setOpaque(false);
@@ -73,16 +79,16 @@ class BalloonRedmineChanged extends JPanel
     lblLine1.setFont(new Font(lblLine1.getFont().getName(), lblLine1.getFont().getStyle(), 10));
     lblLine1.setOpaque(false);
     lblLine1.setText("Assignee: DUMMY");
-    contentPane.add(lblLine1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    contentPane.add(lblLine1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     lblLine2 = new JLabel();
     lblLine2.setFont(new Font(lblLine2.getFont().getName(), lblLine2.getFont().getStyle(), 10));
     lblLine2.setOpaque(false);
     lblLine2.setText("Priority: DUMMY");
-    contentPane.add(lblLine2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    contentPane.add(lblLine2, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     final JPanel panel1 = new JPanel();
     panel1.setLayout(new BorderLayout(2, 0));
     panel1.setOpaque(false);
-    contentPane.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    contentPane.add(panel1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0), null));
     lblTitle = new JLabel();
     lblTitle.setFont(new Font(lblTitle.getFont().getName(), Font.ITALIC, lblTitle.getFont().getSize()));
@@ -94,6 +100,10 @@ class BalloonRedmineChanged extends JPanel
     panel2.setOpaque(false);
     panel1.add(panel2, BorderLayout.WEST);
     panel2.add(lblTicketURL, BorderLayout.CENTER);
+    lblWatchName = new JLabel();
+    lblWatchName.setFont(new Font(lblWatchName.getFont().getName(), Font.BOLD, lblWatchName.getFont().getSize()));
+    lblWatchName.setText("Label");
+    contentPane.add(lblWatchName, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
   }
 
   /**

@@ -52,44 +52,44 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
   @Override
   public void notifyNewTicket(@NotNull IServer pServer, @NotNull ITicket pTicket)
   {
-    _showCustomBalloon(BalloonComponentFactory.createTicketChangedBalloon(pServer, pTicket, null));
-    _logInEventLog(NOTIFICATION_ID, "ticket created: " + pTicket.getID(), NotificationType.INFORMATION);
+    showCustomBalloon(BalloonComponentFactory.createTicketChangedBalloon(pServer, pTicket, null, null));
+    logInEventLog(NOTIFICATION_ID, "ticket created: " + pTicket.getID(), NotificationType.INFORMATION);
   }
 
   @Override
   public void notifyTicketPropertyChanged(@NotNull IServer pServer, @NotNull ITicket pTicket, @NotNull Map<String, Map.Entry<Object, Object>> pProperties)
   {
-    _showCustomBalloon(BalloonComponentFactory.createTicketChangedBalloon(pServer, pTicket, pProperties));
-    _logInEventLog(NOTIFICATION_ID, "ticket changed: " + pTicket.getID(), NotificationType.INFORMATION);
+    showCustomBalloon(BalloonComponentFactory.createTicketChangedBalloon(pServer, pTicket, null, pProperties));
+    logInEventLog(NOTIFICATION_ID, "ticket changed: " + pTicket.getID(), NotificationType.INFORMATION);
   }
 
   @Override
   public void notifyNewProject(@NotNull IServer pServer, @NotNull IProject pProject)
   {
-    _showCustomBalloon(BalloonComponentFactory.createProjectChangedBalloon(pServer, pProject, null));
-    _logInEventLog(NOTIFICATION_ID, "project created: " + pProject.getID(), NotificationType.INFORMATION);
+    showCustomBalloon(BalloonComponentFactory.createProjectChangedBalloon(pServer, pProject, null));
+    logInEventLog(NOTIFICATION_ID, "project created: " + pProject.getID(), NotificationType.INFORMATION);
   }
 
   @Override
   public void notifyProjectPropertyChanged(@NotNull IServer pServer, @NotNull IProject pProject, @NotNull Map<String, Map.Entry<Object, Object>> pProperties)
   {
-    _showCustomBalloon(BalloonComponentFactory.createProjectChangedBalloon(pServer, pProject, pProperties));
-    _logInEventLog(NOTIFICATION_ID, "project changed: " + pProject.getID(), NotificationType.INFORMATION);
+    showCustomBalloon(BalloonComponentFactory.createProjectChangedBalloon(pServer, pProject, pProperties));
+    logInEventLog(NOTIFICATION_ID, "project changed: " + pProject.getID(), NotificationType.INFORMATION);
   }
 
   @Override
   public void notify(String pTitle, String pMessage)
   {
     String html = "<html><b>" + pTitle + "</b></br>" + pMessage + "</html>";
-    _showCustomBalloon(BalloonComponentFactory.createHTMLBalloon(html, MessageType.INFO));
-    _logInEventLog(pTitle, pMessage, NotificationType.INFORMATION);
+    showCustomBalloon(BalloonComponentFactory.createHTMLBalloon(html, MessageType.INFO));
+    logInEventLog(pTitle, pMessage, NotificationType.INFORMATION);
   }
 
   @Override
   public void error(String pMessage, Exception pException)
   {
-    _showCustomBalloon(BalloonComponentFactory.createExceptionBalloon(pMessage, pException));
-    _logInEventLog(pMessage.trim().isEmpty() ? "Exception" : pMessage, StringUtility.toLogString(pException), NotificationType.ERROR);
+    showCustomBalloon(BalloonComponentFactory.createExceptionBalloon(pMessage, pException));
+    logInEventLog(pMessage.trim().isEmpty() ? "Exception" : pMessage, StringUtility.toLogString(pException), NotificationType.ERROR);
   }
 
   /**
@@ -97,7 +97,7 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
    *
    * @param pBalloon      Custom Balloon, not <tt>null</tt>
    */
-  private void _showCustomBalloon(@NotNull Balloon pBalloon)
+  protected void showCustomBalloon(@NotNull Balloon pBalloon)
   {
     for(Project project : ProjectManager.getInstance().getOpenProjects())
     {
@@ -115,7 +115,7 @@ public class SimpleNotifier implements IChangeNotifier, INotifier
    * @param pDetails      Details of the message
    * @param pType         MessageType (Error, Info, ...)
    */
-  private void _logInEventLog(@Nullable String pTitle, @Nullable String pDetails, @NotNull NotificationType pType)
+  protected void logInEventLog(@Nullable String pTitle, @Nullable String pDetails, @NotNull NotificationType pType)
   {
     if(preferences.get().isEnableLog())
     {

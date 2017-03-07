@@ -2,6 +2,7 @@ package com.github.wglanzer.redmine;
 
 import com.github.wglanzer.redmine.gui.RedmineStatusBarWidget;
 import com.github.wglanzer.redmine.listener.ServerListenerManager;
+import com.github.wglanzer.redmine.notifiers.FilteredNotifier;
 import com.github.wglanzer.redmine.notifiers.SimpleNotifier;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ public class RApplicationComponent implements ApplicationComponent
     RManager manager = RManager.getInstance();
 
     // Notifier
-    SimpleNotifier notifier = new SimpleNotifier(() -> manager.getPreferences().getCurrentSettings());
+    SimpleNotifier notifier = new FilteredNotifier(() -> manager.getPreferences().getCurrentSettings());
 
     // Init custom widget to ALL projects
     RedmineStatusBarWidget.init();

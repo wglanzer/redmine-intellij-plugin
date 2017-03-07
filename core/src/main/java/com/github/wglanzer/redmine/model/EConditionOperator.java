@@ -12,6 +12,8 @@ public enum EConditionOperator
 {
 
   EQUALS,
-  NOT_EQUALS
+  NOT_EQUALS,
+  CONTAINS,
+  NOT_CONTAINS
 
 }

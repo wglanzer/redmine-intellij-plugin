@@ -3,6 +3,7 @@ package com.github.wglanzer.redmine.notifiers.balloons;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ITicket;
+import com.github.wglanzer.redmine.model.IWatch;
 import com.github.wglanzer.redmine.util.StringUtility;
 import com.github.wglanzer.redmine.webservice.impl.exceptions.AuthorizationException;
 import com.intellij.openapi.ui.MessageType;
@@ -39,11 +40,12 @@ public class BalloonComponentFactory
    * @return new balloon
    */
   @NotNull
-  public static Balloon createTicketChangedBalloon(@NotNull IServer pServer, @NotNull ITicket pTicket, @Nullable Map<String, Map.Entry<Object, Object>> pChangedProperties)
+  public static Balloon createTicketChangedBalloon(@NotNull IServer pServer, @NotNull ITicket pTicket, @Nullable IWatch pWatch, @Nullable Map<String, Map.Entry<Object, Object>> pChangedProperties)
   {
     String myID = StringUtility.toURL(pServer, pTicket);
+    String watchName = pWatch != null ? pWatch.getDisplayName() : null;
     _Line[] lines = _extractLines(pChangedProperties, "Category: " + pTicket.getCategory(), "Priority: " + pTicket.getPriority());
-    return _createRedmineChangedBalloon(myID, pTicket.getSubject(),
+    return _createRedmineChangedBalloon(watchName, myID, pTicket.getSubject(),
         lines[0].line, lines[0].hasChanged ? _LINE_CHANGE_COLOR : null, lines[1].line, lines[1].hasChanged ? _LINE_CHANGE_COLOR : null);
   }
 
@@ -62,7 +64,7 @@ public class BalloonComponentFactory
   {
     String myID = StringUtility.toURL(pServer, pProject);
     _Line[] lines = _extractLines(pChangedProperties, "Description: " + pProject.getDescription(), "CreatedOn: " + pProject.getCreatedOn());
-    return _createRedmineChangedBalloon(myID, pProject.getName(),
+    return _createRedmineChangedBalloon(null, myID, pProject.getName(),
         lines[0].line, lines[0].hasChanged ? _LINE_CHANGE_COLOR : null, lines[1].line, lines[1].hasChanged ? _LINE_CHANGE_COLOR : null);
   }
 
@@ -120,9 +122,9 @@ public class BalloonComponentFactory
    * @return new Balloon
    */
   @NotNull
-  private static Balloon _createRedmineChangedBalloon(String pID, String pTitle, String pLine1, Color pLine1Color, String pLine2, Color pLine2Color)
+  private static Balloon _createRedmineChangedBalloon(String pWatchName, String pID, String pTitle, String pLine1, Color pLine1Color, String pLine2, Color pLine2Color)
   {
-    return JBPopupFactory.getInstance().createBalloonBuilder(new BalloonRedmineChanged(pID, pTitle, pLine1, pLine1Color, pLine2, pLine2Color))
+    return JBPopupFactory.getInstance().createBalloonBuilder(new BalloonRedmineChanged(pWatchName, pID, pTitle, pLine1, pLine1Color, pLine2, pLine2Color))
         .setFillColor(_NOTIFICATION_COLOR)
         .setFadeoutTime(_FADEOUT_TIME)
         .setCloseButtonEnabled(true)

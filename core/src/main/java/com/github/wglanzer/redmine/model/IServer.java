@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.EventListener;
+import java.util.List;
 
 /**
  * Represents one redmine server
@@ -64,6 +65,14 @@ public interface IServer
    */
   @Nullable
   String getDisplayName();
+
+  /**
+   * Returns a list containing all available watches
+   *
+   * @return a list of all watches
+   */
+  @NotNull
+  List<IWatch> getWatches();
 
   /**
    * Adds an IServerListener

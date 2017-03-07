@@ -5,6 +5,7 @@ import com.github.wglanzer.redmine.IRTaskCreator;
 import com.github.wglanzer.redmine.model.IProject;
 import com.github.wglanzer.redmine.model.IServer;
 import com.github.wglanzer.redmine.model.ISource;
+import com.github.wglanzer.redmine.model.IWatch;
 import com.github.wglanzer.redmine.util.WeakListenerList;
 import com.github.wglanzer.redmine.webservice.impl.RRestConnectionBuilder;
 import com.github.wglanzer.redmine.webservice.spi.IRRestConnection;
@@ -134,6 +135,13 @@ public class PollingServer implements IServer
   public String getDisplayName()
   {
     return source.getDisplayName();
+  }
+
+  @NotNull
+  @Override
+  public List<IWatch> getWatches()
+  {
+    return source.getWatches();
   }
 
   @Override
