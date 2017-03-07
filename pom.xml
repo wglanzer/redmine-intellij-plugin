@@ -6,7 +6,7 @@
 
   <groupId>com.github.wglanzer.redmine</groupId>
   <artifactId>redmine</artifactId>
-  <version>v0.4</version>
+  <version>v1.0.0-alpha</version>
   <packaging>pom</packaging>
   <name>Redmine</name>
 
