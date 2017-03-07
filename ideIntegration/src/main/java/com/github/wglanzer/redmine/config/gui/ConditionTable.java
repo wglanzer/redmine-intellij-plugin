@@ -46,6 +46,10 @@ import java.util.stream.Collectors;
     setDefaultEditor(String.class, new DefaultCellEditor(new JTextField()));
     setDefaultRenderer(ListWithSelection.class, ComboBoxTableCellRenderer.INSTANCE);
     setDefaultRenderer(String.class, new DefaultTableCellRenderer());
+
+    getColumnModel().getColumn(0).setHeaderValue("Attribute");
+    getColumnModel().getColumn(1).setHeaderValue("Operator");
+    getColumnModel().getColumn(2).setHeaderValue("Value");
   }
 
   public void onAddClick(AnActionButton pButton)

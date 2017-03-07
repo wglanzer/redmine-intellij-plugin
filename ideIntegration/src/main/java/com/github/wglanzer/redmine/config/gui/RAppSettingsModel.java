@@ -49,7 +49,7 @@ public class RAppSettingsModel
   /**
    * Adds an empty redmine source
    */
-  public void addEmptySource()
+  public SourceDataModel addEmptySource()
   {
     synchronized(modified)
     {
@@ -62,7 +62,13 @@ public class RAppSettingsModel
       source.setCheckCertificate(true);
       SettingsDataModel.Sources sources = bulkedSettingsHierarchy.getValue().getPit().getProperty(SettingsDataModel.sources).getValue();
       assert sources != null;
-      sources.addProperty(source);
+      SourceDataModel value = sources.addProperty(source).getValue();
+
+      // Empty watch
+      WatchDataModel watch = addEmptyWatch(source.getName());
+      watch.setDisplayName("Default");
+
+      return value;
     }
   }
 
@@ -83,7 +89,7 @@ public class RAppSettingsModel
   /**
    * Adds an empty redmine watch
    */
-  public void addEmptyWatch(String pSourceName)
+  public WatchDataModel addEmptyWatch(String pSourceName)
   {
     synchronized(modified)
     {
@@ -97,9 +103,16 @@ public class RAppSettingsModel
         watch.setDisplayName("New Watch");
         SourceDataModel.Watches watches = source.getPit().getProperty(SourceDataModel.watches).getValue();
         assert watches != null;
-        watches.addProperty(watch);
+        WatchDataModel value = watches.addProperty(watch).getValue();
+
+        // Empty condition - ACCEPT_ALL
+        addEmptyCondition(bulkedSettingsHierarchy.getValue(), source.getName(), watch.getName());
+
+        return value;
       }
     }
+
+    return null;
   }
 
   /**
@@ -125,7 +138,7 @@ public class RAppSettingsModel
    *
    * @param pSettings SettingsDataModel because the conditions have its own bulkModify...
    */
-  public void addEmptyCondition(SettingsDataModel pSettings, String pSourceName, String pWatchName)
+  public ConditionDescriptionDataModel addEmptyCondition(SettingsDataModel pSettings, String pSourceName, String pWatchName)
   {
     synchronized(modified)
     {
@@ -138,12 +151,14 @@ public class RAppSettingsModel
         if(propWatch != null && propWatch.getValue() != null)
         {
           ConditionDescriptionDataModel desc = DataModelFactory.createModel(ConditionDescriptionDataModel.class);
-          desc.setAttribute(EConditionAttribute.ASSIGNEE);
-          desc.setOperator(EConditionOperator.EQUALS);
+          desc.setAttribute(EConditionAttribute.ACCEPT_ALL);
+          desc.setOperator(EConditionOperator.ACCEPT_ALL);
           desc.setPossibleValues(Collections.emptyList());
-          propWatch.getValue().getPit().getProperty(WatchDataModel.conditions).getValue().addProperty(desc);
+          return propWatch.getValue().getPit().getProperty(WatchDataModel.conditions).getValue().addProperty(desc).getValue();
         }
       }
+
+      return null;
     }
   }
 

@@ -38,8 +38,7 @@ class WatchesTable extends JBTable
     model = pModel;
     selectedSourceSupplier = pSelectedSourceSupplier;
 
-    getColumnModel().getColumn(0).setHeaderValue("Name");
-    getColumnModel().getColumn(1).setHeaderValue("");
+    setTableHeader(null);
     setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
     addMouseListener(new MouseAdapter()
     {
@@ -115,10 +114,7 @@ class WatchesTable extends JBTable
     {
       super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       WatchDataModel watch = (WatchDataModel) value;
-      if(column == 0)
-        setText(watch.getDisplayName());
-      else
-        setText(watch.toString());
+      setText(watch.getDisplayName());
       return this;
     }
   }
@@ -157,7 +153,7 @@ class WatchesTable extends JBTable
     @Override
     public int getColumnCount()
     {
-      return 2;
+      return 1;
     }
 
     @Override
