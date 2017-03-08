@@ -6,6 +6,9 @@ import com.github.wglanzer.redmine.model.ISource;
 import com.google.common.base.MoreObjects;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.ui.Splitter;
+import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.SideBorder;
 import com.intellij.ui.ToolbarDecorator;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,6 +67,9 @@ public class RAppSettingsComponent extends JPanel
     splitter.setSecondComponent(contentPane);
     add(splitter, BorderLayout.CENTER);
     add(new JLabel("*: Mandatory input"), BorderLayout.SOUTH);
+
+    // custom borders
+    contentPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
 
     // NO GOD DAMN SCROLLBARS!!
     setPreferredSize(new Dimension(0, 0));
@@ -258,7 +264,7 @@ public class RAppSettingsComponent extends JPanel
         .setRemoveAction(watchesTable::onRemoveClick)
         .disableUpAction()
         .disableDownAction()
-        .setPanelBorder(new MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY))
+        .setPanelBorder(new MatteBorder(1, 0, 0, 0, JBColor.border()))
         .createPanel();
 
     splitter = new Splitter(false, 0.3F);
@@ -276,7 +282,6 @@ public class RAppSettingsComponent extends JPanel
     createUIComponents();
     contentPane = new JPanel();
     contentPane.setLayout(new BorderLayout(0, 0));
-    contentPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-4144960)), null));
     contentPane.add(watchesTablePanel, BorderLayout.CENTER);
     generalTabPanel = new JPanel();
     generalTabPanel.setLayout(new GridBagLayout());

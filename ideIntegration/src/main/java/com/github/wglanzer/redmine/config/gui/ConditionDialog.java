@@ -3,6 +3,7 @@ package com.github.wglanzer.redmine.config.gui;
 import com.github.wglanzer.redmine.config.WatchDataModel;
 import com.github.wglanzer.redmine.util.propertly.BulkModifyHierarchy;
 import com.intellij.openapi.actionSystem.ActionToolbarPosition;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
 import de.adito.propertly.core.common.path.PropertyPath;
 
@@ -68,7 +69,7 @@ class ConditionDialog extends JDialog
         .setRemoveAction(conditionTable::onRemoveClick)
         .disableUpAction()
         .disableDownAction()
-        .setPanelBorder(new LineBorder(Color.LIGHT_GRAY))
+        .setPanelBorder(new LineBorder(JBColor.border()))
         .createPanel();
     conditionTableContainer.requestFocusInWindow();
     add(conditionTableContainer, BorderLayout.CENTER);
